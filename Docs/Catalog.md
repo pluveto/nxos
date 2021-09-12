@@ -1,13 +1,16 @@
 # NXOS 目录结构
 
-Docs: 文档
-Inc: 公共头文件
+- Docs: 文档
+
+- Inc: 公共头文件
+
     - OS
     - Modules
     - Archs
     - Platforms
 
-OS:
+- OS:
+
     - Init
     - Thread
         - Mutex
@@ -30,7 +33,8 @@ OS:
         - LocalSocket
         - LPC
 
-Archs: 处理器架构的公有部分代码
+- Archs: 处理器架构的公有部分代码
+
     - X86
     - Amd64
     - Riscv32
@@ -41,7 +45,7 @@ Archs: 处理器架构的公有部分代码
         - CortextR
     - AArch64
     
-Platforms: 平台私有代码，引导，总线，特有驱动
+- Platforms: 平台私有代码，引导，总线，特有驱动
     
     - PC
         - PC32: 32位系统的引导，地址总线，32位驱动等
@@ -71,7 +75,7 @@ Platforms: 平台私有代码，引导，总线，特有驱动
         - Raspi4-32
         - Raspi4-64
 
-Modules:
+- Modules:
     - Drivers:  不同类型的驱动框架  
         - Disk
         - Char
