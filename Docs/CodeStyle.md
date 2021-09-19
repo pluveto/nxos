@@ -40,8 +40,8 @@ __DRIVER_KEYBOARD__
  * 
  * Change Logs:
  * Date           Author            Notes
- * 2021-9-12      JasonHu           First version
- * 2021-9-13      JasonHu           Add function support
+ * 2021-9-12      JasonHu           Init
+ * 2021-10-1      JasonHu           Add xxx
  */
 ```
 
