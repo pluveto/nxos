@@ -59,3 +59,9 @@ run:
 # 
 clean:
 	@$(MAKE) -s -C $(GRUB_DIR) clean
+
+# 
+# prepare tools
+# 
+prepare:
+	git clone https://gitee.com/BookOS/nxos-platform-pc32-tools Tools

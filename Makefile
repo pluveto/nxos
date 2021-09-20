@@ -93,3 +93,9 @@ endif
 #
 run: all
 	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(PLATFORM) run
+
+#
+# Prepare platform tools
+#
+prepare: 
+	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(PLATFORM) prepare
