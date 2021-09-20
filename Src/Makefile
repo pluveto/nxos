@@ -9,24 +9,6 @@
 # 2021-9-20      JasonHu           Init
 ##
 
-# target file name
-NXOS_NAME ?= NXOS
-export NXOS_NAME
-
-CROSS_COMPILE	?=x86_64-elf-
-TARGET			?=I386-PC32
-
-#
-# Get platform information about ARCH and PLATFORM from TARGET variable.
-#
-ifeq ($(words $(subst -, , $(TARGET))), 2)
-ARCH			:= $(word 1, $(subst -, , $(TARGET)))
-PLATFORM		:= Platform-$(word 2, $(subst -, , $(TARGET)))
-else
-ARCH			:= I386
-PLATFORM		:= Platform-PC32
-endif
-
 #
 # System environment variable.
 #
@@ -109,7 +91,9 @@ X_INCDIRS	:=	$(INCDIRS)
 SRC			:=	$(SRCDIRS)
 NAME		:= Platforms/$(ARCH)/$(PLATFORM)/$(NXOS_NAME).elf
 
-# custom cmds for xbuild
+#
+# Custom cmds for xbuild
+#
 define CUSTOM_TARGET_CMD
 echo [KERNEL] $@; \
 $(LD) $(X_LDFLAGS) -o $@ $(X_OBJS)
