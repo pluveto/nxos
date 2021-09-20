@@ -23,7 +23,7 @@ BUILD_DIR :=Build
 #
 # Set compile and machine
 #
-CROSS_COMPILE	?=x86_64-elf-
+CROSS_COMPILE	?=
 MACHINE			?=I386-PC32
 
 #
@@ -44,10 +44,23 @@ PLATFORM		:= Platform-PC32
 endif
 
 #
+# System environment variable.
+#
+ifeq ($(OS), Windows_NT)
+	HOSTOS		:= windows
+else
+	ifneq (,$(findstring Linux, $(shell uname -a)))
+		HOSTOS	:= linux
+	endif
+endif
+
+#
 # Export global values
 #
+export CROSS_COMPILE
 export PLATFORM
 export ARCH
+export HOSTOS
 
 #
 # Cmds

@@ -10,17 +10,6 @@
 ##
 
 #
-# System environment variable.
-#
-ifeq ($(OS), Windows_NT)
-	HOSTOS		:= windows
-else
-	ifneq (,$(findstring Linux, $(shell uname -a)))
-		HOSTOS	:= linux
-	endif
-endif
-
-#
 # Load default variables.
 #
 ASFLAGS			:= -g -ggdb -Wall -O0
@@ -34,15 +23,14 @@ INCDIRS			:=
 SRCDIRS			:=
 
 #
+# Override default variables.
+#
+include Platforms/$(ARCH)/$(PLATFORM)/NXOS.mk
+
+#
 # include xbuild scripts
 #
 include ../Scripts/XBuild/env.mk
-
-#
-# Override default variables.
-#
-
-include Platforms/$(ARCH)/$(PLATFORM)/NXOS.mk
 
 #
 # Modify default variables.
