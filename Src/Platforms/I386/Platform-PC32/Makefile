@@ -20,6 +20,7 @@ QEMU_WINDOW ?= n
 TOOL_DIR 	:= Tools/
 GRUB_DIR	:= $(TOOL_DIR)grub-2.04
 BIOS_FW_DIR	:= $(TOOL_DIR)bios_fw
+RM			:= rm
 
 #
 # Tools name
@@ -59,6 +60,7 @@ run:
 # 
 clean:
 	@$(MAKE) -s -C $(GRUB_DIR) clean
+	-$(RM) $(NXOS_NAME).elf
 
 # 
 # prepare tools

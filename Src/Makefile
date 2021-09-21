@@ -10,11 +10,16 @@
 ##
 
 #
+# include xbuild scripts
+#
+sinclude ../Scripts/XBuild/env.mk
+
+#
 # Load default variables.
 #
 ASFLAGS			:= -g -ggdb -Wall -O0
 CFLAGS			:= -g -ggdb -Wall -O0
-LDFLAGS			:= -T Platforms/$(ARCH)/$(PLATFORM)/NXOS.ld -nostdlib -static
+LDFLAGS			:= -T $(srctree)/Platforms/$(ARCH)/$(PLATFORM)/NXOS.ld -nostdlib -static
 MCFLAGS			:=
 
 LIBDIRS			:=
@@ -22,15 +27,12 @@ LIBS 			:=
 INCDIRS			:=
 SRCDIRS			:=
 
+CP				:=cp
+
 #
 # Override default variables.
 #
-include Platforms/$(ARCH)/$(PLATFORM)/NXOS.mk
-
-#
-# include xbuild scripts
-#
-include ../Scripts/XBuild/env.mk
+sinclude $(srctree)/Platforms/$(ARCH)/$(PLATFORM)/NXOS.mk
 
 #
 # Modify default variables.
@@ -64,9 +66,12 @@ INCDIRS		+=	Inc \
 				Platforms/$(ARCH)/Inc \
 				Platforms/$(ARCH)/$(PLATFORM)/Inc
 
-SRCDIRS		+=	Platforms/$(ARCH)/$(PLATFORM)/*.c \
-				Platforms/$(ARCH)/$(PLATFORM)/*.S \
-				Init/*.c
+# Platform srouce
+SRCDIRS		+=	Platforms/$(ARCH)/$(PLATFORM)/Src/*.c \
+				Platforms/$(ARCH)/$(PLATFORM)/Src/*.S \
+				Platforms/$(ARCH)/$(PLATFORM)/Drivers/*.c
+				
+SRCDIRS		+=	Init/*.c
 
 #
 # XBuild variables
@@ -81,8 +86,22 @@ NAME		:= Platforms/$(ARCH)/$(PLATFORM)/$(NXOS_NAME).elf
 
 #
 # Custom cmds for xbuild
+# Link OS and copy into platform dir
 #
+
+ifeq ($(USE_BUILD_DIR), y)
+
+define CUSTOM_TARGET_CMD
+echo [KERNEL] $@; \
+$(LD) $(X_LDFLAGS) -o $@ $(X_OBJS); \
+$(CP) $@ $(srctree)/Platforms/$(ARCH)/$(PLATFORM)
+endef # CUSTOM_TARGET_CMD
+
+else
+
 define CUSTOM_TARGET_CMD
 echo [KERNEL] $@; \
 $(LD) $(X_LDFLAGS) -o $@ $(X_OBJS)
-endef
+endef # CUSTOM_TARGET_CMD
+
+endif # USE_BUILD_DIR

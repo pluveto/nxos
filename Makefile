@@ -17,7 +17,7 @@ MAKE = make
 #
 # Use build dir for target
 #
-USE_BUILD_DIR	:=n
+USE_BUILD_DIR	:=y
 BUILD_DIR :=Build
 
 #
@@ -61,6 +61,7 @@ export CROSS_COMPILE
 export PLATFORM
 export ARCH
 export HOSTOS
+export USE_BUILD_DIR
 
 #
 # Cmds
