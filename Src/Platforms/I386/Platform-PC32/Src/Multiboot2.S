@@ -10,7 +10,7 @@
  */
 
 #define __ASSEMBLY__
-#include "Multiboot2.h"
+#include <Multiboot2.h>
 
 # the size of bootStack is 16KB
 #define BOOT_STACK_SIZE 0x4000

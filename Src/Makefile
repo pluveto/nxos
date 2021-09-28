@@ -62,16 +62,14 @@ CFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 $(DEFIN
 #
 # Add necessary directory for INCDIRS and SRCDIRS.
 #
-INCDIRS		+=	Inc \
-				Platforms/$(ARCH)/Inc \
-				Platforms/$(ARCH)/$(PLATFORM)/Inc
+INCDIRS		+=	Inc
+INCDIRS		+=	./
+INCDIRS		+=	Platforms/$(ARCH)/Inc
+INCDIRS		+=	Platforms/$(ARCH)/$(PLATFORM)/Src/Inc
 
 # Platform srouce
-SRCDIRS		+=	Platforms/$(ARCH)/$(PLATFORM)/Src/*.c \
-				Platforms/$(ARCH)/$(PLATFORM)/Src/*.S \
-				Platforms/$(ARCH)/$(PLATFORM)/Drivers/*.c
-				
-SRCDIRS		+=	Init/*.c
+SRCDIRS		+=	Platforms/$(ARCH)/$(PLATFORM)/Src/
+SRCDIRS		+=	Init/
 
 #
 # XBuild variables
