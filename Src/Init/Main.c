@@ -1,6 +1,6 @@
 #include <Platforms/Init.h>
 
-int OS_Main(void)
+PUBLIC int OS_Main(void)
 {
     /* platfrom init */
     PlatformInit();

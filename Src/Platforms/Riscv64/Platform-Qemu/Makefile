@@ -2,11 +2,11 @@
 # Copyright (c) 2018-2021, BookOS Development Team
 # SPDX-License-Identifier: Apache-2.0
 # 
-# Contains: Makefile for run PC32 Platform
+# Contains: Makefile for run QEMU Riscv64 Platform
 # 
 # Change Logs:
 # Date           Author            Notes
-# 2021-9-20      JasonHu           Init
+# 2021-10-1      JasonHu           Init
 ##
 
 #
@@ -18,24 +18,32 @@ QEMU_WINDOW ?= n
 # Tools for PC32
 # 
 TOOL_DIR 	:= Tools/
-GRUB_DIR	:= $(TOOL_DIR)grub-2.04
-BIOS_FW_DIR	:= $(TOOL_DIR)bios_fw
+RUSTSBI_DIR	:= $(TOOL_DIR)SBI
+RUSTSBI		:= $(RUSTSBI_DIR)/rustsbi-qemu
+
 RM			:= rm
 
 #
 # Tools name
 # 
 MAKE		:= make
-QEMU 		:= qemu-system-i386
+QEMU 		:= qemu-system-riscv64
 
 #
 # Qemu args configure
 # 
 QEMU_ARGS 	:=  -m 128m \
-				-name "NXOS - Plartform PC32 - Arch x86" \
-				-rtc base=localtime \
-				-boot d \
-				-cdrom $(NXOS_NAME).iso \
+				-name "NXOS - Plartform QEMU - Arch Riscv64"
+
+# cpus
+ifndef CPUS
+CPUS := 2
+endif # CPUS
+
+QEMU_ARGS	+= 	-machine virt
+QEMU_ARGS	+= 	-kernel $(NXOS_NAME).elf
+QEMU_ARGS	+= 	-bios $(RUSTSBI)
+QEMU_ARGS	+= 	-smp $(CPUS)
 
 ifeq ($(QEMU_WINDOW),y)
 	QEMU_ARGS += -serial stdio
@@ -52,14 +60,12 @@ endif
 # Run OS in QEMU
 # 
 run:
-	@$(MAKE) -s -C $(GRUB_DIR) KERNEL=$(NXOS_NAME).elf OS_NAME=$(NXOS_NAME)
 	$(QEMU) $(QEMU_ARGS)
 
 # 
 # Clear target file
 # 
 clean:
-	@$(MAKE) -s -C $(GRUB_DIR) clean
 	-$(RM) $(NXOS_NAME).elf
 
 # 
@@ -67,5 +73,5 @@ clean:
 # 
 prepare:
 	-$(RM) -rf $(TOOL_DIR)
-	git clone https://gitee.com/BookOS/nxos-platform-pc32-tools $(TOOL_DIR)
+	git clone https://gitee.com/BookOS/nxos-platform-qemu-riscv64-tools $(TOOL_DIR)
 	echo "parpare done."

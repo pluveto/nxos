@@ -9,12 +9,6 @@
 # 2021-9-20      JasonHu           Init
 ##
 
-ifeq ($(HOSTOS), windows)
-CROSS_COMPILE	:= x86_64-elf-
-else
-CROSS_COMPILE	:= 
-endif
-
 #
 # Override default variables.
 #

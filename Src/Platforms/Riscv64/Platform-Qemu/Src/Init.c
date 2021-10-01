@@ -2,25 +2,20 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Init PC32 platfrom 
+ * Contains: Init Riscv64 Qemu platfrom 
  * 
  * Change Logs:
  * Date           Author            Notes
- * 2021-9-17      JasonHu           Init
+ * 2021-10-1      JasonHu           Init
  */
 
 #include <XBook.h>
 #include <Platforms/Init.h>
-#include <I386.h>
-#include <DirectUart.h>
 #include <Mods/Console/Console.h>
 
 INTERFACE int PlatformInit(void)
 {
-    HAL_DirectUartInit();
-    
-    COUT Str("Hello, PC32!") Endln;
-
+    COUT Str("Hello, QEMU Riscv64!") Endln;
     u32 i = 0;
     for (;;)
     {

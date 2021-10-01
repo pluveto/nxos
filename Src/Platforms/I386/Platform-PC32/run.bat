@@ -1,1 +1,0 @@
-qemu-system-i386 -m 128m -rtc base=localtime -boot d -cdrom NXOS.iso -nographic

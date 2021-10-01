@@ -24,7 +24,7 @@ BUILD_DIR :=Build
 # Set compile and machine
 #
 CROSS_COMPILE	?=
-MACHINE			?=I386-PC32
+PLATFORM		?=
 
 #
 # Target file name
@@ -33,14 +33,16 @@ NXOS_NAME ?= NXOS
 export NXOS_NAME
 
 #
-# Get platform information about ARCH and PLATFORM from MACHINE variable.
+# Get platform information about ARCH and MACH from PLATFORM variable.
 #
-ifeq ($(words $(subst -, , $(MACHINE))), 2)
-ARCH			:= $(word 1, $(subst -, , $(MACHINE)))
-PLATFORM		:= Platform-$(word 2, $(subst -, , $(MACHINE)))
+ifeq ($(words $(subst -, , $(PLATFORM))), 2)
+ARCH			:= $(word 1, $(subst -, , $(PLATFORM)))
+MACH			:= Platform-$(word 2, $(subst -, , $(PLATFORM)))
 else
 ARCH			:= I386
-PLATFORM		:= Platform-PC32
+MACH			:= Platform-PC32
+#ARCH			:= Riscv64
+#MACH			:= Platform-Qemu
 endif
 
 #
@@ -55,10 +57,15 @@ else
 endif
 
 #
+# Override default variables.
+#
+sinclude Src/Platforms/$(ARCH)/$(MACH)/COMPILE.mk
+
+#
 # Export global values
 #
 export CROSS_COMPILE
-export PLATFORM
+export MACH
 export ARCH
 export HOSTOS
 export USE_BUILD_DIR
@@ -87,16 +94,16 @@ ifeq ($(USE_BUILD_DIR), y)
 else
 	@$(MAKE) -s -C Src clean
 endif
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(PLATFORM) clean
+	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) clean
 
 #
 # Run OS
 #
 run: all
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(PLATFORM) run
+	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) run
 
 #
 # Prepare platform tools
 #
 prepare: 
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(PLATFORM) prepare
+	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) prepare

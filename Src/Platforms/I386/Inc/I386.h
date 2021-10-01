@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: I386 registers 
+ * Contains: I386 arch special 
  * 
  * Change Logs:
  * Date           Author            Notes
