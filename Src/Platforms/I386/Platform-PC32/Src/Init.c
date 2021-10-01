@@ -13,22 +13,46 @@
 #include <Platforms/Init.h>
 #include <I386.h>
 #include <DirectUart.h>
+#include <Mods/Console/Console.h>
 
-int PlatformInit(void)
+INTERFACE int PlatformInit(void)
 {
     HAL_DirectUartInit();
 
-    HAL_DirectUartPutc('A');
-    u32 i = 0;
-    for (;;) 
-    {
-        HAL_DirectUartPutc('0' + i);
-        i++;
-        if (i > 9)
-        {
-            i = 0;
-        }
-    }
+    COUT Char('A')Str("Hello, world!\n");
     
+    int n = 123456789;
+    COUT Int(n)Endln;
+    COUT Hex(n)Endln;
+    COUT HexBig(n)Endln;
+    COUT Oct(n)Endln;
+    COUT Bin(n)Endln;
+
+    n = -123456789;
+    COUT Int(n)Endln;
+    COUT Hex(n)Endln;
+    COUT HexBig(n)Endln;
+    COUT Oct(n)Endln;
+    COUT Bin(n)Endln;
+
+    n = 0x1234abcd;
+    COUT Int(n)Endln;
+    COUT Hex(n)Endln;
+    COUT HexBig(n)Endln;
+    COUT Oct(n)Endln;
+    COUT Bin(n)Endln;
+
+    n = -0x1234abcd;
+    COUT Int(n)Endln;
+    COUT Hex(n)Endln;
+    COUT HexBig(n)Endln;
+    COUT Oct(n)Endln;
+    COUT Bin(n)Endln;
+
+    u32 i = 0;
+    for (;;)
+    {
+        i++;
+    }
     return 0;
 }

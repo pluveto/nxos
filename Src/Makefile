@@ -56,8 +56,8 @@ ifeq ($(strip $(ARCH)), I386)
 DEFINES		+=	-D__I386__
 endif
 
-ASFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 $(DEFINES)
-CFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 $(DEFINES)
+ASFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 -Werror $(DEFINES)
+CFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 -Werror $(DEFINES)
 
 #
 # Add necessary directory for INCDIRS and SRCDIRS.
@@ -67,9 +67,10 @@ INCDIRS		+=	./
 INCDIRS		+=	Platforms/$(ARCH)/Inc
 INCDIRS		+=	Platforms/$(ARCH)/$(PLATFORM)/Src/Inc
 
-# Platform srouce
+# Srouce codes
 SRCDIRS		+=	Platforms/$(ARCH)/$(PLATFORM)/Src/
 SRCDIRS		+=	Init/
+SRCDIRS		+=	Mods/
 
 #
 # XBuild variables

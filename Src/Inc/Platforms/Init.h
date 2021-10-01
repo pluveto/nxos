@@ -12,6 +12,8 @@
 #ifndef __PLATFROM_INIT__
 #define __PLATFROM_INIT__
 
-int PlatformInit(void);
+#include <XBook.h>
+
+INTERFACE int PlatformInit(void);
 
 #endif /* __PLATFROM_INIT__ */

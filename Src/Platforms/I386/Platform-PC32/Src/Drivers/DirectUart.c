@@ -9,6 +9,7 @@
  */
 
 #include <XBook.h>
+#include <HAL.h>
 #include <I386.h>
 #include <DirectUart.h>
 
@@ -115,15 +116,15 @@ PRIVATE void UartSent(struct DirectUart *uart, char data)
 {
 #if UART_SEND_TIMEOUT == 1
     int timeout = 0x100000;
-    while (!(In8(uart->lineStatus) & LINE_STATUS_EMPTY_TRANSMITTER_HOLDING) && timeout--)
+    while (!(IO_In8(uart->lineStatus) & LINE_STATUS_EMPTY_TRANSMITTER_HOLDING) && timeout--)
     {
     }
 #else
-    while (!(In8(uart->lineStatus) & LINE_STATUS_EMPTY_TRANSMITTER_HOLDING))
+    while (!(IO_In8(uart->lineStatus) & LINE_STATUS_EMPTY_TRANSMITTER_HOLDING))
     {
     }
 #endif
-    Out8(uart->data, data);
+    IO_Out8(uart->data, data);
 }
 
 PUBLIC void HAL_DirectUartPutc(char ch)
@@ -132,6 +133,11 @@ PUBLIC void HAL_DirectUartPutc(char ch)
         UartSent(&directUart, '\r');
     }
     UartSent(&directUart, ch);
+}
+
+INTERFACE void HAL_ConsoleOutChar(char ch)
+{
+    HAL_DirectUartPutc(ch);
 }
 
 PUBLIC void HAL_DirectUartInit(void)
@@ -151,21 +157,21 @@ PUBLIC void HAL_DirectUartInit(void)
     uart->modem_status              = iobase + 6;
     uart->scratch                   = iobase + 7;
 
-    Out8(uart->lineCtrl, LINE_DLAB);
+    IO_Out8(uart->lineCtrl, LINE_DLAB);
 
-    Out8(uart->divisorLow, (BAUD_DIVISOR_DEFAULT) & 0xff);
-    Out8(uart->divisorHigh, ((BAUD_DIVISOR_DEFAULT) >> 8) & 0xff);
+    IO_Out8(uart->divisorLow, (BAUD_DIVISOR_DEFAULT) & 0xff);
+    IO_Out8(uart->divisorHigh, ((BAUD_DIVISOR_DEFAULT) >> 8) & 0xff);
 
-    Out8(uart->lineCtrl, LINE_WORD_LENGTH_8 |
+    IO_Out8(uart->lineCtrl, LINE_WORD_LENGTH_8 |
         LINE_STOP_BIT_1 | LINE_PARITY_NO);
 
     /* close all intr */
-    Out8(uart->intrEnable, 0);
+    IO_Out8(uart->intrEnable, 0);
 
-    Out8(uart->fifo, FIFO_ENABLE | FIFO_CLEAR_TRANSMIT |
+    IO_Out8(uart->fifo, FIFO_ENABLE | FIFO_CLEAR_TRANSMIT |
         FIFO_CLEAR_RECEIVE | FIFO_ENABLE_64 |
         FIFO_TRIGGER_14);
 
-    Out8(uart->modemCtrl, 0x00);
-    Out8(uart->scratch, 0x00);
+    IO_Out8(uart->modemCtrl, 0x00);
+    IO_Out8(uart->scratch, 0x00);
 }
