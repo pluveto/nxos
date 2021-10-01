@@ -64,10 +64,11 @@ CFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 -Werror
 #
 INCDIRS		+=	Inc
 INCDIRS		+=	./
-INCDIRS		+=	Platforms/$(ARCH)/Inc
+INCDIRS		+=	Platforms/$(ARCH)/Src/Inc
 INCDIRS		+=	Platforms/$(ARCH)/$(MACH)/Src/Inc
 
 # Srouce codes
+SRCDIRS		+=	Platforms/$(ARCH)/Src/
 SRCDIRS		+=	Platforms/$(ARCH)/$(MACH)/Src/
 SRCDIRS		+=	Init/
 SRCDIRS		+=	Mods/
