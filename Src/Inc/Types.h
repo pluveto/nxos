@@ -33,4 +33,7 @@ typedef signed char         s8;
 typedef unsigned long       ubase;
 typedef signed long         sbase;
 
+typedef unsigned long       size;
+typedef signed long         ssize;
+
 #endif  /* __XBOOK_TYPES__ */

@@ -11,13 +11,21 @@
 
 #include <XBook.h>
 #include <Platforms/Init.h>
+#include <Mods/Console/Console.h>
+
 #include <I386.h>
 #include <DirectUart.h>
-#include <Mods/Console/Console.h>
+#include <Segment.h>
+#include <Gate.h>
+#include <Interrupt.h>
+#include <TSS.h>
 
 INTERFACE int PlatformInit(void)
 {
     HAL_DirectUartInit();
+    CPU_InitGate();
+    CPU_InitSegment();
+    CPU_InitTSS();
     
     COUT Str("Hello, PC32!") Endln;
 

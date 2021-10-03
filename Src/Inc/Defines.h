@@ -30,6 +30,17 @@
 #define INTERFACE PUBLIC 
 
 /**
+ * Import variable or function 
+ */
+#define IMPORT extern
+
+/**
+ * Export variable or function
+ * TODO: add to link module 
+ */
+#define EXPORT
+
+/**
  * Inline function 
  * 
  */

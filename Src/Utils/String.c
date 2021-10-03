@@ -2,19 +2,20 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Init OS 
+ * Contains: string tools 
  * 
  * Change Logs:
  * Date           Author            Notes
  * 2021-10-3      JasonHu           Init
  */
 
-#include <Platforms/Init.h>
+#include <Utils/String.h>
 
-PUBLIC int OS_Main(void)
+PUBLIC char *CopyStr(char *dst, char *src)
 {
-    /* platfrom init */
-    PlatformInit();
-    
-    return 0;
+    char *dstPtr = dst;		       
+    while ((*dstPtr++ = *src++))
+    {
+    }
+    return dst;
 }

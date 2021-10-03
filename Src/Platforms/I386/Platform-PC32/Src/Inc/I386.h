@@ -63,4 +63,9 @@ INLINE void IO_Out32(u16 port, u32 data)
     CASM("outl %0, %w1" : : "a" (data), "d" (port));
 }
 
+INLINE void CPU_LoadTR(u32 selector)
+{
+    CASM("ltr %w0" : : "q" (selector));
+}
+
 #endif  /* __I386_HEADER__ */

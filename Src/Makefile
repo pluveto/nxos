@@ -72,6 +72,7 @@ SRCDIRS		+=	Platforms/$(ARCH)/Src/
 SRCDIRS		+=	Platforms/$(ARCH)/$(MACH)/Src/
 SRCDIRS		+=	Init/
 SRCDIRS		+=	Mods/
+SRCDIRS		+=	Utils/
 
 #
 # XBuild variables
