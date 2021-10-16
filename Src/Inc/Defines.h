@@ -57,4 +57,17 @@
 #define ALIGN_UP(x, y) ((x + (y - 1)) & (~(y - 1)))
 #define ALIGN_DOWN(x, y) ((x) & ~((y) - 1))
 
+/**
+ * Offset of struct
+ */
+#define OffsetOfStruct(type, member) ((Size) &((type *)0)->member)
+
+/**
+ * Ptr of struct base addr 
+ */
+#define PtrOfStruct(ptr, type, member) ({ \
+    const typeof( ((type *)0)->member ) *__mptr = (ptr); \
+    (type *)( (char *)__mptr - OffsetOfStruct(type,member) ); \
+})
+
 #endif  /* __XBOOK_DEFINES__ */

@@ -18,7 +18,7 @@
 #define CON_NEWLINE "\n"
 
 PUBLIC void ConsoleOutChar(char ch);
-PUBLIC void ConsoleOutStr(char *str);
+PUBLIC void ConsoleOutStr(const char *str);
 PUBLIC void ConsoleOutInt(long n, int radix, int small);
 
 #define __Char(ch) ConsoleOutChar(ch)

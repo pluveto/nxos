@@ -12,6 +12,7 @@
 #include <XBook.h>
 #include <Platforms/Init.h>
 #include <Mods/Console/Console.h>
+#include <Utils/List.h>
 
 #include <I386.h>
 #include <DirectUart.h>
@@ -77,7 +78,17 @@ INTERFACE OS_Error PlatformInit(void)
         COUT Str("Init clock failed!") Endln;
         return OS_ERROR;
     }
-    ThreadTest();
+    
+    List listHead;
+
+    List list1, list2;
+
+    ListInit(&listHead);
+    ListInit(&list1);
+    ListInit(&list2);
+
+    SPIN("test");
+    // ThreadTest();
 
     // HAL_InterruptEnable();
 

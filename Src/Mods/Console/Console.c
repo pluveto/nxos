@@ -73,9 +73,9 @@ PUBLIC void ConsoleOutChar(char ch)
     HAL_ConsoleOutChar(ch);
 }
 
-PUBLIC void ConsoleOutStr(char *str)
+PUBLIC void ConsoleOutStr(const char *str)
 {
-    char *p = str;
+    char *p = (char *)str;
     while (*p)
     {
         HAL_ConsoleOutChar(*p++);
