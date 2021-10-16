@@ -87,8 +87,6 @@ PUBLIC void InterruptDispatch(void *stackFrame)
     void *arg;
     IRQ_Handler handler;
 
-    COUT Str("Interrupt Occur!\n");
-
     if (vector < EXCEPTION_BASE || vector >= MAX_INTR_NR)
     {
         COUT Str("unknown intr vector ") Hex(vector) Endln;

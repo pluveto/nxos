@@ -137,7 +137,7 @@ PRIVATE OS_Error ClockHandler(U32 irq, void *arg)
 {
     ticks++;
 
-    COUT Str("ticks: ") Int(ticks) Endln;
+    // COUT Str("ticks: ") Int(ticks) Endln;
 
     return OS_EOK;
 }

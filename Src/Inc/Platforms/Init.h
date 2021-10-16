@@ -14,6 +14,6 @@
 
 #include <XBook.h>
 
-INTERFACE int PlatformInit(void);
+INTERFACE OS_Error PlatformInit(void);
 
 #endif /* __PLATFROM_INIT__ */

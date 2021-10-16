@@ -10,11 +10,16 @@
  */
 
 #include <Platforms/Init.h>
+#include <Mods/Console/Console.h>
 
 PUBLIC int OS_Main(void)
 {
     /* platfrom init */
-    PlatformInit();
+    if (PlatformInit() != OS_EOK)
+    {
+        COUT Str("Platfrom init failed!") Endln PANIC();
+    }
     
+    SPIN("OS_Main");
     return 0;
 }

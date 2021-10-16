@@ -50,6 +50,6 @@ struct CPU_TSS
 
 void CPU_InitTSS(void);
 struct CPU_TSS *CPU_GetTSS(void);
-void CPU_SetTSS_Stack(Ubase top);
+void CPU_SetTSS_Stack(UBase top);
 
 #endif  /* __I386_TSS__ */

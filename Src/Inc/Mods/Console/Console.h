@@ -44,11 +44,27 @@ PUBLIC void ConsoleOutInt(long n, int radix, int small);
  */
 #define COUT
 
-#define PANIC \
-    { \
-        Str("PANIC Here!") \
+/**
+ * Spin here
+ */
+#define SPIN(s) \
+        Str(s) \
+        Str("FILE:") \
+        Str(__FILE__) \
+        Endln \
+        Str("FUNCTION:") \
+        Str(__FUNCTION__) \
+        Endln \
+        Str("LINE:") \
+        Int(__LINE__) \
+        for(;;)
+
+/**
+ * OS Panic
+ */
+#define PANIC() \
         HAL_InterruptDisable(); \
-        while (1); \
-    }
+        SPIN("!PANIC!" CON_NEWLINE); \
+
 
 #endif  /* __MODS_CONSOLE_HEADER__ */

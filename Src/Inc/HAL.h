@@ -14,7 +14,7 @@
 
 #include <XBook.h>
 
-/* IRQ hal */
+/* IRQ HAL */
 typedef OS_Error (*IRQ_Handler)(U32 irqno, void *arg);
 typedef U32 IRQ_Number;
 
@@ -35,7 +35,12 @@ INTERFACE OS_Error HAL_IRQAck(IRQ_Number irqno);
 INTERFACE void HAL_InterruptEnable(void);
 INTERFACE void HAL_InterruptDisable(void);
 
-/* Conosle hal */
+/* Conosle HAL */
 INTERFACE void HAL_ConsoleOutChar(char ch);
+
+/* Context HAL */
+INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackBase, void *exit);
+INTERFACE void HAL_ContextSwitchNext(UBase nextSP);
+INTERFACE void HAL_ContextSwitchPrevNext(UBase prevSP, UBase nextSP);
 
 #endif  /* __XBOOK_HAL__ */

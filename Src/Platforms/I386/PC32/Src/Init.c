@@ -20,8 +20,48 @@
 #include <Interrupt.h>
 #include <TSS.h>
 #include <Clock.h>
+#include <Context.h>
 
-INTERFACE int PlatformInit(void)
+#define STACK_SZ 1024
+
+char threadStack1[STACK_SZ];
+char threadStack2[STACK_SZ];
+
+char *threadSP1;
+char *threadSP2;
+
+void thread_entry1(void *arg)
+{
+    COUT Str("Thread 1...") Endln;
+    COUT Hex(arg) Endln;
+
+    while (1)
+    {
+        COUT Str("Hello 1") Endln;
+        HAL_ContextSwitchPrevNext(&threadSP1, &threadSP2);
+    }    
+}
+
+void thread_entry2(void *arg)
+{
+    COUT Str("Thread 2...") Endln;
+    COUT Hex(arg) Endln;
+
+    while (1)
+    {
+        COUT Str("Hello 2") Endln;
+        HAL_ContextSwitchPrevNext(&threadSP2, &threadSP1);
+    }
+}
+
+PRIVATE void ThreadTest(void)
+{
+    threadSP1 = HAL_ContextInit(thread_entry1, (void *) 0x12345678, threadStack1, NULL);
+    threadSP2 = HAL_ContextInit(thread_entry2, (void *) 0x12345678, threadStack2, NULL);
+    HAL_ContextSwitchNext(&threadSP1);
+}
+
+INTERFACE OS_Error PlatformInit(void)
 {
     HAL_DirectUartInit();
     
@@ -34,19 +74,12 @@ INTERFACE int PlatformInit(void)
     
     if (HAL_InitClock() != OS_EOK)
     {
-        COUT Str("Init clock error!") Endln PANIC;
+        COUT Str("Init clock failed!") Endln;
+        return OS_ERROR;
     }
+    ThreadTest();
 
-    HAL_InterruptEnable();
-    
-    /*
-    int a = 3;
-    int b = a / 0;
-    */
-    U32 i = 0;
-    for (;;)
-    {
-        i++;
-    }
-    return 0;
+    // HAL_InterruptEnable();
+
+    return OS_EOK;
 }
