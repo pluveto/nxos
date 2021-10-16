@@ -19,17 +19,31 @@
 #include <Gate.h>
 #include <Interrupt.h>
 #include <TSS.h>
+#include <Clock.h>
 
 INTERFACE int PlatformInit(void)
 {
     HAL_DirectUartInit();
-    CPU_InitGate();
-    CPU_InitSegment();
-    CPU_InitTSS();
     
     COUT Str("Hello, PC32!") Endln;
 
-    u32 i = 0;
+    CPU_InitGate();
+    CPU_InitSegment();
+    CPU_InitTSS();
+    CPU_InitInterrupt();
+    
+    if (HAL_InitClock() != OS_EOK)
+    {
+        COUT Str("Init clock error!") Endln PANIC;
+    }
+
+    HAL_InterruptEnable();
+    
+    /*
+    int a = 3;
+    int b = a / 0;
+    */
+    U32 i = 0;
     for (;;)
     {
         i++;

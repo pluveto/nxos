@@ -56,8 +56,8 @@ ifeq ($(strip $(ARCH)), I386)
 DEFINES		+=	-D__I386__
 endif
 
-ASFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 -Werror $(DEFINES)
-CFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 -Werror $(DEFINES)
+ASFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 $(DEFINES)
+CFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 $(DEFINES)
 
 #
 # Add necessary directory for INCDIRS and SRCDIRS.

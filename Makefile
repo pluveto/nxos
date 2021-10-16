@@ -37,12 +37,12 @@ export NXOS_NAME
 #
 ifeq ($(words $(subst -, , $(PLATFORM))), 2)
 ARCH			:= $(word 1, $(subst -, , $(PLATFORM)))
-MACH			:= Platform-$(word 2, $(subst -, , $(PLATFORM)))
+MACH			:= $(word 2, $(subst -, , $(PLATFORM)))
 else
 ARCH			:= I386
-MACH			:= Platform-PC32
+MACH			:= PC32
 #ARCH			:= Riscv64
-#MACH			:= Platform-Qemu
+#MACH			:= Qemu
 endif
 
 #

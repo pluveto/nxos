@@ -17,6 +17,7 @@
 #if !defined(__ASSEMBLY__) && !defined(ASSEMBLY) 
 #include <Defines.h>
 #include <Types.h>
+#include <Error.h>
 #endif
 
 #endif  /* __XBOOK_HEADER__ */

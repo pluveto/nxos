@@ -9,11 +9,11 @@
  * 2021-10-3      JasonHu           Init
  */
 
-#ifndef __UTILS_MEMORY__
-#define __UTILS_MEMORY__
+#ifndef __UTILS_STRING__
+#define __UTILS_STRING__
 
 #include <XBook.h>
 
 PUBLIC char *CopyStr(char *dst, char *src);
 
-#endif  /* __UTILS_MEMORY__ */
+#endif  /* __UTILS_STRING__ */

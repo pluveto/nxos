@@ -139,19 +139,19 @@
 #endif
 
 #ifdef OS_WIN32
-void *mmap(char *filename, unsigned int filesize, HANDLE *phMap) {
-	if ((filename == NULL) || (filesize == 0) || (phMap == NULL)) return NULL;
+void *mmap(char *filename, unsigned int fileSize, HANDLE *phMap) {
+	if ((filename == NULL) || (fileSize == 0) || (phMap == NULL)) return NULL;
 
 	HANDLE hMap = OpenFileMapping(FILE_MAP_READ, TRUE, filename);
 	if (hMap == NULL) {
 		OFSTRUCT buffer;
 		HFILE hfile = OpenFile(filename, &buffer, OF_READ);
 		if (hfile == NULL) return NULL;
-		hMap = CreateFileMapping((HANDLE)hfile, NULL, PAGE_READONLY, 0, filesize, filename);
+		hMap = CreateFileMapping((HANDLE)hfile, NULL, PAGE_READONLY, 0, fileSize, filename);
 		CloseHandle(hfile);
 		if (hMap == NULL) return NULL;
 	}
-	char *text = (CHAR *)MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, filesize);
+	char *text = (CHAR *)MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, fileSize);
 	if (text == NULL) {
 		CloseHandle(hMap);
 		return NULL;
@@ -283,7 +283,7 @@ static void use_config(const char *m, int slen)
 	printf(".h) \\\n");
 }
 
-static void parse_config_file(const char *map, size_t len)
+static void parse_config_file(const char *map, Size_t len)
 {
 	const int *end = (const int *) (map + len);
 	/* start at +1, so that p can never be < map */
@@ -341,12 +341,12 @@ static void do_config_file(const char *filename)
 		exit(2);
 	}
 	fstat(fd, &st);
-	if (st.st_size == 0) {
+	if (st.st_Size == 0) {
 		close(fd);
 		return;
 	}
 #ifndef OS_WIN32
-	map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	map = mmap(NULL, st.st_Size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if ((long) map == -1) {
 		perror("fixdep: mmap");
 		close(fd);
@@ -355,17 +355,17 @@ static void do_config_file(const char *filename)
 #else
 	HANDLE fMap;
 	close(fd);
-	map = mmap(filename, st.st_size, &fMap);
+	map = mmap(filename, st.st_Size, &fMap);
 	if ((long) map == NULL) {
 		perror("fixdep: mmap");
 		return;
 	}
 #endif
 
-	parse_config_file(map, st.st_size);
+	parse_config_file(map, st.st_Size);
 
 #ifndef OS_WIN32
-	munmap(map, st.st_size);
+	munmap(map, st.st_Size);
 	close(fd);
 #else
 	munmap(map, fMap);
@@ -378,7 +378,7 @@ static void do_config_file(const char *filename)
  * assignments are parsed not only by make, but also by the rather simple
  * parser in scripts/mod/sumversion.c.
  */
-static void parse_dep_file(void *map, size_t len)
+static void parse_dep_file(void *map, Size_t len)
 {
 	char *m = map;
 	char *end = m + len;
@@ -453,14 +453,14 @@ static void print_deps(void)
                 perror(depfile);
                 exit(2);
         }
-	if (st.st_size == 0) {
+	if (st.st_Size == 0) {
 		fprintf(stderr,"fixdep: %s is empty\n",depfile);
 		close(fd);
 		return;
 	}
 
 #ifndef OS_WIN32
-	map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	map = mmap(NULL, st.st_Size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if ((long) map == -1) {
 		perror("fixdep: mmap");
 		close(fd);
@@ -469,17 +469,17 @@ static void print_deps(void)
 #else
 	HANDLE fMap;
 	close(fd);
-	map = mmap(depfile, st.st_size, &fMap);
+	map = mmap(depfile, st.st_Size, &fMap);
 	if ((long) map == NULL) {
 		perror("fixdep: mmap");
 		return;
 	}
 #endif
 
-	parse_dep_file(map, st.st_size);
+	parse_dep_file(map, st.st_Size);
 
 #ifndef OS_WIN32
-	munmap(map, st.st_size);
+	munmap(map, st.st_Size);
 	close(fd);
 #else
 	munmap(map, fMap);

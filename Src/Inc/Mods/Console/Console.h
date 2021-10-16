@@ -13,6 +13,7 @@
 #define __MODS_CONSOLE_HEADER__
 
 #include <XBook.h>
+#include <HAL.h>
 
 #define CON_NEWLINE "\n"
 
@@ -43,5 +44,11 @@ PUBLIC void ConsoleOutInt(long n, int radix, int small);
  */
 #define COUT
 
+#define PANIC \
+    { \
+        Str("PANIC Here!") \
+        HAL_InterruptDisable(); \
+        while (1); \
+    }
 
 #endif  /* __MODS_CONSOLE_HEADER__ */

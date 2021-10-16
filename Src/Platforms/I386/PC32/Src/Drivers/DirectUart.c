@@ -97,18 +97,18 @@ enum UartIntrIndenty
 
 struct DirectUart
 {
-    u16 iobase;
-    u16 data;
-    u16 divisorLow;
-    u16 intrEnable;
-    u16 divisorHigh;
-    u16 intrIndenty;
-    u16 fifo;
-    u16 lineCtrl;
-    u16 modemCtrl;
-    u16 lineStatus;
-    u16 modem_status;
-    u16 scratch;
+    U16 iobase;
+    U16 data;
+    U16 divisorLow;
+    U16 intrEnable;
+    U16 divisorHigh;
+    U16 intrIndenty;
+    U16 fifo;
+    U16 lineCtrl;
+    U16 modemCtrl;
+    U16 lineStatus;
+    U16 modem_status;
+    U16 scratch;
 };
 
 PRIVATE struct DirectUart directUart;
@@ -144,7 +144,7 @@ INTERFACE void HAL_ConsoleOutChar(char ch)
 PUBLIC void HAL_DirectUartInit(void)
 {
     struct DirectUart *uart = &directUart;
-    u16 iobase = COM1_BASE;
+    U16 iobase = COM1_BASE;
 
     uart->iobase                    = iobase;
     uart->data                      = iobase + 0;

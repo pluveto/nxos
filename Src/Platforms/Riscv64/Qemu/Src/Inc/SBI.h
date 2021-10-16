@@ -25,11 +25,11 @@
 #define SBI_SHUTDOWN 8
 
 #define SBI_CALL(which, arg0, arg1, arg2, arg3) ({		\
-	register ubase a0 asm ("a0") = (ubase)(arg0);	\
-	register ubase a1 asm ("a1") = (ubase)(arg1);	\
-	register ubase a2 asm ("a2") = (ubase)(arg2);	\
-	register ubase a3 asm ("a3") = (ubase)(arg3);	\
-	register ubase a7 asm ("a7") = (ubase)(which);	\
+	register Ubase a0 asm ("a0") = (Ubase)(arg0);	\
+	register Ubase a1 asm ("a1") = (Ubase)(arg1);	\
+	register Ubase a2 asm ("a2") = (Ubase)(arg2);	\
+	register Ubase a3 asm ("a3") = (Ubase)(arg3);	\
+	register Ubase a7 asm ("a7") = (Ubase)(which);	\
 	asm volatile ("ecall"					\
 		      : "+r" (a0)				\
 		      : "r" (a1), "r" (a2), "r" (a3), "r" (a7)	\
@@ -56,7 +56,7 @@ INLINE int SBI_ConsoleGetChar(void)
 	return SBI_CALL_0(SBI_CONSOLE_GETCHAR);
 }
 
-INLINE void SBI_SetTimer(uint64 stime_value)
+INLINE void SBI_SetTimer(Uint64 stime_value)
 {
 	SBI_CALL_1(SBI_SET_TIMER, stime_value);
 }
@@ -71,30 +71,30 @@ INLINE void SBI_ClearIpi(void)
 	SBI_CALL_0(SBI_CLEAR_IPI);
 }
 
-INLINE void SBI_SendIpi(const ubase *hart_mask)
+INLINE void SBI_SendIpi(const Ubase *hart_mask)
 {
 	SBI_CALL_1(SBI_SEND_IPI, hart_mask);
 }
 
-INLINE void SBI_RemoteFenceI(const ubase *hart_mask)
+INLINE void SBI_RemoteFenceI(const Ubase *hart_mask)
 {
 	SBI_CALL_1(SBI_REMOTE_FENCE_I, hart_mask);
 }
 
-INLINE void SBI_RemoteSfenceVma(const ubase *hart_mask, ubase start, ubase size)
+INLINE void SBI_RemoteSfenceVma(const Ubase *hart_mask, Ubase start, Ubase Size)
 {
-	SBI_CALL_3(SBI_REMOTE_SFENCE_VMA, hart_mask, start, size);
+	SBI_CALL_3(SBI_REMOTE_SFENCE_VMA, hart_mask, start, Size);
 }
 
-INLINE void SBI_RemoteSfenceVmaAsid(const ubase *hart_mask,
-    ubase start,
-    ubase size,
-    ubase asid)
+INLINE void SBI_RemoteSfenceVmaAsid(const Ubase *hart_mask,
+    Ubase start,
+    Ubase Size,
+    Ubase asid)
 {
-	SBI_CALL_4(SBI_REMOTE_SFENCE_VMA_ASID, hart_mask, start, size, asid);
+	SBI_CALL_4(SBI_REMOTE_SFENCE_VMA_ASID, hart_mask, start, Size, asid);
 }
 
-INLINE void SBI_SetExternInterrupt(ubase func_pointer)
+INLINE void SBI_SetExternInterrupt(Ubase func_pointer)
 {
 	asm volatile("mv a6, %0" : : "r" (0x210));
 	SBI_CALL_1(0x0A000004, func_pointer);

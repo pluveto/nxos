@@ -14,4 +14,8 @@
 
 #define KERNEL_VADDR_START 0
 
+#define OS_TICKS_PER_SECOND 100
+
+#define IRQ_NAME_LEN 48
+
 #endif  /* __OS_CONFIG__ */

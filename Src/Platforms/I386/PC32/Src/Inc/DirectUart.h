@@ -1,12 +1,12 @@
-/*
- * Copyright (c) 2006-2021, RT-Thread Development Team
+/**
+ * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Direct uart driver header
+ * Contains: Direct uart
  * 
  * Change Logs:
- * Date           Author        Notes
- * 2021-07-15     JasonHu       first version
+ * Date           Author            Notes
+ * 2021-10-3      JasonHu           Init
  */
 
 #ifndef __DIRECT_UART_HEADER__

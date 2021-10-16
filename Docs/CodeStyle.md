@@ -144,7 +144,7 @@ typedef enum SoundType SoundType;
  * Line2
  */
 
-bufSize = 16;	// set buffer size
+bufSize = 16;	// set buffer Size
 ```
 
 ## 11.缩进以及分行

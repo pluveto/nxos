@@ -12,17 +12,17 @@
 #include <Segment.h>
 #include <TSS.h>
 
-IMPORT void CPU_LoadGDT(ubase size, ubase gdtr);
+IMPORT void CPU_LoadGDT(Ubase Size, Ubase gdtr);
 
 struct CPU_Segment
 {
-    u16 limitLow, baseLow;
-    u8 baseMid, accessRight;
-    u8 limitHigh, baseHigh;
+    U16 limitLow, baseLow;
+    U8 baseMid, accessRight;
+    U8 limitHigh, baseHigh;
 };
 
-PRIVATE void SetSegment(struct CPU_Segment *seg, ubase limit,
-                        ubase base, ubase attributes)
+PRIVATE void SetSegment(struct CPU_Segment *seg, Ubase limit,
+                        Ubase base, Ubase attributes)
 {
     seg->limitLow    = limit & 0xffff;
     seg->baseLow     = base & 0xffff;
@@ -47,7 +47,7 @@ PUBLIC void CPU_InitSegment(void)
     SetSegment(GDT_OFF2PTR(gdt, INDEX_KERNEL_DATA), GDT_BOUND_TOP, GDT_BOUND_BOTTOM, GDT_KERNEL_DATA_ATTR);
 
     struct CPU_TSS *tss = CPU_GetTSS();
-    SetSegment(GDT_OFF2PTR(gdt, INDEX_TSS), sizeof(struct CPU_TSS) - 1, (ubase)tss, GDT_TSS_ATTR);
+    SetSegment(GDT_OFF2PTR(gdt, INDEX_TSS), sizeof(struct CPU_TSS) - 1, (Ubase)tss, GDT_TSS_ATTR);
 
     SetSegment(GDT_OFF2PTR(gdt, INDEX_USER_CODE), GDT_BOUND_TOP, GDT_BOUND_BOTTOM, GDT_USER_CODE_ATTR);
     SetSegment(GDT_OFF2PTR(gdt, INDEX_USER_DATA), GDT_BOUND_TOP, GDT_BOUND_BOTTOM, GDT_USER_DATA_ATTR);

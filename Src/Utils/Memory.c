@@ -11,9 +11,9 @@
 
 #include <Utils/Memory.h>
 
-PUBLIC void *Set(void *dst, u8 value, size sz)
+PUBLIC void *Set(void *dst, U8 value, Size sz)
 {
-    u8 *dstPtr = (u8 *)dst;
+    U8 *dstPtr = (U8 *)dst;
 	while (sz > 0)
     {
 		*dstPtr++ = value;
@@ -22,17 +22,17 @@ PUBLIC void *Set(void *dst, u8 value, size sz)
 	return dst;
 }
 
-PUBLIC void Copy(void *dst, void *src, size sz)
+PUBLIC void Copy(void *dst, void *src, Size sz)
 {
-    u8 *dstPtr = (u8 *)dst;
-    u8 *srcPtr = (u8 *)src;
+    U8 *dstPtr = (U8 *)dst;
+    U8 *srcPtr = (U8 *)src;
     while (sz-- > 0)
     {
         *dstPtr++ = *srcPtr++;
     }
 }
 
-PUBLIC void *Zero(void *dst, size sz)
+PUBLIC void *Zero(void *dst, Size sz)
 {
     return Set(dst, 0, sz);
 }

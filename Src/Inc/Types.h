@@ -12,28 +12,28 @@
 #ifndef __XBOOK_TYPES__
 #define __XBOOK_TYPES__
 
-typedef unsigned long long  uint64;
-typedef signed long long    int64;
-typedef unsigned int        uint32;
-typedef signed int          int32;
-typedef unsigned short      uint16;
-typedef signed short        int16;
-typedef unsigned char       uint8;
-typedef signed char         int8;
+typedef unsigned long long  Uint64;
+typedef signed long long    Int64;
+typedef unsigned int        Uint32;
+typedef signed int          Int32;
+typedef unsigned short      UInt16;
+typedef signed short        Int16;
+typedef unsigned char       UInt8;
+typedef signed char         Int8;
 
-typedef unsigned long long  u64;
-typedef signed long long    s64;
-typedef unsigned int        u32;
-typedef signed int          s32;
-typedef unsigned short      u16;
-typedef signed short        s16;
-typedef unsigned char       u8;
-typedef signed char         s8;
+typedef unsigned long long  U64;
+typedef signed long long    I64;
+typedef unsigned int        U32;
+typedef signed int          I32;
+typedef unsigned short      U16;
+typedef signed short        I16;
+typedef unsigned char       U8;
+typedef signed char         I8;
 
-typedef unsigned long       ubase;
-typedef signed long         sbase;
+typedef unsigned long       Ubase;
+typedef signed long         Base;
 
-typedef unsigned long       size;
-typedef signed long         ssize;
+typedef unsigned long       Size;
+typedef signed long         SSize;
 
 #endif  /* __XBOOK_TYPES__ */

@@ -19,37 +19,37 @@
 
 struct CPU_TSS
 {
-    u32 backlink;
-    u32 esp0;
-    u32 ss0;
-    u32 esp1;
-    u32 ss1;
-    u32 esp2;
-    u32 ss2;
-    u32 cr3;
-    u32 eip;
-    u32 eflags;
-    u32 eax;
-    u32 ecx;
-    u32 edx;
-    u32 ebx;
-    u32 esp;
-    u32 ebp;
-    u32 esi;
-    u32 edi;
-    u32 es;
-    u32 cs;
-    u32 ss;
-    u32 ds;
-    u32 fs;
-    u32 gs;
-    u32 ldtr;
-    u32 trap;
-    u32 iobase;
+    U32 backlink;
+    U32 esp0;
+    U32 ss0;
+    U32 esp1;
+    U32 ss1;
+    U32 esp2;
+    U32 ss2;
+    U32 cr3;
+    U32 eip;
+    U32 eflags;
+    U32 eax;
+    U32 ecx;
+    U32 edx;
+    U32 ebx;
+    U32 esp;
+    U32 ebp;
+    U32 esi;
+    U32 edi;
+    U32 es;
+    U32 cs;
+    U32 ss;
+    U32 ds;
+    U32 fs;
+    U32 gs;
+    U32 ldtr;
+    U32 trap;
+    U32 iobase;
 };
 
 void CPU_InitTSS(void);
 struct CPU_TSS *CPU_GetTSS(void);
-void CPU_SetTSS_Stack(ubase top);
+void CPU_SetTSS_Stack(Ubase top);
 
 #endif  /* __I386_TSS__ */

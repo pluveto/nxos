@@ -9,10 +9,9 @@
  * 2021-10-1      JasonHu           Init
  */
 
-#include <HAL.h>
 #include <Mods/Console/Console.h>
 
-PRIVATE char *I2A(long num, char *str, u8 radix, int small)
+PRIVATE char *I2A(long num, char *str, U8 radix, int small)
 {
     char *index;
     if (small)
