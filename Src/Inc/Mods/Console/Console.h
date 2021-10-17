@@ -17,54 +17,49 @@
 
 #define CON_NEWLINE "\n"
 
+#define Endln CON_NEWLINE
+
+#define MAX_INT_BUF_SZ  (64 + 1)
+#define MAX_BUF_NR  64
+
 PUBLIC void ConsoleOutChar(char ch);
 PUBLIC void ConsoleOutStr(const char *str);
-PUBLIC void ConsoleOutInt(long n, int radix, int small);
-
-#define __Char(ch) ConsoleOutChar(ch)
-#define __Str(str) ConsoleOutStr(str)
-#define __Bin(n) ConsoleOutInt(n, 2, 0)
-#define __Oct(n) ConsoleOutInt(n, 8, 0)
-#define __Int(n) ConsoleOutInt(n, 10, 0)
-#define __Hex(n) ConsoleOutInt(n, 16, 1)
-#define __HexBig(n) ConsoleOutInt(n, 16, 0)
-
-#define Char(ch) __Char(ch);
-#define Str(str) __Str(str);
-#define Bin(n) __Bin(n);
-#define Oct(n) __Oct(n);
-#define Int(n) __Int(n);
-#define Hex(n) __Hex(n);
-#define HexBig(n) __HexBig(n);
-
-#define Endln __Str(CON_NEWLINE);
+PUBLIC char *NumberToString(long n, int radix, int small);
 
 /**
- * Console output prefix
+ * Console Output
  */
-#define COUT
+#define $(v) , (char *)v, 
+#define $s(v) $(v)
+#define $d(v) , NumberToString((I32)(v), 10, 0),
+#define $x(v) , NumberToString((U32)(v), 16, 1),
+#define $X(v) , NumberToString((U32)(v), 16, 0),
+#define $b(v) , NumberToString((U32)(v), 2, 0),
+#define $o(v) , NumberToString((U32)(v), 8, 0),
+
+#define Cout(x, ...) \
+        do { \
+            char *args[] = {x, ##__VA_ARGS__}; \
+            int i; \
+            for (i = 0; i < sizeof(args)/sizeof(args[0]); i++) \
+            { \
+                ConsoleOutStr(args[i]); \
+            } \
+        } while (0)
 
 /**
  * Spin here
  */
-#define SPIN(s) \
-        Str(s) \
-        Str("FILE:") \
-        Str(__FILE__) \
-        Endln \
-        Str("FUNCTION:") \
-        Str(__FUNCTION__) \
-        Endln \
-        Str("LINE:") \
-        Int(__LINE__) \
+#define SPIN(str) \
+        Cout(str, "FILE:" $s(__FILE__) "\nFUNCTION:" $s(__FUNCTION__) "\nLINE:" $d(__LINE__)); \
         for(;;)
 
 /**
  * OS Panic
  */
-#define PANIC() \
+#define PANIC(str) \
         HAL_InterruptDisable(); \
-        SPIN("!PANIC!" CON_NEWLINE); \
-
+        Cout("!PANIC!" CON_NEWLINE); \
+        SPIN(str)
 
 #endif  /* __MODS_CONSOLE_HEADER__ */

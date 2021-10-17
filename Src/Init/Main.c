@@ -17,7 +17,7 @@ PUBLIC int OS_Main(void)
     /* platfrom init */
     if (PlatformInit() != OS_EOK)
     {
-        COUT Str("Platfrom init failed!") Endln PANIC();
+        PANIC("Platfrom init failed!" Endln);
     }
     
     SPIN("OS_Main");

@@ -10,6 +10,7 @@
  */
 
 #include <Mods/Console/Console.h>
+#include <Utils/Memory.h>
 
 PRIVATE char *I2A(long num, char *str, U8 radix, int small)
 {
@@ -82,16 +83,19 @@ PUBLIC void ConsoleOutStr(const char *str)
     }
 }
 
-#define MAX_INT_BUF_SZ  (64 + 1)
+PRIVATE U32 strBufPtr = 0;
+PRIVATE char tmpStrBuf[MAX_BUF_NR][MAX_INT_BUF_SZ];
 
-PUBLIC void ConsoleOutInt(long n, int radix, int small)
+PUBLIC char *NumberToString(long n, int radix, int small)
 {
     if (radix < 2 || radix > 16)
     {
-        return;
+        return "(NULL)";
     }
 
-    char str[MAX_INT_BUF_SZ] = {0};
-    I2A(n, str, radix, small);
-    ConsoleOutStr(str);
+    /* TODO: fetch and add atomic */
+    char *buf = tmpStrBuf[strBufPtr];
+    strBufPtr = (strBufPtr + 1) % MAX_BUF_NR;
+    Zero(buf, MAX_INT_BUF_SZ);
+    return I2A(n, buf, radix, small);
 }

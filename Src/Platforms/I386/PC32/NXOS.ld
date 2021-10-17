@@ -19,13 +19,15 @@ SECTIONS {
     . = 0x00100000; /* GRUB2 need kernel here */
 
     /* code segment */
+    . = ALIGN(4);
+    __textStart = .;
     .text : {
-        . = ALIGN(4);   /* 4 bytes align */
         *(.text.start)
         *(.text)
         *(.init.text)
 		*(.exit.text)
     }
+    __textEnd = .;
 
     .initcall ALIGN(8) :
 	{
@@ -44,16 +46,35 @@ SECTIONS {
 		KEEP(*(.exitcall_2.text))
 		PROVIDE(__exitcall_end = .);
 	}
+    
+	. = ALIGN(4);
+    __rodataStart = .;
+    .rodata : { *(.rodata) *(.rodata.*) }
+    __rodataEnd = .;
+
 
     /* data segment */
-    .data : {
-        . = ALIGN(4);   /* 4 bytes align */
+    . = ALIGN(4);
+    __dataStart = .;
+    .data :
+    {
         *(.data)
+        *(.data.*)
     }
-
+    __dataEnd = .;
+    
     /* bss segement */
-    .bss : {
-        . = ALIGN(4);   /* 4 bytes align */
-        *(.bss)
+    
+    . = ALIGN(4);
+    __bssStart = .;
+    .bss       :
+    {
+    *(.bss)
+    *(.bss.*)
+    *(COMMON)
+    . = ALIGN(4);
     }
+    . = ALIGN(4);
+    __bssEnd = .;
+
 }

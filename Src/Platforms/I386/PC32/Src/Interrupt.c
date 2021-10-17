@@ -47,7 +47,7 @@ PRIVATE char *exceptionName[] = {
 PRIVATE OS_Error DefaultExceptionHandler(U32 irq, void *arg)
 {
     char *name = irqInfoTable[irq].name;
-    COUT Str("Exception: vector/0x") Hex(irq) Str(" Name: ") Str(name) Str(" handled!") Endln;
+    Cout("Exception: vector/0x" $x(irq) " Name: " $s(name) " handled!" Endln);
 
     while (1);
     return OS_EOK;
@@ -56,7 +56,7 @@ PRIVATE OS_Error DefaultExceptionHandler(U32 irq, void *arg)
 PRIVATE OS_Error DefaultExternalHandler(U32 irq, void *arg)
 {
     char *name = irqInfoTable[irq].name;
-    COUT Str("External: vector/0x") Hex(irq) Str(" Name: ") Str(name) Str(" handled!") Endln;
+    Cout("External: vector/0x" $x(irq) " Name: " $s(name) " handled!" Endln);
     return OS_EOK;
 }
 
@@ -89,7 +89,7 @@ PUBLIC void InterruptDispatch(void *stackFrame)
 
     if (vector < EXCEPTION_BASE || vector >= MAX_INTR_NR)
     {
-        COUT Str("unknown intr vector ") Hex(vector) Endln;
+        Cout("unknown intr vector " $x(vector) Endln);
         return;
     }
     /* call handler with different vector */
@@ -123,7 +123,7 @@ PUBLIC void InterruptDispatch(void *stackFrame)
     }
     else
     {
-        COUT Str("uninstall intr vector ") Hex(vector) Endln;
+        Cout("uninstall intr vector " $x(vector) Endln);
         while (1);
     }
 }
