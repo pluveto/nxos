@@ -12,10 +12,20 @@
 #ifndef __OS_CONFIG__
 #define __OS_CONFIG__
 
-#define KERNEL_VADDR_START 0
+/* OS normal config */
+#define CONFIG_KERNEL_VADDR_START 0
+#define CONFIG_TICKS_PER_SECOND 100
+#define CONFIG_IRQ_NAME_LEN 48
 
-#define OS_TICKS_PER_SECOND 100
+/* OS debug config */
+#define CONFIG_ASSERT_DEBUG
 
-#define IRQ_NAME_LEN 48
+/* OS test config */
+#define CONFIG_PLATFROM_TEST
+#ifdef CONFIG_PLATFROM_TEST
+    /* #define CONFIG_THREAD_TEST */
+    #define CONFIG_CONSOLE_TEST
+    #define CONFIG_PAGE_TEST
+#endif
 
 #endif  /* __OS_CONFIG__ */

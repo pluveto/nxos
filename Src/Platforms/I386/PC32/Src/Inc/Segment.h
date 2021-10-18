@@ -64,7 +64,7 @@
 #define GDT_LIMIT           0x000007ff
 #define GDT_PADDR           0x003F0000
 
-#define GDT_VADDR           (KERNEL_VADDR_START + GDT_PADDR)
+#define GDT_VADDR           (CONFIG_KERNEL_VADDR_START + GDT_PADDR)
 
 #define GDT_OFF2PTR(gdt, off)    (gdt + off)
 

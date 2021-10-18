@@ -9,7 +9,7 @@
  * 2021-10-3      JasonHu           Init
  */
 
-#include <Platforms/Init.h>
+#include <HAL.h>
 #include <Mods/Console/Console.h>
 
 PUBLIC int OS_Main(void)

@@ -36,4 +36,6 @@ typedef signed long         Base;
 typedef unsigned long       Size;
 typedef signed long         SSize;
 
+typedef int PtrDiff;
+
 #endif  /* __XBOOK_TYPES__ */

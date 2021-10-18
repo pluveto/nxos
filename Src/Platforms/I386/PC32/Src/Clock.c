@@ -129,7 +129,7 @@ enum ctrl_mode_bits
 };
 
 #define TIMER_FREQ     1193180  /* clock frequency */
-#define COUNTER0_VALUE  (TIMER_FREQ / OS_TICKS_PER_SECOND)
+#define COUNTER0_VALUE  (TIMER_FREQ / CONFIG_TICKS_PER_SECOND)
 
 U32 ticks = 0;
 

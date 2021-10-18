@@ -70,4 +70,14 @@
     (type *)( (char *)__mptr - OffsetOfStruct(type,member) ); \
 })
 
+#define TypeCast(t, exp) ((t)(exp))
+#define ArraryCast(p, size) (((char(*)[size])(p)))
+
+#define MIN(x, y) ({typeof(x) _x = (x);typeof(y) _y = (y);(void)(&_x == &_y);_x < _y ? _x : _y; })
+
+#define SZ_KB   1024
+#define SZ_MB   (SZ_KB * 1024)
+#define SZ_GB   (SZ_MB * 1024)
+#define SZ_TB   (SZ_GB * 1024)
+
 #endif  /* __XBOOK_DEFINES__ */

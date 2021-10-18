@@ -2,29 +2,20 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Init PC32 platfrom 
+ * Contains: Platfrom test
  * 
  * Change Logs:
  * Date           Author            Notes
- * 2021-9-17      JasonHu           Init
+ * 2021-9-18      JasonHu           Init
  */
 
 #include <XBook.h>
-#include <Platforms/Init.h>
+#include <Assert.h>
+#include <HAL.h>
 #include <Mods/Console/Console.h>
-#include <Utils/List.h>
-#include <Utils/Memory.h>
-
-#include <I386.h>
-#include <DirectUart.h>
-#include <Segment.h>
-#include <Gate.h>
-#include <Interrupt.h>
-#include <TSS.h>
-#include <Clock.h>
 #include <Context.h>
-
-#define CONFIG_THREAD_TEST
+#include <MM/Page.h>
+#include <Platfrom.h>
 
 #ifdef CONFIG_THREAD_TEST
 #define STACK_SZ 1024
@@ -65,46 +56,61 @@ PRIVATE void ThreadTest(void)
 }
 #endif
 
-IMPORT UBase __bssStart;
-IMPORT UBase __bssEnd;
-
-PRIVATE void ClearBSS(void)
+#ifdef CONFIG_CONSOLE_TEST
+PRIVATE void ConsoleTest(void)
 {
-    Zero(&__bssStart, &__bssEnd - &__bssStart);
-}
-
-INTERFACE OS_Error PlatformInit(void)
-{
-    ClearBSS();
-    
-    HAL_DirectUartInit();
-    
-    Cout("Hello, PC32!" Endln);
-
-    CPU_InitGate();
-    CPU_InitSegment();
-    CPU_InitTSS();
-    CPU_InitInterrupt();
-    
-    if (HAL_InitClock() != OS_EOK)
-    {
-        Cout("Init clock failed!" Endln);
-        return OS_ERROR;
-    }
-    
     char *s = "hello";
     int a = 12345678;
     int b = 0x12345678;
     Cout("Cout:" $s(s) " 16:" $x(0x12345678) " 10:" $d(0x12345678) "a:" $d(a) "b:" $X(b) " End." "\n");
 
+    ASSERT(a == 12345678);   
+}
+#endif
+
+#ifdef CONFIG_PAGE_TEST
+PRIVATE void PageTest(void)
+{
+    /* alloc memory */
+    void *bufs[16];
+
+    int i;
+    for (i = 0; i < 16; i++)
+    {
+        void *buf = PageAlloc(i + 1);
+        Cout("Alloc:" $x(buf) Endln);
+        bufs[i] = buf; 
+    }
+
+    for (i = 0; i < 16; i++)
+    {
+        Cout("Free:" $x(bufs[i]) Endln);
+        if (bufs[i])
+        {
+            PageFree(bufs[i]);
+        }
+    }
+    for (i = 0; i < 16; i++)
+    {
+        void *buf = PageAlloc(i + 1);
+        Cout("Alloc:" $x(buf) Endln);
+        bufs[i] = buf; 
+    }
+}
+#endif
+
+PUBLIC void PlatfromTest(void)
+{
+#ifdef CONFIG_CONSOLE_TEST
+    ConsoleTest();
+#endif
+
 #ifdef CONFIG_THREAD_TEST
     ThreadTest();
 #endif
 
-    SPIN("test");
-    
+#ifdef CONFIG_PAGE_TEST
+    PageTest();
+#endif
 
-    // HAL_InterruptEnable();
-
-    return OS_EOK;
 }

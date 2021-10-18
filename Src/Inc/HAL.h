@@ -14,6 +14,9 @@
 
 #include <XBook.h>
 
+/* Platform */
+INTERFACE OS_Error PlatformInit(void);
+
 /* IRQ HAL */
 typedef OS_Error (*IRQ_Handler)(U32 irqno, void *arg);
 typedef U32 IRQ_Number;
@@ -22,7 +25,7 @@ struct IRQ_Info
 {
     IRQ_Handler handler;
     void *arg;
-    char name[IRQ_NAME_LEN];
+    char name[CONFIG_IRQ_NAME_LEN];
 };
 typedef struct IRQ_Info IRQ_Info;
 

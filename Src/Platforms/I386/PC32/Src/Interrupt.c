@@ -136,7 +136,7 @@ INTERFACE OS_Error HAL_IRQInstall(IRQ_Number irqno, IRQ_Handler handler, void *a
     }
     irqInfoTable[irqno].handler = handler;
     irqInfoTable[irqno].arg = arg;
-    Zero(irqInfoTable[irqno].name, IRQ_NAME_LEN);
+    Zero(irqInfoTable[irqno].name, CONFIG_IRQ_NAME_LEN);
     CopyStr(irqInfoTable[irqno].name, name);
     return OS_EOK;
 }

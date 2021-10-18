@@ -51,7 +51,7 @@ PUBLIC char *NumberToString(long n, int radix, int small);
  * Spin here
  */
 #define SPIN(str) \
-        Cout(str, "FILE:" $s(__FILE__) "\nFUNCTION:" $s(__FUNCTION__) "\nLINE:" $d(__LINE__)); \
+        Cout(str, Endln "FILE:" $s(__FILE__) "\nFUNCTION:" $s(__FUNCTION__) "\nLINE:" $d(__LINE__)); \
         for(;;)
 
 /**
@@ -61,5 +61,7 @@ PUBLIC char *NumberToString(long n, int radix, int small);
         HAL_InterruptDisable(); \
         Cout("!PANIC!" CON_NEWLINE); \
         SPIN(str)
+
+void AssertionFailure(char *exp, char *file, char *baseFile, int line);
 
 #endif  /* __MODS_CONSOLE_HEADER__ */

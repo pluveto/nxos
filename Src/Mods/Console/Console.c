@@ -99,3 +99,9 @@ PUBLIC char *NumberToString(long n, int radix, int small)
     Zero(buf, MAX_INT_BUF_SZ);
     return I2A(n, buf, radix, small);
 }
+
+void AssertionFailure(char *exp, char *file, char *baseFile, int line)
+{
+	Cout("\nAssert(" $(exp) ") failed:\nfile: " $(file) "\nbase_file: " $(baseFile) "\nln: " $d(line) Endln);
+	while (1);
+}
