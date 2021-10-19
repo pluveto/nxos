@@ -38,13 +38,13 @@ PRIVATE void BuddyDelPage(BuddySystem* system, Page* page)
     system->count[order]--;
 }
 
-PRIVATE void* PageToPtr(BuddySystem* system, Page* page)
+PRIVATE void *PageToPtr(BuddySystem* system, Page* page)
 {
     PtrDiff diff = page - system->map;
     return &ArraryCast(system->pageStart, PAGE_SIZE)[diff];
 }
 
-PRIVATE Page* PageFromPtr(BuddySystem* system, void* ptr)
+PRIVATE Page* PageFromPtr(BuddySystem* system, void *ptr)
 {
     ASSERT(0 == ((Size)ptr % PAGE_SIZE));
     PtrDiff diff = ArraryCast(ptr, PAGE_SIZE) - ArraryCast(system->pageStart, PAGE_SIZE);
@@ -77,7 +77,7 @@ PRIVATE int DoPageFree(Page* page)
     return (page->flags & PAGE_FLAG_IS_FREE);
 }
 
-PRIVATE BuddySystem* BuddyCreateFromMemory(void* mem)
+PRIVATE BuddySystem* BuddyCreateFromMemory(void *mem)
 {
     ASSERT(mem);
     BuddySystem* system = mem;
@@ -107,7 +107,7 @@ PRIVATE void BuddyDebug(BuddySystem* system)
 #endif
 }
 
-BuddySystem* BuddyCreate(void* mem, Size size)
+PUBLIC BuddySystem* BuddyCreate(void *mem, Size size)
 {
     ASSERT(mem && size);
     Cout("mem:" $x(mem) " size:" $x(size) Endln);
@@ -237,7 +237,7 @@ PRIVATE Page* PageMerge(BuddySystem* system, Page* page)
     return page;
 }
 
-PRIVATE void* PagePrepareUsed(BuddySystem* system, Page* page, int order)
+PRIVATE void *PagePrepareUsed(BuddySystem* system, Page* page, int order)
 {
     ASSERT(system && page && (order >= 0));
 
@@ -251,7 +251,7 @@ PRIVATE void* PagePrepareUsed(BuddySystem* system, Page* page, int order)
     return PageToPtr(system, page);
 }
 
-void* BuddyAllocPage(BuddySystem* system, Size count)
+PUBLIC void *BuddyAllocPage(BuddySystem* system, Size count)
 {
     ASSERT(system && count);
 
@@ -273,7 +273,7 @@ void* BuddyAllocPage(BuddySystem* system, Size count)
     return PagePrepareUsed(system, page, order);
 }
 
-void BuddyFreePage(BuddySystem* system, void* ptr)
+PUBLIC void BuddyFreePage(BuddySystem* system, void *ptr)
 {
     ASSERT(system && ptr);
 

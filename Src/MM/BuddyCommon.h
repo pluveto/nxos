@@ -73,7 +73,7 @@ PRIVATE Size BuddyAlignDown(Size x, Size align)
     return x - (x & (align - 1));
 }
 
-PRIVATE void* BuddyAlignPtr(const void* ptr, Size align)
+PRIVATE void *BuddyAlignPtr(const void *ptr, Size align)
 {
     ASSERT(ptr && align);
 

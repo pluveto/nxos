@@ -31,8 +31,8 @@
 
 IMPORT void PlatfromTest(void);
 
-IMPORT UBase __bssStart;
-IMPORT UBase __bssEnd;
+IMPORT Uint __bssStart;
+IMPORT Uint __bssEnd;
 
 PRIVATE void ClearBSS(void)
 {

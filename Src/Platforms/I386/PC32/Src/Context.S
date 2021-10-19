@@ -13,7 +13,7 @@
 .text
 
 /**
- * void HAL_ContextSwitchNext(UBase nextSP);
+ * void HAL_ContextSwitchNext(Uint nextSP);
  */
 .globl HAL_ContextSwitchNext
 HAL_ContextSwitchNext:
@@ -27,7 +27,7 @@ HAL_ContextSwitchNext:
     ret
 
 /**
- * void HAL_ContextSwitchPrevNext(UBase prevSP, UBase nextSP);
+ * void HAL_ContextSwitchPrevNext(Uint prevSP, Uint nextSP);
  */
 .globl HAL_ContextSwitchPrevNext
 HAL_ContextSwitchPrevNext:

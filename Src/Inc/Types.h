@@ -30,8 +30,8 @@ typedef signed short        I16;
 typedef unsigned char       U8;
 typedef signed char         I8;
 
-typedef unsigned long       UBase;
-typedef signed long         Base;
+typedef unsigned long       Uint;
+typedef signed long         Int;
 
 typedef unsigned long       Size;
 typedef signed long         SSize;

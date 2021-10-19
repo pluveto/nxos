@@ -29,8 +29,8 @@ PRIVATE void ThreadEntry(HAL_ThreadHandler handler, void *arg, void (*texit)())
 INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackBase, void *exit)
 {
     U8 *stack;
-    stack = stackBase + sizeof(UBase);
-    stack = (U8 *)ALIGN_DOWN((UBase)stack, sizeof(UBase));
+    stack = stackBase + sizeof(Uint);
+    stack = (U8 *)ALIGN_DOWN((Uint)stack, sizeof(Uint));
     stack -= sizeof(HAL_TrapFrame);
     stack -= sizeof(HAL_Context);
 

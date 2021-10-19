@@ -39,14 +39,14 @@ struct BuddySystem
     List pageBuddy[MAX_PAGE_ORDER + 1];
     Size count[MAX_PAGE_ORDER + 1];
     Size bitmap;    /* map order has free page */
-    void* pageStart;    /* page start addr */
+    void *pageStart;    /* page start addr */
     Size maxPFN;
     Page map[0];    /* pages array */
 };
 typedef struct BuddySystem BuddySystem;
 
-BuddySystem* BuddyCreate(void* mem, Size size);
-void* BuddyAllocPage(BuddySystem* system, Size count);
-void BuddyFreePage(BuddySystem* system, void* ptr);
+PUBLIC BuddySystem* BuddyCreate(void *mem, Size size);
+PUBLIC void *BuddyAllocPage(BuddySystem* system, Size count);
+PUBLIC void BuddyFreePage(BuddySystem* system, void *ptr);
 
 #endif /* __MM_BUDDY__ */

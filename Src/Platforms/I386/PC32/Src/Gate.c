@@ -74,12 +74,12 @@ IMPORT void CPU_TrapEntry0x2e(void);
 IMPORT void CPU_TrapEntry0x2f(void);
 
 IMPORT void CPU_SyscallEntry(void);
-IMPORT void CPU_LoadIDT(UBase Size, UBase idtr);    
+IMPORT void CPU_LoadIDT(Uint Size, Uint idtr);    
 
 PRIVATE void SetGate(struct CPU_Gate *gate, TrapHandler handler,
                      U32 selector, U32 attributes, U8 privilege)
 {
-    UBase offset = (UBase) handler;
+    Uint offset = (Uint) handler;
     gate->offsetLow  = offset & 0xffff;
     gate->selector    = selector;
     gate->attributes  = attributes | (privilege << 5);

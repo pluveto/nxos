@@ -25,11 +25,11 @@
 #define SBI_SHUTDOWN 8
 
 #define SBI_CALL(which, arg0, arg1, arg2, arg3) ({		\
-	register UBase a0 asm ("a0") = (UBase)(arg0);	\
-	register UBase a1 asm ("a1") = (UBase)(arg1);	\
-	register UBase a2 asm ("a2") = (UBase)(arg2);	\
-	register UBase a3 asm ("a3") = (UBase)(arg3);	\
-	register UBase a7 asm ("a7") = (UBase)(which);	\
+	register Uint a0 asm ("a0") = (Uint)(arg0);	\
+	register Uint a1 asm ("a1") = (Uint)(arg1);	\
+	register Uint a2 asm ("a2") = (Uint)(arg2);	\
+	register Uint a3 asm ("a3") = (Uint)(arg3);	\
+	register Uint a7 asm ("a7") = (Uint)(which);	\
 	asm volatile ("ecall"					\
 		      : "+r" (a0)				\
 		      : "r" (a1), "r" (a2), "r" (a3), "r" (a7)	\
@@ -71,30 +71,30 @@ INLINE void SBI_ClearIpi(void)
 	SBI_CALL_0(SBI_CLEAR_IPI);
 }
 
-INLINE void SBI_SendIpi(const UBase *hart_mask)
+INLINE void SBI_SendIpi(const Uint *hart_mask)
 {
 	SBI_CALL_1(SBI_SEND_IPI, hart_mask);
 }
 
-INLINE void SBI_RemoteFenceI(const UBase *hart_mask)
+INLINE void SBI_RemoteFenceI(const Uint *hart_mask)
 {
 	SBI_CALL_1(SBI_REMOTE_FENCE_I, hart_mask);
 }
 
-INLINE void SBI_RemoteSfenceVma(const UBase *hart_mask, UBase start, UBase Size)
+INLINE void SBI_RemoteSfenceVma(const Uint *hart_mask, Uint start, Uint Size)
 {
 	SBI_CALL_3(SBI_REMOTE_SFENCE_VMA, hart_mask, start, Size);
 }
 
-INLINE void SBI_RemoteSfenceVmaAsid(const UBase *hart_mask,
-    UBase start,
-    UBase Size,
-    UBase asid)
+INLINE void SBI_RemoteSfenceVmaAsid(const Uint *hart_mask,
+    Uint start,
+    Uint Size,
+    Uint asid)
 {
 	SBI_CALL_4(SBI_REMOTE_SFENCE_VMA_ASID, hart_mask, start, Size, asid);
 }
 
-INLINE void SBI_SetExternInterrupt(UBase func_pointer)
+INLINE void SBI_SetExternInterrupt(Uint func_pointer)
 {
 	asm volatile("mv a6, %0" : : "r" (0x210));
 	SBI_CALL_1(0x0A000004, func_pointer);
