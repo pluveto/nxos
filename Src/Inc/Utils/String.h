@@ -15,5 +15,6 @@
 #include <XBook.h>
 
 PUBLIC char *CopyStr(char *dst, char *src);
+PUBLIC char CompareStr(const char* a, const char* b);
 
 #endif  /* __UTILS_STRING__ */

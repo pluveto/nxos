@@ -19,3 +19,13 @@ PUBLIC char *CopyStr(char *dst, char *src)
     }
     return dst;
 }
+
+PUBLIC char CompareStr(const char* a, const char* b)
+{  
+    while (*a != 0 && *a == *b)
+    {
+        a++;
+        b++;
+    }
+    return *a < *b ? -1 : *a > *b;
+}

@@ -39,11 +39,20 @@ PRIVATE void ClearBSS(void)
     Zero(&__bssStart, &__bssEnd - &__bssStart);
 }
 
+#define GRUB2_READ_MEMORY_BYTES_ADDR (0x000001000)
+
 PRIVATE void PageInit(void)
-{
+{    
+    U32 memSize = *(U32 *)GRUB2_READ_MEMORY_BYTES_ADDR;
+    if (memSize == 0)
+    {
+        PANIC("Get Memory Size Failed!");
+    }
+    Cout("Memory Size: " $x(memSize) " Bytes " $d(memSize / SZ_MB) " MB" Endln);
+    U32 normalSize = memSize - MEM_DMA_SIZE - MEM_KERNEL_SZ;
     /* init page zone */
     PageInitZone(PZ_DMA, (void *)MEM_DMA_BASE, MEM_DMA_SIZE);
-    PageInitZone(PZ_NORMAL, (void *)MEM_NORMAL_BASE, MEM_NORMAL_SIZE);
+    PageInitZone(PZ_NORMAL, (void *)MEM_NORMAL_BASE, normalSize);
 }
 
 INTERFACE OS_Error PlatformInit(void)

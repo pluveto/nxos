@@ -14,10 +14,12 @@
 
 #include <XBook.h>
 
-#define MEM_DMA_BASE 0x8000000
+#define MEM_KERNEL_BASE 0x00000000
+#define MEM_KERNEL_SZ (8 * SZ_MB)
+
+#define MEM_DMA_BASE (MEM_KERNEL_BASE + MEM_KERNEL_SZ)
 #define MEM_DMA_SIZE (8 * SZ_MB)
 
 #define MEM_NORMAL_BASE (MEM_DMA_BASE + MEM_DMA_SIZE)
-#define MEM_NORMAL_SIZE (256 * SZ_MB)
 
 #endif /* __PLATFORM_I386__ */
