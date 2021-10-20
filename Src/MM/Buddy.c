@@ -110,7 +110,7 @@ PRIVATE void BuddyDebug(BuddySystem* system)
 PUBLIC BuddySystem* BuddyCreate(void *mem, Size size)
 {
     ASSERT(mem && size);
-    Cout("mem:" $x(mem) " size:" $x(size) Endln);
+    // Cout("mem:" $x(mem) " size:" $x(size) Endln);
     if (!(mem && size))
     {
         return NULL;

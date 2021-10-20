@@ -44,15 +44,39 @@ PRIVATE void ClearBSS(void)
 PRIVATE void PageInit(void)
 {    
     U32 memSize = *(U32 *)GRUB2_READ_MEMORY_BYTES_ADDR;
+    
+    Cout("Memory Size: " $x(memSize) " Bytes " $d(memSize / SZ_MB) " MB" Endln);
+
     if (memSize == 0)
     {
         PANIC("Get Memory Size Failed!");
     }
-    Cout("Memory Size: " $x(memSize) " Bytes " $d(memSize / SZ_MB) " MB" Endln);
+    if (memSize < MEM_MIN_SIZE)
+    {
+        Cout("Must has " $d(MEM_MIN_SIZE / SZ_MB) " MB memory!");
+        PANIC("Memory too small");
+    }
+    
+    /* calc normal base & size */
     U32 normalSize = memSize - MEM_DMA_SIZE - MEM_KERNEL_SZ;
+    normalSize /= 2;
+    if (normalSize + MEM_NORMAL_BASE > MEM_KERNEL_TOP)
+    {
+        normalSize = MEM_KERNEL_TOP - MEM_NORMAL_BASE;
+    }
+    
+    /* calc user base & size */
+    U32 userBase = MEM_NORMAL_BASE + normalSize;
+    U32 userSize = memSize - userBase;
+
+    Cout("DMA memory base: " $x(MEM_DMA_BASE) " Size:" $d(MEM_DMA_SIZE / SZ_MB) " MB" Endln);
+    Cout("Normal memory base: " $x(MEM_NORMAL_BASE) " Size:" $d(normalSize / SZ_MB) " MB" Endln);
+    Cout("User memory base: " $x(userBase) " Size:" $d(userSize / SZ_MB) " MB" Endln);
+    
     /* init page zone */
     PageInitZone(PZ_DMA, (void *)MEM_DMA_BASE, MEM_DMA_SIZE);
     PageInitZone(PZ_NORMAL, (void *)MEM_NORMAL_BASE, normalSize);
+    PageInitZone(PZ_USER, (void *)userBase, userSize);
 }
 
 INTERFACE OS_Error PlatformInit(void)

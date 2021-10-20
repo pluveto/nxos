@@ -31,7 +31,7 @@ QEMU 		:= qemu-system-i386
 #
 # Qemu args configure
 # 
-QEMU_ARGS 	:=  -m 256m \
+QEMU_ARGS 	:=  -m 512m \
 				-name "NXOS - Plartform PC32 - Arch x86" \
 				-rtc base=localtime \
 				-boot d \
