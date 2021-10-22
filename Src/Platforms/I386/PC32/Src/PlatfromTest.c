@@ -16,6 +16,7 @@
 #include <Context.h>
 #include <MM/Page.h>
 #include <Platfrom.h>
+#include <Utils/Memory.h>
 
 #ifdef CONFIG_THREAD_TEST
 #define STACK_SZ 1024
@@ -78,6 +79,7 @@ PRIVATE void PageTest(void)
     for (i = 0; i < 16; i++)
     {
         void *buf = PageAlloc(i + 1);
+        Zero(buf, PAGE_SIZE);
         Cout("Alloc:" $x(buf) Endln);
         bufs[i] = buf; 
     }
@@ -93,6 +95,31 @@ PRIVATE void PageTest(void)
     for (i = 0; i < 16; i++)
     {
         void *buf = PageAlloc(i + 1);
+        Zero(buf, PAGE_SIZE);
+        Cout("Alloc:" $x(buf) Endln);
+        bufs[i] = buf; 
+    }
+
+    for (i = 0; i < 16; i++)
+    {
+        void *buf = PageAllocInZone(PZ_DMA, i + 1);
+        Zero(buf, PAGE_SIZE);
+        Cout("Alloc:" $x(buf) Endln);
+        bufs[i] = buf; 
+    }
+
+    for (i = 0; i < 16; i++)
+    {
+        Cout("Free:" $x(bufs[i]) Endln);
+        if (bufs[i])
+        {
+            PageFreeInZone(PZ_DMA, bufs[i]);
+        }
+    }
+    for (i = 0; i < 16; i++)
+    {
+        void *buf = PageAllocInZone(PZ_DMA, i + 1);
+        Zero(buf, PAGE_SIZE);
         Cout("Alloc:" $x(buf) Endln);
         bufs[i] = buf; 
     }

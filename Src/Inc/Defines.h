@@ -80,4 +80,14 @@
 #define SZ_GB   (SZ_MB * 1024)
 #define SZ_TB   (SZ_GB * 1024)
 
+/**
+ * Compile Align
+ */
+#define CALIGN(size) __attribute__((aligned(size)))
+
+/**
+ * Make sure no compile optimization
+ */
+#define NOOPT volatile 
+
 #endif  /* __XBOOK_DEFINES__ */

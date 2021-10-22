@@ -10,12 +10,12 @@
  */
 
 #include <Clock.h>
-#include <I386.h>
+#include <IO.h>
 #include <HAL.h>
 #include <Interrupt.h>
 #include <Mods/Console/Console.h>
 
-/* PIT （Programmable Interval Timer）8253/8254 可编程中断计时器 */
+/* PIT （Programmable Interval Timer）8253/8254 */
 
 /*
 Port 40h, 8253 Counter 0 Time of Day Clock (normally mode 3)

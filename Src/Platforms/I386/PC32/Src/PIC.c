@@ -9,7 +9,7 @@
  * 2021-10-16     JasonHu           Init
  */
 
-#include <I386.h>
+#include <IO.h>
 #include <PIC.h>
 #include <Interrupt.h>
 

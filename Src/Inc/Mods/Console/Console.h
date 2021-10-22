@@ -34,6 +34,8 @@ PUBLIC char *NumberToString(long n, int radix, int small);
 #define $d(v) , NumberToString((I32)(v), 10, 0),
 #define $x(v) , NumberToString((U32)(v), 16, 1),
 #define $X(v) , NumberToString((U32)(v), 16, 0),
+#define $p(v) , NumberToString((U32)(v), 16, 1),
+#define $P(v) , NumberToString((U32)(v), 16, 0),
 #define $b(v) , NumberToString((U32)(v), 2, 0),
 #define $o(v) , NumberToString((U32)(v), 8, 0),
 

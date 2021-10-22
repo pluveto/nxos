@@ -16,8 +16,7 @@
 #include <Utils/List.h>
 #include <Utils/Memory.h>
 
-#include <I386.h>
-#include <DirectUart.h>
+#include <Drivers/DirectUart.h>
 #include <Segment.h>
 #include <Gate.h>
 #include <Interrupt.h>
@@ -28,11 +27,47 @@
 #include <MM/Page.h>
 #include <Page.h>
 #include <Platfrom.h>
+#include <MMU.h>
 
 IMPORT void PlatfromTest(void);
 
-IMPORT Uint __bssStart;
-IMPORT Uint __bssEnd;
+IMPORT Addr __bssStart;
+IMPORT Addr __bssEnd;
+
+PRIVATE void PageInit(void);
+PRIVATE void ClearBSS(void);
+
+PUBLIC MMU kernelMMU;
+
+PRIVATE NOOPT U32 kernelTable[PAGE_SIZE / sizeof(U32)] CALIGN(PAGE_SIZE);
+
+INTERFACE OS_Error PlatformInit(void)
+{
+    ClearBSS();
+    
+    HAL_DirectUartInit();
+    
+    Cout("Hello, PC32!" Endln);
+
+    CPU_InitGate();
+    CPU_InitSegment();
+    CPU_InitTSS();
+    CPU_InitInterrupt();
+    
+    if (HAL_InitClock() != OS_EOK)
+    {
+        Cout("Init clock failed!" Endln);
+        return OS_ERROR;
+    }
+    PageInit();
+    
+    PlatfromTest();
+    
+    SPIN("test");
+    // HAL_InterruptEnable();
+
+    return OS_EOK;
+}
 
 PRIVATE void ClearBSS(void)
 {
@@ -66,43 +101,27 @@ PRIVATE void PageInit(void)
     }
     
     /* calc user base & size */
-    U32 userBase = MEM_NORMAL_BASE + normalSize;
-    U32 userSize = memSize - userBase;
+    Addr userBase = MEM_NORMAL_BASE + normalSize;
+    Size userSize = memSize - userBase;
 
     Cout("DMA memory base: " $x(MEM_DMA_BASE) " Size:" $d(MEM_DMA_SIZE / SZ_MB) " MB" Endln);
     Cout("Normal memory base: " $x(MEM_NORMAL_BASE) " Size:" $d(normalSize / SZ_MB) " MB" Endln);
     Cout("User memory base: " $x(userBase) " Size:" $d(userSize / SZ_MB) " MB" Endln);
-    
+
     /* init page zone */
     PageInitZone(PZ_DMA, (void *)MEM_DMA_BASE, MEM_DMA_SIZE);
     PageInitZone(PZ_NORMAL, (void *)MEM_NORMAL_BASE, normalSize);
     PageInitZone(PZ_USER, (void *)userBase, userSize);
-}
 
-INTERFACE OS_Error PlatformInit(void)
-{
-    ClearBSS();
-    
-    HAL_DirectUartInit();
-    
-    Cout("Hello, PC32!" Endln);
+    kernelMMU.virStart = 0;
+    kernelMMU.earlyEnd = userBase;
+    kernelMMU.virEnd = MEM_KERNEL_TOP;
+    kernelMMU.table = kernelTable;
 
-    CPU_InitGate();
-    CPU_InitSegment();
-    CPU_InitTSS();
-    CPU_InitInterrupt();
-    
-    if (HAL_InitClock() != OS_EOK)
-    {
-        Cout("Init clock failed!" Endln);
-        return OS_ERROR;
-    }
-    PageInit();
-    
-    PlatfromTest();
-    
-    SPIN("test");
-    // HAL_InterruptEnable();
+    MMU_EarlyMap(&kernelMMU, kernelMMU.virStart, kernelMMU.earlyEnd);
 
-    return OS_EOK;
+    MMU_SetPageTable((Uint)kernelMMU.table);
+    MMU_Enable();
+
+    Cout("MMU enabled\n");
 }

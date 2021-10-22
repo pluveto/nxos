@@ -2,30 +2,18 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: I386 arch special 
+ * Contains: I/O operate 
  * 
  * Change Logs:
  * Date           Author            Notes
  * 2021-9-23      JasonHu           Init
  */
 
-#ifndef __I386_HEADER__
-#define __I386_HEADER__
+#ifndef __PLATFORM_IO__
+#define __PLATFORM_IO__
 
 #include <Types.h>
 #include <Defines.h>
-
-#define EFLAGS_MBS    (1 << 1)
-#define EFLAGS_IF_1   (1 << 9)
-#define EFLAGS_IF_0 0
-#define EFLAGS_IOPL_3 (3 << 12)
-#define EFLAGS_IOPL_1 (1 << 12)
-#define EFLAGS_IOPL_0 (0 << 12)
-
-#define EFLAGS_IF (EFLAGS_IF_1)
-
-/* cr0 bit 31 is page enable bit, 1: enable MMU, 0: disable MMU */
-#define CR0_PG  (1 << 31)
 
 INLINE U8 IO_In8(U16 port)
 {
@@ -63,9 +51,4 @@ INLINE void IO_Out32(U16 port, U32 data)
     CASM("outl %0, %w1" : : "a" (data), "d" (port));
 }
 
-INLINE void CPU_LoadTR(U32 selector)
-{
-    CASM("ltr %w0" : : "q" (selector));
-}
-
-#endif  /* __I386_HEADER__ */
+#endif  /* __PLATFORM_IO__ */

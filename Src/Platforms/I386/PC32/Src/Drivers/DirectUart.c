@@ -11,8 +11,8 @@
 
 #include <XBook.h>
 #include <HAL.h>
-#include <I386.h>
-#include <DirectUart.h>
+#include <IO.h>
+#include <Drivers/DirectUart.h>
 
 #define UART_SEND_TIMEOUT       1
 

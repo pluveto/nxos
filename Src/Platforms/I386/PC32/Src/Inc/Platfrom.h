@@ -22,10 +22,8 @@
 
 #define MEM_NORMAL_BASE (MEM_DMA_BASE + MEM_DMA_SIZE)
 
-/* Minim physical memory size */
 #define MEM_MIN_SIZE (510 * SZ_MB)
-
-/* Minim physical memory size */
+#define MEM_HEAP_TOP (256 * SZ_MB)
 #define MEM_KERNEL_TOP (512 * SZ_MB)
 
 /**

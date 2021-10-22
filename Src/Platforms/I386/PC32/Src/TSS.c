@@ -11,7 +11,7 @@
 
 #include <TSS.h>
 #include <Segment.h>
-#include <I386.h>
+#include <Regs.h>
 #include <Utils/Memory.h>
 
 PRIVATE struct CPU_TSS tss;

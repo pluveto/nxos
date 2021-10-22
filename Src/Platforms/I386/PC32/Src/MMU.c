@@ -10,4 +10,55 @@
  */
 
 #include <MMU.h>
+#include <Regs.h>
+#include <Mods/Console/Console.h>
 
+PUBLIC void MMU_EarlyMap(MMU *mmu, Addr virStart, Size size)
+{
+    virStart = virStart & PAGE_ADDR_MASK;
+    Addr phyStart = virStart;
+    Addr virEnd = virStart + PAGE_ALIGNUP(size);
+
+    Cout("OS map early on [" $p(virStart) "~" $p(virEnd) "]\n");
+    
+    MMU_PDE *pdt = (MMU_PDE *)mmu->table;
+    
+    Size pdeCnt = (virEnd - virStart) / (PTE_CNT_PER_PAGE * PAGE_SIZE);
+    Size pteCnt = ((virEnd - virStart) / PAGE_SIZE) % PTE_CNT_PER_PAGE;
+    Addr *pte = (Uint *) PAGE_TABLE_ADDR;
+    U32 pdeIdx = PAGE_GET_L1(virStart);
+    int i, j;
+    for (i = 0; i < pdeCnt; i++)
+    {
+        /* fill pde */
+        pdt[pdeIdx + i] = MAKE_PTE(pte, KERNEL_PAGE_ATTR);
+        for (j = 0; j < PTE_CNT_PER_PAGE; j++)
+        {
+            /* fill each pte */
+            pte[j] = MAKE_PTE(phyStart, KERNEL_PAGE_ATTR);
+            phyStart += PAGE_SIZE;
+        }
+        pte += PTE_CNT_PER_PAGE;
+    }
+    if (pteCnt > 0)
+    {
+        /* fill left pte */
+        pdt[pdeIdx + i] = MAKE_PTE(pte, KERNEL_PAGE_ATTR);
+        for (j = 0; j < pteCnt; j++)
+        {
+            pte[j] = MAKE_PTE(phyStart, KERNEL_PAGE_ATTR);
+            phyStart += PAGE_SIZE;
+        }
+    }
+}
+
+PUBLIC void MMU_SetPageTable(Addr addr)
+{
+    /* set new pgdir will flush tlb */
+    CPU_WriteCR3(addr);
+}
+
+PUBLIC void MMU_Enable(void)
+{
+    CPU_WriteCR0(CPU_ReadCR0() | CR0_PG);
+}

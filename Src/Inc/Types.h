@@ -33,6 +33,8 @@ typedef signed char         I8;
 typedef unsigned long       Uint;
 typedef signed long         Int;
 
+typedef unsigned long       Addr;
+
 typedef unsigned long       Size;
 typedef signed long         SSize;
 
