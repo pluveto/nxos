@@ -32,6 +32,13 @@
 #define LARGE_SPAN_FREE_THRESHOLD_MAX  32
 
 /**
+ * max threshold for free small span.
+ * if free small list span count beyond thresold,
+ * free span will directly free to buddy system.
+ */
+#define SMALL_SPAN_FREE_THRESHOLD_MAX  64
+
+/**
  * span mark use to covert page to span
  */
 struct SpanMark

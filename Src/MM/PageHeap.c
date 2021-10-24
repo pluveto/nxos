@@ -153,13 +153,24 @@ PUBLIC void *PageHeapAlloc(Size count)
     {
         if (ListEmpty(&pageHeap.spanFreeList[count]))
         {
-            /* alloc from buddy system */
-
+            /* alloc from big free list first  */
+            void *span = PageAllocVirtual(count);
+            if (span == NULL)
+            {
+                Cout("no enough memroy to allocate for " $d(count) "pages!" Endln);
+                return NULL;
+            }
+            MarkSpan(span, count);
+            return span;
         }
         else
         {
             /* use first fit to alloc a span */
+            Span *spanNodeFirst = ListFirstOwner(&pageHeap.spanFreeList[count], Span, list);
+            ListDelInit(&spanNodeFirst->list);
 
+            /* return base addr as spin */
+            return (void *)spanNodeFirst;
         }
     }
     return NULL;
@@ -195,19 +206,29 @@ PUBLIC void PageHeapFree(void *span)
             /* add to large list */
             Span *spanNode = (Span *)page;
             spanNode->pageCount = count;
-
             ListAdd(&spanNode->list, &pageHeap.largeSpanFreeList);
         }
     }
-    else    /* alloc from normal list */
+    else    /* free from normal list */
     {
+        /* free list too long, free to buddy system directly */
+        if (ListLength(&pageHeap.spanFreeList[count]) >= SMALL_SPAN_FREE_THRESHOLD_MAX)
+        {
+            ClearSpan(page, count);
+            PageFreeVirtual(page);
+        }
+        else
+        {
+            /* add to free list */
+            Span *spanNode = (Span *)page;
+            spanNode->pageCount = count;
+            ListAdd(&spanNode->list, &pageHeap.spanFreeList[count]);
+        }
     }
 }
 
-PRIVATE void PageHeapTest(void)
+PRIVATE void PageHeapLarge(void)
 {
-    Cout("PageHeap test" Endln);
-
     void *span = PageHeapAlloc(128);
     Cout("span: " $p(span) Endln);
     PageHeapFree(span);
@@ -238,7 +259,61 @@ PRIVATE void PageHeapTest(void)
         Cout("free span: " $p(table[i]) Endln);
         PageHeapFree(table[i]);
     }
+    
+}
 
+PRIVATE void PageHeapSmall(void)
+{
+    void *span = PageHeapAlloc(1);
+    Cout("span: " $p(span) Endln);
+    PageHeapFree(span);
+    span = PageHeapAlloc(1);
+    Cout("span: " $p(span) Endln);
+    PageHeapFree(span);
+
+    span = PageHeapAlloc(10);
+    Cout("span: " $p(span) Endln);
+    PageHeapFree(span);
+    span = PageHeapAlloc(10);
+    Cout("span: " $p(span) Endln);
+    PageHeapFree(span);
+
+    void *table[128];
+    
+    int i;
+    for (i = 1; i <= 128; i++)
+    {
+        table[i] = PageHeapAlloc(i);
+        Cout("alloc span: " $p(table[i]) Endln);
+        Set(table[i], 0x5a, PAGE_SIZE * i);
+    }
+
+    for (i = 1; i <= 128; i++)
+    {
+        Cout("free span: " $p(table[i]) Endln);
+        PageHeapFree(table[i]);
+    }
+
+    for (i = 1; i <= 128; i++)
+    {
+        table[i] = PageHeapAlloc(i);
+        Cout("alloc span: " $p(table[i]) Endln);
+        Set(table[i], 0x5a, PAGE_SIZE * i);
+    }
+
+    for (i = 1; i <= 128; i++)
+    {
+        Cout("free span: " $p(table[i]) Endln);
+        PageHeapFree(table[i]);
+    }
+}
+
+PRIVATE void PageHeapTest(void)
+{
+    Cout("PageHeap test" Endln);
+
+    PageHeapLarge();
+    PageHeapSmall();
 }
 
 PUBLIC void PageHeapInit(void)
