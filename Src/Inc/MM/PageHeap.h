@@ -39,6 +39,12 @@
 #define SMALL_SPAN_FREE_THRESHOLD_MAX  64
 
 /**
+ * max threshold for free one page span.
+ * one page span will used more 
+ */
+#define ONE_PAGE_SPAN_FREE_THRESHOLD_MAX  1024
+
+/**
  * span mark use to covert page to span
  */
 struct SpanMark

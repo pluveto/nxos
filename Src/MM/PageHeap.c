@@ -191,7 +191,14 @@ PUBLIC void PageHeapFree(void *span)
     }
     else    /* free from normal list */
     {
-        maxThresold = SMALL_SPAN_FREE_THRESHOLD_MAX;
+        if (count == 1) /* one page special */
+        {
+            maxThresold = ONE_PAGE_SPAN_FREE_THRESHOLD_MAX;
+        }
+        else
+        {
+            maxThresold = SMALL_SPAN_FREE_THRESHOLD_MAX;
+        }
         listHead = &pageHeap.spanFreeList[count];
     }
 
@@ -289,12 +296,43 @@ PRIVATE void PageHeapSmall(void)
     }
 }
 
+PRIVATE void PageHeapOnePage(void)
+{
+    void *table[1024];
+    int i;
+    for (i = 0; i < 1024; i++)
+    {
+        table[i] = PageHeapAlloc(1);
+        Cout("alloc span: " $p(table[i]) Endln);
+        Set(table[i], 0x5a, PAGE_SIZE);
+    }
+
+    for (i = 0; i < 1024; i++)
+    {
+        Cout("free span: " $p(table[i]) Endln);
+        PageHeapFree(table[i]);
+    }
+    for (i = 0; i < 1024; i++)
+    {
+        table[i] = PageHeapAlloc(1);
+        Cout("alloc span: " $p(table[i]) Endln);
+        Set(table[i], 0x5a, PAGE_SIZE);
+    }
+
+    for (i = 0; i < 1024; i++)
+    {
+        Cout("free span: " $p(table[i]) Endln);
+        PageHeapFree(table[i]);
+    }
+}
+
 PRIVATE void PageHeapTest(void)
 {
     Cout("PageHeap test" Endln);
 
     PageHeapLarge();
     PageHeapSmall();
+    PageHeapOnePage();
 }
 
 PUBLIC void PageHeapInit(void)
