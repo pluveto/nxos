@@ -25,6 +25,7 @@
 #include <Context.h>
 #include <MM/buddy.h>
 #include <MM/Page.h>
+#include <MM/PageHeap.h>
 #include <Page.h>
 #include <Platfrom.h>
 #include <MMU.h>
@@ -124,4 +125,8 @@ PRIVATE void PageInit(void)
     MMU_Enable();
 
     Cout("MMU enabled\n");
+
+    /* init memory allocator */
+    PageHeapInit();
+
 }

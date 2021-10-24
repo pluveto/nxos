@@ -90,4 +90,7 @@
  */
 #define NOOPT volatile 
 
+#define DIV_ROUND_UP(x, step) (((x) + (step) - 1) / (step))
+#define DIV_ROUND_DOWN(x, step) ((x) / (step))
+
 #endif  /* __XBOOK_DEFINES__ */

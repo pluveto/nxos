@@ -18,9 +18,11 @@
 
 * [+] 从硬件获取内存大小
 
-* [-] 添加MMU
+* [+] 添加MMU
 
 * [-] 添加内核内存管理
+https://zhuanlan.zhihu.com/p/29216091
+http://goog-perftools.sourceforge.net/doc/tcmalloc.html
 
 * [-] 添加单元测试
 

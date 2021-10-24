@@ -36,3 +36,15 @@ PUBLIC void PageFreeInZone(PageZone zone, void *ptr)
     ASSERT(zone >= PZ_NORMAL && zone < PZ_NR && ptr != NULL);
     BuddyFreePage(buddySystem[zone], ptr);
 }
+
+PUBLIC void *PageZoneGetBase(PageZone zone)
+{
+    ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
+    return buddySystem[zone]->pageStart;
+}
+
+PUBLIC Size PageZoneGetPages(PageZone zone)
+{
+    ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
+    return (buddySystem[zone]->maxPFN + 1);
+}

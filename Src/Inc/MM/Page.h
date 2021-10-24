@@ -18,8 +18,13 @@
 PUBLIC void PageInitZone(PageZone zone, void *mem, Size size);
 PUBLIC void *PageAllocInZone(PageZone zone, Size count);
 PUBLIC void PageFreeInZone(PageZone zone, void *ptr);
+PUBLIC void *PageZoneGetBase(PageZone zone);
+PUBLIC Size PageZoneGetPages(PageZone zone);
 
 #define PageAlloc(size) PageAllocInZone(PZ_NORMAL, size)
 #define PageFree(ptr) PageFreeInZone(PZ_NORMAL, ptr)
+
+#define P2V(addr) ((addr) + CONFIG_KERNEL_VSTART)
+#define V2P(addr) ((addr) - CONFIG_KERNEL_VSTART)
 
 #endif /* __MM_PAGE__ */
