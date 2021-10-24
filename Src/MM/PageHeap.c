@@ -104,76 +104,64 @@ PUBLIC void *PageHeapAlloc(Size count)
         Cout("alloc page count is 0!" Endln);
         return NULL;
     }
-    
-    if (count > PAGE_HEAP_MAX_PAGES)
+    else if (count > PAGE_HEAP_MAX_PAGES)
     {
         Cout("alloc page count beyond " $d(PAGE_HEAP_MAX_PAGES) Endln);
         return NULL;
     }
     
+    int isLargeSpan = 0;
+    List *listHead;
+    Span *spanNode = NULL;
+    Span *spanNodeBest = NULL;
+
     if (count >= SMALL_SPAN_PAGES_MAX)    /* alloc from large list */
     {
-        if (ListEmpty(&pageHeap.largeSpanFreeList))
-        {
-            /* alloc from buddy system */
-            void *span = PageAllocVirtual(count);
-            if (span == NULL)
-            {
-                Cout("no enough memroy to allocate for " $d(count) "pages!" Endln);
-                return NULL;
-            }
-            MarkSpan(span, count);
-            return span;
-        }
-        else
-        {
-            /* use best fit to alloc a span */
-            Span *spanNodeBest = NULL;
-            
-            Span *spanNode;
-            ListForEachOwner (spanNode, &pageHeap.largeSpanFreeList, list)
-            {
-                if (spanNodeBest == NULL)
-                {
-                    spanNodeBest = spanNode;
-                }
-                if (spanNode != spanNodeBest && spanNode->pageCount < spanNodeBest->pageCount)
-                {
-                    spanNodeBest = spanNode;
-                }
-            }
-            /* del span node from list */
-            ListDelInit(&spanNodeBest->list);
-
-            /* return base addr as spin */
-            return (void *)spanNodeBest;
-        }
+        isLargeSpan = 1;
+        listHead = &pageHeap.largeSpanFreeList;
     }
     else    /* alloc from normal list */
     {
-        if (ListEmpty(&pageHeap.spanFreeList[count]))
-        {
-            /* alloc from big free list first  */
-            void *span = PageAllocVirtual(count);
-            if (span == NULL)
-            {
-                Cout("no enough memroy to allocate for " $d(count) "pages!" Endln);
-                return NULL;
-            }
-            MarkSpan(span, count);
-            return span;
-        }
-        else
-        {
-            /* use first fit to alloc a span */
-            Span *spanNodeFirst = ListFirstOwner(&pageHeap.spanFreeList[count], Span, list);
-            ListDelInit(&spanNodeFirst->list);
+        listHead = &pageHeap.spanFreeList[count];
+    }
 
-            /* return base addr as spin */
-            return (void *)spanNodeFirst;
+    if (ListEmpty(listHead))
+    {
+        /* alloc from buddy system */
+        void *span = PageAllocVirtual(count);
+        if (span == NULL)
+        {
+            Cout("no enough memroy to allocate for " $d(count) "pages!" Endln);
+            return NULL;
+        }
+        MarkSpan(span, count);
+        return span;
+    }
+    
+    if (isLargeSpan)
+    {
+        /* use best fit to alloc a span */
+        ListForEachOwner (spanNode, &pageHeap.largeSpanFreeList, list)
+        {
+            if (spanNodeBest == NULL)
+            {
+                spanNodeBest = spanNode;
+            }
+            if (spanNode != spanNodeBest && spanNode->pageCount < spanNodeBest->pageCount)
+            {
+                spanNodeBest = spanNode;
+            }
         }
     }
-    return NULL;
+    else
+    {
+        /* use first fit to alloc a span */
+        spanNodeBest = ListFirstOwner(&pageHeap.spanFreeList[count], Span, list);
+    }
+    /* del span node from list */
+    ListDelInit(&spanNodeBest->list);
+    /* return base addr as spin */
+    return (void *)spanNodeBest;
 }
 
 PUBLIC void PageHeapFree(void *span)
@@ -183,7 +171,7 @@ PUBLIC void PageHeapFree(void *span)
         Cout("free NULL span!" Endln);
         return;
     }
-    /* find ptr in system */
+
     void *page = SpanToPage(span);
     Size count = SpanToPageCount(span);
 
@@ -193,37 +181,30 @@ PUBLIC void PageHeapFree(void *span)
         return;
     }
 
+    List *listHead;
+    Size maxThresold = 0;
+
     if (count >= SMALL_SPAN_PAGES_MAX)    /* free to large list */
     {
-        /* large list too long, free to buddy system directly */
-        if (ListLength(&pageHeap.largeSpanFreeList) >= LARGE_SPAN_FREE_THRESHOLD_MAX)
-        {
-            ClearSpan(page, count);
-            PageFreeVirtual(page);
-        }
-        else
-        {
-            /* add to large list */
-            Span *spanNode = (Span *)page;
-            spanNode->pageCount = count;
-            ListAdd(&spanNode->list, &pageHeap.largeSpanFreeList);
-        }
+        maxThresold = LARGE_SPAN_FREE_THRESHOLD_MAX;
+        listHead = &pageHeap.largeSpanFreeList;
     }
     else    /* free from normal list */
     {
-        /* free list too long, free to buddy system directly */
-        if (ListLength(&pageHeap.spanFreeList[count]) >= SMALL_SPAN_FREE_THRESHOLD_MAX)
-        {
-            ClearSpan(page, count);
-            PageFreeVirtual(page);
-        }
-        else
-        {
-            /* add to free list */
-            Span *spanNode = (Span *)page;
-            spanNode->pageCount = count;
-            ListAdd(&spanNode->list, &pageHeap.spanFreeList[count]);
-        }
+        maxThresold = SMALL_SPAN_FREE_THRESHOLD_MAX;
+        listHead = &pageHeap.spanFreeList[count];
+    }
+
+    if (ListLength(listHead) >= maxThresold)    /* directly free */
+    {
+        ClearSpan(page, count);
+        PageFreeVirtual(page);
+    }
+    else    /* add to list for cache */
+    {
+        Span *spanNode = (Span *)page;
+        spanNode->pageCount = count;
+        ListAdd(&spanNode->list, listHead);
     }
 }
 
