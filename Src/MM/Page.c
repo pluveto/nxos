@@ -48,3 +48,9 @@ PUBLIC Size PageZoneGetPages(PageZone zone)
     ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
     return (buddySystem[zone]->maxPFN + 1);
 }
+
+PUBLIC void *PageZoneGetBuddySystem(PageZone zone)
+{
+    ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
+    return buddySystem[zone];
+}

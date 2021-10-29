@@ -26,6 +26,7 @@
 #include <MM/buddy.h>
 #include <MM/Page.h>
 #include <MM/PageHeap.h>
+#include <MM/HeapCache.h>
 #include <Page.h>
 #include <Platfrom.h>
 #include <MMU.h>
@@ -128,5 +129,5 @@ PRIVATE void PageInit(void)
 
     /* init memory allocator */
     PageHeapInit();
-
+    HeapCacheInit();
 }

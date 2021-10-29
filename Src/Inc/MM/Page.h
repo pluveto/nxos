@@ -21,6 +21,8 @@ PUBLIC void PageFreeInZone(PageZone zone, void *ptr);
 PUBLIC void *PageZoneGetBase(PageZone zone);
 PUBLIC Size PageZoneGetPages(PageZone zone);
 
+PUBLIC void *PageZoneGetBuddySystem(PageZone zone);
+
 #define PageAlloc(size) PageAllocInZone(PZ_NORMAL, size)
 #define PageFree(ptr) PageFreeInZone(PZ_NORMAL, ptr)
 

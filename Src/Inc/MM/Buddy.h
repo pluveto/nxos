@@ -42,6 +42,8 @@ struct Page
     List list;
     U32 flags;
     U32 order;
+    Size sizeClass;         /* size class on this span */
+    Size maxObjectsOnSpan;  /* max memory objects on this span */
 };
 typedef struct Page Page;
 
@@ -59,5 +61,7 @@ typedef struct BuddySystem BuddySystem;
 PUBLIC BuddySystem* BuddyCreate(void *mem, Size size);
 PUBLIC void *BuddyAllocPage(BuddySystem* system, Size count);
 PUBLIC void BuddyFreePage(BuddySystem* system, void *ptr);
+
+PUBLIC Page* PageFromPtr(BuddySystem* system, void *ptr);
 
 #endif /* __MM_BUDDY__ */

@@ -56,11 +56,10 @@ typedef struct SpanMark SpanMark;
 
 struct Span
 {
-    List list;
+    List list;  /* NOTICE: list must be first member here */
     Size pageCount; /* page count for this span */
 };
 typedef struct Span Span;
-
 
 struct PageHeap
 {
@@ -71,5 +70,9 @@ typedef struct PageHeap PageHeap;
 
 PUBLIC void PageHeapInit(void);
 PUBLIC void *PageHeapAlloc(Size count);
+PUBLIC void PageHeapFree(void *page);
+
+PUBLIC void *PageToSpan(void *page);
+PUBLIC Size PageToSpanCount(void *span);
 
 #endif /* __MM_PAGE_HEAP__ */

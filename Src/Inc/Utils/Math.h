@@ -1,0 +1,37 @@
+/**
+ * Copyright (c) 2018-2021, BookOS Development Team
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Contains: Math utils
+ * 
+ * Change Logs:
+ * Date           Author            Notes
+ * 2021-10-256    JasonHu           Init
+ */
+
+#ifndef __UTILS_MATH__
+#define __UTILS_MATH__
+
+#include <XBook.h>
+
+INLINE int PowInt(int x, int n)
+{
+    int res = 1;
+    if (n < 0)
+    {
+        x = 1 / x;
+        n = -n;
+    }
+    while (n)
+    {
+        if(n & 1)
+        {
+            res *= x;
+        }
+        x *= x;
+        n >>= 1;
+    }
+    return res;
+}
+
+#endif  /* __UTILS_MATH__ */

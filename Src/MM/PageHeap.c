@@ -47,7 +47,6 @@ PRIVATE void MarkSpan(void *span, Size count)
     Size idx = dis >> PAGE_SHIFT;
 
     SpanMark *mark = spanMark + idx;
-
     int i;
     for (i = 0; i < count; i++)
     {
@@ -76,16 +75,16 @@ PRIVATE void ClearSpan(void *span, Size count)
     }
 }
 
-PUBLIC void *SpanToPage(void *span)
+PUBLIC void *PageToSpan(void *page)
 {
-    Size dis = (Addr)span - (Addr)spanBaseAddr;
+    Size dis = (Addr)page - (Addr)spanBaseAddr;
     Size idx = dis >> PAGE_SHIFT;
 
     SpanMark *mark = spanMark + idx;
-    return (void *)((Addr)span - mark->idx * PAGE_SIZE);
+    return (void *)((Addr)page - mark->idx * PAGE_SIZE);
 }
 
-PUBLIC Size SpanToPageCount(void *span)
+PUBLIC Size PageToSpanCount(void *span)
 {
     Size dis = (Addr)span - (Addr)spanBaseAddr;
     Size idx = dis >> PAGE_SHIFT;
@@ -164,16 +163,16 @@ PUBLIC void *PageHeapAlloc(Size count)
     return (void *)spanNodeBest;
 }
 
-PUBLIC void PageHeapFree(void *span)
+PUBLIC void PageHeapFree(void *page)
 {
-    if (span == NULL)
+    if (page == NULL)
     {
-        Cout("free NULL span!" Endln);
+        Cout("free NULL page!" Endln);
         return;
     }
 
-    void *page = SpanToPage(span);
-    Size count = SpanToPageCount(span);
+    void *span = PageToSpan(page);
+    Size count = PageToSpanCount(page);
 
     if (!count)
     {
@@ -204,12 +203,12 @@ PUBLIC void PageHeapFree(void *span)
 
     if (ListLength(listHead) >= maxThresold)    /* directly free */
     {
-        ClearSpan(page, count);
-        PageFreeVirtual(page);
+        ClearSpan(span, count);
+        PageFreeVirtual(span);
     }
     else    /* add to list for cache */
     {
-        Span *spanNode = (Span *)page;
+        Span *spanNode = (Span *)span;
         spanNode->pageCount = count;
         ListAdd(&spanNode->list, listHead);
     }
@@ -358,5 +357,5 @@ PUBLIC void PageHeapInit(void)
     }
     Zero(spanMark, spanMarkPages * PAGE_SIZE);
 
-    PageHeapTest();
+    // PageHeapTest();
 }

@@ -44,7 +44,7 @@ PRIVATE void *PageToPtr(BuddySystem* system, Page* page)
     return &ArraryCast(system->pageStart, PAGE_SIZE)[diff];
 }
 
-PRIVATE Page* PageFromPtr(BuddySystem* system, void *ptr)
+PUBLIC Page* PageFromPtr(BuddySystem* system, void *ptr)
 {
     ASSERT(0 == ((Size)ptr % PAGE_SIZE));
     PtrDiff diff = ArraryCast(ptr, PAGE_SIZE) - ArraryCast(system->pageStart, PAGE_SIZE);
