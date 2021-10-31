@@ -10,6 +10,8 @@
  */
 
 #include <HAL.h>
+#define LOG_NAME "Main"
+#define LOG_LEVEL LOG_INFO
 #include <Utils/Debug.h>
 
 PUBLIC int OS_Main(void)
@@ -20,6 +22,9 @@ PUBLIC int OS_Main(void)
         PANIC("Platfrom init failed!" Endln);
     }
     
-    SPIN("OS_Main");
+    LOG_I("Hello, NXOS!");
+    HAL_InterruptEnable();
+    while (1);
+    // SPIN("OS_Main");
     return 0;
 }

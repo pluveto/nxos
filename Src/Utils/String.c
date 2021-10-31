@@ -11,7 +11,7 @@
 
 #include <Utils/String.h>
 
-PUBLIC char *CopyStr(char *dst, char *src)
+PUBLIC char *StrCopy(char *dst, char *src)
 {
     char *dstPtr = dst;		       
     while ((*dstPtr++ = *src++))
@@ -20,7 +20,7 @@ PUBLIC char *CopyStr(char *dst, char *src)
     return dst;
 }
 
-PUBLIC char CompareStr(const char* a, const char* b)
+PUBLIC char StrCmp(const char* a, const char* b)
 {  
     while (*a != 0 && *a == *b)
     {
@@ -28,4 +28,11 @@ PUBLIC char CompareStr(const char* a, const char* b)
         b++;
     }
     return *a < *b ? -1 : *a > *b;
+}
+
+PUBLIC int StrLen(const char *str)
+{
+    const char *p = str;
+    while(*p++);
+    return (p - str - 1);
 }

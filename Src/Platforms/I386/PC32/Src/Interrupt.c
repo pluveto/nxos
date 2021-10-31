@@ -11,7 +11,6 @@
 
 #include <Gate.h>
 #include <Interrupt.h>
-#include <Mods/Console/Console.h>
 #include <Utils/String.h>
 #include <Utils/Memory.h>
 #include <HAL.h>
@@ -72,14 +71,14 @@ PUBLIC void CPU_InitInterrupt(void)
     {
         irqInfoTable[i].handler = DefaultExceptionHandler;
         irqInfoTable[i].arg = NULL;
-        CopyStr(irqInfoTable[i].name, exceptionName[i]);
+        StrCopy(irqInfoTable[i].name, exceptionName[i]);
     }
     /* external */
     for (i = EXTERNAL_BASE; i < EXTERNAL_BASE + MAX_EXTERNAL_NR; i++)
     {
         irqInfoTable[i].handler = DefaultExternalHandler;
         irqInfoTable[i].arg = NULL;
-        CopyStr(irqInfoTable[i].name, "external");
+        StrCopy(irqInfoTable[i].name, "external");
     }
     PIC_Init();
 }
@@ -141,7 +140,7 @@ INTERFACE OS_Error HAL_IRQInstall(IRQ_Number irqno, IRQ_Handler handler, void *a
     irqInfoTable[irqno].handler = handler;
     irqInfoTable[irqno].arg = arg;
     Zero(irqInfoTable[irqno].name, CONFIG_IRQ_NAME_LEN);
-    CopyStr(irqInfoTable[irqno].name, name);
+    StrCopy(irqInfoTable[irqno].name, name);
     return OS_EOK;
 }
 

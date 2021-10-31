@@ -11,11 +11,11 @@
 
 #include <XBook.h>
 #include <Platforms/Init.h>
-#include <Mods/Console/Console.h>
+#include <Utils/Debug.h>
 
 INTERFACE int PlatformInit(void)
 {
-    COUT Str("Hello, QEMU Riscv64!") Endln;
+    LOG_I("Hello, QEMU Riscv64!");
     U32 i = 0;
     for (;;)
     {

@@ -11,7 +11,6 @@
 
 #include <XBook.h>
 #include <HAL.h>
-#include <Mods/Console/Console.h>
 #include <Utils/List.h>
 #include <Utils/Memory.h>
 
@@ -68,9 +67,6 @@ INTERFACE OS_Error PlatformInit(void)
     
     PlatfromTest();
     
-    SPIN("test");
-    // HAL_InterruptEnable();
-
     return OS_EOK;
 }
 

@@ -13,7 +13,7 @@
 #include <IO.h>
 #include <HAL.h>
 #include <Interrupt.h>
-#include <Mods/Console/Console.h>
+#include <Mods/Time/Clock.h>
 
 /* PIT （Programmable Interval Timer）8253/8254 */
 
@@ -129,16 +129,12 @@ enum ctrl_mode_bits
 };
 
 #define TIMER_FREQ     1193180  /* clock frequency */
-#define COUNTER0_VALUE  (TIMER_FREQ / CONFIG_TICKS_PER_SECOND)
-
-U32 ticks = 0;
+#define COUNTER0_VALUE  (TIMER_FREQ / OS_TICKS_PER_SECOND)
 
 PRIVATE OS_Error ClockHandler(U32 irq, void *arg)
 {
-    ticks++;
-
-    // COUT Str("ticks: ") Int(ticks) Endln;
-
+    ClockTickGo();
+    
     return OS_EOK;
 }
 

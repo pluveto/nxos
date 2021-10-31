@@ -12,7 +12,6 @@
 #include <MM/Page.h>
 #include <MM/PageHeap.h>
 #include <MM/Buddy.h>
-#include <Mods/Console/Console.h>
 #include <Utils/Memory.h>
 
 #define LOG_LEVEL LOG_INFO

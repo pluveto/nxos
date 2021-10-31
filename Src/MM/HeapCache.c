@@ -10,7 +10,6 @@
  */
 
 #include <MM/HeapCache.h>
-#include <Mods/Console/Console.h>
 #include <Utils/Math.h>
 #include <MM/PageHeap.h>
 #include <MM/Buddy.h>

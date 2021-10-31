@@ -9,12 +9,11 @@
  * 2021-10-1      JasonHu           Init
  */
 
-#include <Mods/Console/Console.h>
 #include <Utils/Memory.h>
-
 #include <Utils/Log.h>
+#include <Utils/String.h>
 
-PRIVATE char *I2A(long num, char *str, U8 radix, int small)
+PRIVATE char *I2A(long num, char *str, int buflen, U8 radix, int small, int pad, char padChar)
 {
     char *index;
     if (small)
@@ -26,7 +25,7 @@ PRIVATE char *I2A(long num, char *str, U8 radix, int small)
         index = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     }
     unsigned long unum;
-    int i = 0, j, k;
+    int i = 0, j, k, n;
     char temp;
 
     /* signe */
@@ -67,6 +66,29 @@ PRIVATE char *I2A(long num, char *str, U8 radix, int small)
         str[j] = str[i - 1 + k - j];
         str[i - 1 + k - j] = temp;
     }
+
+    /* pad space */
+    j = StrLen(str);
+
+    if (pad > j)
+    {
+        if (pad > buflen)
+        {
+            pad = buflen;
+        }
+        n = pad - j;    /* need pad n bytes */
+
+        str[j + n] = '\0';
+        
+        for (i = j - 1; i >= 0; --i)
+        {
+            str[i + n] = str[i];
+        }
+        for (i = 0; i < n; ++i)
+        {
+            str[i] = padChar;   /* pad 'space' */
+        }
+    }
     return str;
 }
 
@@ -88,7 +110,7 @@ PUBLIC void ConsoleOutStr(const char *str)
 PRIVATE U32 strBufPtr = 0;
 PRIVATE char tmpStrBuf[MAX_BUF_NR][MAX_INT_BUF_SZ];
 
-PUBLIC char *NumberToString(long n, int radix, int small)
+PUBLIC char *NumberToString(long n, int radix, int small, int pad, char padChar)
 {
     if (radix < 2 || radix > 16)
     {
@@ -99,7 +121,7 @@ PUBLIC char *NumberToString(long n, int radix, int small)
     char *buf = tmpStrBuf[strBufPtr];
     strBufPtr = (strBufPtr + 1) % MAX_BUF_NR;
     Zero(buf, MAX_INT_BUF_SZ);
-    return I2A(n, buf, radix, small);
+    return I2A(n, buf, MAX_INT_BUF_SZ, radix, small, pad, padChar);
 }
 
 void AssertionFailure(char *exp, char *file, char *baseFile, int line)

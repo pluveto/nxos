@@ -39,9 +39,9 @@
 #endif
 #endif /* LOG_NAME */
 
-
 #ifdef LOG_ENABLE
 #include <Mods/Console/Console.h>
+#include <Mods/Time/Clock.h>
 
 #ifdef LOG_LEVEL
 #ifndef LOG_MOD_LEVEL
@@ -74,15 +74,25 @@
 #define __LOG_END Cout(CON_NEWLINE)
 #endif /* LOG_COLOR */
 
+
+#ifdef CONFIG_DEBUG_TIMELINE
+#define LOG_TIMELINE Cout("[" $d_(ClockTickGetMilliSecond() / 1000, 10, ' ') "." \
+        $d_(ClockTickGetMilliSecond() % 1000, 3, '0') "] ") ;
+#else
+#define LOG_TIMELINE
+#endif
+
 #define LOG_LINE(logName, color, ...) \
     do \
     { \
+        LOG_TIMELINE \
         __LOG_BEGIN(logName, color); \
         Cout(__VA_ARGS__); \
         __LOG_END; \
     } \
     while (0)
-#define __LOG_RAW(...)         Cout(__VA_ARGS__)
+#define __LOG_RAW(...) LOG_TIMELINE \
+        Cout(__VA_ARGS__)
 
 #else
 #define LOG_LINE(logName, color, ...)

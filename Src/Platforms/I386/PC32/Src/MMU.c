@@ -11,7 +11,6 @@
 
 #include <MMU.h>
 #include <Regs.h>
-#include <Mods/Console/Console.h>
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "MMU"

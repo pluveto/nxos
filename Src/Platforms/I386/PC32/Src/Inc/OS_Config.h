@@ -22,6 +22,7 @@
 /* OS debug config */
 #define CONFIG_DEBUG
 #define CONFIG_DEBUG_COLOR
+#define CONFIG_DEBUG_TIMELINE
 
 /* OS test config */
 /* #define CONFIG_PLATFROM_TEST */

@@ -43,7 +43,7 @@ int BootSetting(unsigned long magic, unsigned long addr)
     return 0;
 }
 
-#define CmdlineIs(cmd) (!CompareStr(((struct multiboot_tag_module *)tag)->cmdline, cmd))
+#define CmdlineIs(cmd) (!StrCmp(((struct multiboot_tag_module *)tag)->cmdline, cmd))
 
 static void BootModInit(struct multiboot_tag *tag) {
     struct BootModInfo *modInfo = (struct BootModInfo *)BOOT_INFO_ADDR;
