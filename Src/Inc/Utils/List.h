@@ -135,29 +135,29 @@ INLINE int ListEmpty(const List *head)
     return (head->next == head);
 }
 
-#define ListOwner(ptr, type, member) PtrOfStruct(ptr, type, member)
+#define ListEntry(ptr, type, member) PtrOfStruct(ptr, type, member)
 
-#define ListFirstOwner(head, type, member) ListOwner((head)->next, type, member)
+#define ListFirstEntry(head, type, member) ListEntry((head)->next, type, member)
 
-#define ListLastOwner(head, type, member) ListOwner((head)->prev, type, member)
+#define ListLastEntry(head, type, member) ListEntry((head)->prev, type, member)
 
-#define ListFirstOwnerOrNULL(head, type, member) ({ \
+#define ListFirstEntryOrNULL(head, type, member) ({ \
         List *__head = (head); \
         List *__pos = (__head->next); \
-        __pos != __head ? ListOwner(__pos, type, member) : NULL; \
+        __pos != __head ? ListEntry(__pos, type, member) : NULL; \
 })
 
-#define ListLastOwnerOrNULL(head, type, member) ({ \
+#define ListLastEntryOrNULL(head, type, member) ({ \
         List *__head = (head); \
         List *__pos = (__head->prev); \
-        __pos != __head ? ListOwner(__pos, type, member) : NULL; \
+        __pos != __head ? ListEntry(__pos, type, member) : NULL; \
 })
 
-#define ListNextOwner(pos, member) \
-       ListOwner((pos)->member.next, typeof(*(pos)), member)
+#define ListNextEntry(pos, member) \
+       ListEntry((pos)->member.next, typeof(*(pos)), member)
 
 #define ListPrevOnwer(pos, member) \
-       ListOwner((pos)->member.prev, typeof(*(pos)), member)
+       ListEntry((pos)->member.prev, typeof(*(pos)), member)
 
 #define ListForEach(pos, head) \
        for (pos = (head)->next; pos != (head); pos = pos->next)
@@ -188,24 +188,24 @@ INLINE int ListLength(List *head)
         for (pos = (head)->prev, _prev = pos->prev; pos != (head); \
             pos = _prev, _prev = pos->prev)
 
-#define ListForEachOwner(pos, head, member)                     \
-        for (pos = ListFirstOwner(head, typeof(*pos), member);  \
+#define ListForEachEntry(pos, head, member)                     \
+        for (pos = ListFirstEntry(head, typeof(*pos), member);  \
             &pos->member != (head);                             \
-            pos = ListNextOwner(pos, member))
+            pos = ListNextEntry(pos, member))
 
-#define ListForEachOwnerReverse(pos, head, member)              \
-        for (pos = ListLastOwner(head, typeof(*pos), member);   \
+#define ListForEachEntryReverse(pos, head, member)              \
+        for (pos = ListLastEntry(head, typeof(*pos), member);   \
             &pos->member != (head);                             \
             pos = ListPrevOnwer(pos, member))
 
-#define ListForEachOwnerSafe(pos, next, head, member)           \
-        for (pos = ListFirstOwner(head, typeof(*pos), member),  \
-            next = ListNextOwner(pos, member);                  \
+#define ListForEachEntrySafe(pos, next, head, member)           \
+        for (pos = ListFirstEntry(head, typeof(*pos), member),  \
+            next = ListNextEntry(pos, member);                  \
             &pos->member != (head);                             \
-            pos = next, next = ListNextOwner(next, member))
+            pos = next, next = ListNextEntry(next, member))
 
-#define ListForEachOwnerReverseSafe(pos, prev, head, member)    \
-        for (pos = ListLastOwner(head, typeof(*pos), member),   \
+#define ListForEachEntryReverseSafe(pos, prev, head, member)    \
+        for (pos = ListLastEntry(head, typeof(*pos), member),   \
             prev = ListPrevOnwer(pos, member);                  \
             &pos->member != (head);                             \
             pos = prev, prev = ListPrevOnwer(prev, member))

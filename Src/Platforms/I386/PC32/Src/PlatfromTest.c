@@ -10,13 +10,16 @@
  */
 
 #include <XBook.h>
-#include <Assert.h>
 #include <HAL.h>
 #include <Mods/Console/Console.h>
 #include <Context.h>
 #include <MM/Page.h>
 #include <Platfrom.h>
 #include <Utils/Memory.h>
+
+#define LOG_LEVEL LOG_DBG
+#define LOG_NAME "TEST"
+#include <Utils/Debug.h>
 
 #ifdef CONFIG_THREAD_TEST
 #define STACK_SZ 1024
@@ -29,22 +32,22 @@ U8 *threadSP2;
 
 void thread_entry1(void *arg)
 {
-    Cout("Thread 1..." $x(arg) Endln);
+    LOG_D("Thread 1..." $x(arg));
     
     while (1)
     {
-        Cout("Hello 1" Endln);
+        LOG_D("Hello 1");
         HAL_ContextSwitchPrevNext((Uint)&threadSP1, (Uint)&threadSP2);
     }    
 }
 
 void thread_entry2(void *arg)
 {
-    Cout("Thread 2..." $x(arg) Endln);
+    LOG_D("Thread 2..." $x(arg));
 
     while (1)
     {
-        Cout("Hello 2" Endln);
+        LOG_D("Hello 2");
         HAL_ContextSwitchPrevNext((Uint)&threadSP2, (Uint)&threadSP1);
     }
 }
@@ -63,7 +66,7 @@ PRIVATE void ConsoleTest(void)
     char *s = "hello";
     int a = 12345678;
     int b = 0x12345678;
-    Cout("Cout:" $s(s) " 16:" $x(0x12345678) " 10:" $d(0x12345678) "a:" $d(a) "b:" $X(b) " End." "\n");
+    LOG_D(s, " 16:" $x(0x12345678) " 10:" $d(0x12345678) "a:" $d(a) "b:" $X(b) " End.");
 
     ASSERT(a == 12345678);   
 }
@@ -80,13 +83,13 @@ PRIVATE void PageTest(void)
     {
         void *buf = PageAlloc(i + 1);
         Zero(buf, PAGE_SIZE);
-        Cout("Alloc:" $x(buf) Endln);
+        LOG_D("Alloc:" $x(buf));
         bufs[i] = buf; 
     }
 
     for (i = 0; i < 16; i++)
     {
-        Cout("Free:" $x(bufs[i]) Endln);
+        LOG_D("Free:" $x(bufs[i]));
         if (bufs[i])
         {
             PageFree(bufs[i]);
@@ -96,7 +99,7 @@ PRIVATE void PageTest(void)
     {
         void *buf = PageAlloc(i + 1);
         Zero(buf, PAGE_SIZE);
-        Cout("Alloc:" $x(buf) Endln);
+        LOG_D("Alloc:" $x(buf));
         bufs[i] = buf; 
     }
 
@@ -104,13 +107,13 @@ PRIVATE void PageTest(void)
     {
         void *buf = PageAllocInZone(PZ_DMA, i + 1);
         Zero(buf, PAGE_SIZE);
-        Cout("Alloc:" $x(buf) Endln);
+        LOG_D("Alloc:" $x(buf));
         bufs[i] = buf; 
     }
 
     for (i = 0; i < 16; i++)
     {
-        Cout("Free:" $x(bufs[i]) Endln);
+        LOG_D("Free:" $x(bufs[i]));
         if (bufs[i])
         {
             PageFreeInZone(PZ_DMA, bufs[i]);
@@ -120,7 +123,7 @@ PRIVATE void PageTest(void)
     {
         void *buf = PageAllocInZone(PZ_DMA, i + 1);
         Zero(buf, PAGE_SIZE);
-        Cout("Alloc:" $x(buf) Endln);
+        LOG_D("Alloc:" $x(buf));
         bufs[i] = buf; 
     }
 }

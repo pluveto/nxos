@@ -9,7 +9,9 @@
  * 2021-10-17     JasonHu           Update code style
  */
 
-#include <Assert.h>
+#define LOG_LEVEL LOG_INFO
+#define LOG_NAME "Buddy"
+#include <Utils/Debug.h>
 #include <XBook.h>
 
 #define BUDDY_ASSERT(x, msg) ASSERT((x) && (msg))
@@ -67,11 +69,13 @@ PRIVATE Size BuddyAlignUp(Size x, Size align)
     return (x + (align - 1)) & ~(align - 1);
 }
 
+#if 0
 PRIVATE Size BuddyAlignDown(Size x, Size align)
 {
     BUDDY_ASSERT(0 == (align & (align - 1)), "must align to a power of two");
     return x - (x & (align - 1));
 }
+#endif
 
 PRIVATE void *BuddyAlignPtr(const void *ptr, Size align)
 {

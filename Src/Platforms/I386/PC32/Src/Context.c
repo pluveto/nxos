@@ -12,7 +12,7 @@
 #include <Context.h>
 #include <HAL.h>
 #include <Interrupt.h>
-#include <Mods/Console/Console.h>
+#include <Utils/Debug.h>
 
 /**
  * any thread will come here when first start

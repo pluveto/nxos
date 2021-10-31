@@ -15,9 +15,10 @@
 #include <MM/PageHeap.h>
 #include <MM/Buddy.h>
 #include <MM/Page.h>
-#include <Assert.h>
 
-// #define CONFIG_SIZE_CLASS_DEBUG
+#define LOG_LEVEL LOG_INFO
+#define LOG_NAME "HeapCache"
+#include <Utils/Debug.h>
 
 PRIVATE struct SizeClass sizeAarray[MAX_SIZE_CLASS_NR];
 PRIVATE HeapCache middleSizeCache;
@@ -75,39 +76,30 @@ PRIVATE void HeapSizeClassInit(void)
     for (i = 8; i <= 16; i+=8)
     {
         sizeAarray[n].size = i;
-#if defined(CONFIG_SIZE_CLASS_DEBUG)
-        Cout("[" $d(n) "] size: " $d(i) Endln);
-#endif
+        LOG_D("[" $d(n) "] size: " $d(i));
         n++;
     }
     for (i = 32; i <= 128; i+=16)
     {
         sizeAarray[n].size = i;
-#if defined(CONFIG_SIZE_CLASS_DEBUG)
-        Cout("[" $d(n) "] size: " $d(i) Endln);
-#endif
+        LOG_D("[" $d(n) "] size: " $d(i));
         n++;
     }
     for (i = 128 + 128 / 8; i <= MAX_SMALL_OBJECT_SIZE; )
     {
         sizeAarray[n].size = i;
-#if defined(CONFIG_SIZE_CLASS_DEBUG)
-        Cout("[" $d(n) "] size: " $d(i) Endln);
-        Cout("align down: " $d(AlignDownToPow2(i / 8)) Endln);
-#endif
+        LOG_D("[" $d(n) "] size: " $d(i));
+        LOG_D("align down: " $d(AlignDownToPow2(i / 8)));
         i += AlignDownToPow2(i / 8);
         n++;
     }
 
-#if defined(CONFIG_SIZE_CLASS_DEBUG)
-    Cout("Count: " $d(n) Endln);
-#endif
+    LOG_D("Count: " $d(n));
+
     for (i = 0; i < MAX_SIZE_CLASS_NR; i++)
     {
         HeapCacheInitOne(&sizeAarray[i].cache, sizeAarray[i].size);
-#if defined(CONFIG_SIZE_CLASS_DEBUG)
-        Cout("[" $d(i) "] size: " $d(sizeAarray[i].size) Endln);
-#endif
+        LOG_D("[" $d(i) "] size: " $d(sizeAarray[i].size));
     }
 
     HeapCacheInitOne(&middleSizeCache, 0);
@@ -170,13 +162,13 @@ PUBLIC void *HeapAlloc(Size size)
             span = (Span *)PageHeapAlloc(pageCount);
             if (span == NULL)
             {
-                Cout("no enough memory span!\n");
+                LOG_E("no enough memory span!\n");
                 return NULL;
             }
         }
         else    /* get span from span list */
         {
-            span = ListFirstOwner(&cache->spanFreeList, Span, list);
+            span = ListFirstEntry(&cache->spanFreeList, Span, list);
             ListDelInit(&span->list);            
         }
 
@@ -207,7 +199,7 @@ PUBLIC void *HeapAlloc(Size size)
         }
     }
     /* get a object from list */
-    objectNode = ListFirstOwner(&cache->objectFreeList, SmallCacheObject, list);
+    objectNode = ListFirstEntry(&cache->objectFreeList, SmallCacheObject, list);
     ListDel(&objectNode->list); /* del from free list */
     return (void *)objectNode;
 }
@@ -300,20 +292,21 @@ PUBLIC Size HeapGetObjectSize(void *object)
     return pageNode->sizeClass;
 }
 
+#ifdef CONFIG_PAGE_CACHE_TEST
 PRIVATE void LargeObjectTest(void)
 {
     /* large object */
     void *p = HeapAlloc(2 * SZ_MB);
     if (p == NULL)
     {
-        Cout("alloc failed!" Endln);
+        LOG_E("alloc failed!");
         return;
     }
     HeapFree(p);
     p = HeapAlloc(2 * SZ_MB);
     if (p == NULL)
     {
-        Cout("alloc failed!" Endln);
+        LOG_E("alloc failed!");
         return;
     }
     HeapFree(p);   
@@ -325,7 +318,7 @@ PRIVATE void MiddleObjectTest(void)
     void *p = HeapAlloc(512 * SZ_KB);
     if (p == NULL)
     {
-        Cout("alloc failed!" Endln);
+        LOG_E("alloc failed!");
         return;
     }
     HeapFree(p);
@@ -333,7 +326,7 @@ PRIVATE void MiddleObjectTest(void)
     p = HeapAlloc(512 * SZ_KB);
     if (p == NULL)
     {
-        Cout("alloc failed!" Endln);
+        LOG_E("alloc failed!");
         return;
     }
     HeapFree(p);
@@ -343,13 +336,13 @@ PRIVATE void MiddleObjectTest(void)
     for (i = 256 + 1, j = 0; i < 1024; i += 16, j++)
     {
         buf[j] = HeapAlloc(i * SZ_KB);
-        Cout("alloc: " $p(buf[j]) Endln);
+        LOG_D("alloc: " $p(buf[j]));
     }
 
     for (i = 256 + 1, j = 0; i < 1024; i += 16, j++)
     {
         HeapFree(buf[j]);
-        Cout("free: " $p(buf[j]) Endln);
+        LOG_D("free: " $p(buf[j]));
     }
 }
 
@@ -358,31 +351,31 @@ PRIVATE void SmallObjectTest(void)
     /* small object */
     void *p = HeapAlloc(8);
     p = HeapAlloc(9);
-    Cout("Alloc & Free:" $p(p) Endln);
+    LOG_D("Alloc & Free:" $p(p));
     HeapFree(p);
     p = HeapAlloc(16);
-    Cout("Alloc & Free:" $p(p) Endln);
+    LOG_D("Alloc & Free:" $p(p));
     HeapFree(p);
     p = HeapAlloc(20);
-    Cout("Alloc & Free:" $p(p) Endln);
+    LOG_D("Alloc & Free:" $p(p));
     HeapFree(p);
     p = HeapAlloc(28);
-    Cout("Alloc & Free:" $p(p) Endln);
+    LOG_D("Alloc & Free:" $p(p));
     HeapFree(p);
     p = HeapAlloc(32);
-    Cout("Alloc & Free:" $p(p) Endln);
+    LOG_D("Alloc & Free:" $p(p));
     HeapFree(p);
     p = HeapAlloc(48);
-    Cout("Alloc & Free:" $p(p) Endln);
+    LOG_D("Alloc & Free:" $p(p));
     HeapFree(p);
     p = HeapAlloc(63);
-    Cout("Alloc & Free:" $p(p) Endln);
+    LOG_D("Alloc & Free:" $p(p));
     HeapFree(p);
     p = HeapAlloc(72);
-    Cout("Alloc & Free:" $p(p) Endln);
+    LOG_D("Alloc & Free:" $p(p));
     HeapFree(p);
     p = HeapAlloc(120);
-    Cout("Alloc & Free:" $p(p) Endln);
+    LOG_D("Alloc & Free:" $p(p));
     HeapFree(p);
     p = HeapAlloc(250);
 
@@ -390,14 +383,14 @@ PRIVATE void SmallObjectTest(void)
     for (i = 0; i < 20; i++)
     {
         p = HeapAlloc(512);
-        Cout("Alloc & Free:" $p(p) Endln);
+        LOG_D("Alloc & Free:" $p(p));
         HeapFree(p);
     }
     
     for (i = 0; i < 20; i++)
     {
         p = HeapAlloc(2048);
-        Cout("Alloc & Free:" $p(p) Endln);
+        LOG_D("Alloc & Free:" $p(p));
         HeapFree(p);
     }
     
@@ -406,18 +399,20 @@ PRIVATE void SmallObjectTest(void)
         for (j = 0; j < 10; j++)
         {
             p = HeapAlloc(i);
-            Cout("Alloc & Free:" $p(p) " Size: " $d(HeapGetObjectSize(p)) Endln);
+            LOG_D("Alloc & Free:" $p(p) " Size: " $d(HeapGetObjectSize(p)));
             HeapFree(p);
         }
     }
     
 }
+#endif /* CONFIG_PAGE_CACHE_TEST */
 
 PUBLIC void HeapCacheInit(void)
 {
     HeapSizeClassInit();
-
-    // LargeObjectTest();
-    // MiddleObjectTest();
-    // SmallObjectTest();
+#ifdef CONFIG_PAGE_CACHE_TEST
+    LargeObjectTest();
+    MiddleObjectTest();
+    SmallObjectTest();
+#endif /* CONFIG_PAGE_CACHE_TEST */
 }

@@ -10,7 +10,6 @@
  */
 
 #include <XBook.h>
-#include <Assert.h>
 #include <HAL.h>
 #include <Mods/Console/Console.h>
 #include <Utils/List.h>
@@ -31,6 +30,10 @@
 #include <Platfrom.h>
 #include <MMU.h>
 
+#define LOG_LEVEL LOG_INFO
+#define LOG_NAME "INIT"
+#include <Utils/Debug.h>
+
 IMPORT void PlatfromTest(void);
 
 IMPORT Addr __bssStart;
@@ -49,7 +52,7 @@ INTERFACE OS_Error PlatformInit(void)
     
     HAL_DirectUartInit();
     
-    Cout("Hello, PC32!" Endln);
+    LOG_I("Hello, PC32!");
 
     CPU_InitGate();
     CPU_InitSegment();
@@ -58,7 +61,7 @@ INTERFACE OS_Error PlatformInit(void)
     
     if (HAL_InitClock() != OS_EOK)
     {
-        Cout("Init clock failed!" Endln);
+        LOG_E("Init clock failed!");
         return OS_ERROR;
     }
     PageInit();
@@ -82,7 +85,7 @@ PRIVATE void PageInit(void)
 {    
     U32 memSize = *(U32 *)GRUB2_READ_MEMORY_BYTES_ADDR;
     
-    Cout("Memory Size: " $x(memSize) " Bytes " $d(memSize / SZ_MB) " MB" Endln);
+    LOG_I("Memory Size: " $x(memSize) " Bytes " $d(memSize / SZ_MB) " MB");
 
     if (memSize == 0)
     {
@@ -90,7 +93,7 @@ PRIVATE void PageInit(void)
     }
     if (memSize < MEM_MIN_SIZE)
     {
-        Cout("Must has " $d(MEM_MIN_SIZE / SZ_MB) " MB memory!");
+        LOG_E("Must has " $d(MEM_MIN_SIZE / SZ_MB) " MB memory!");
         PANIC("Memory too small");
     }
     
@@ -106,9 +109,9 @@ PRIVATE void PageInit(void)
     Addr userBase = MEM_NORMAL_BASE + normalSize;
     Size userSize = memSize - userBase;
 
-    Cout("DMA memory base: " $x(MEM_DMA_BASE) " Size:" $d(MEM_DMA_SIZE / SZ_MB) " MB" Endln);
-    Cout("Normal memory base: " $x(MEM_NORMAL_BASE) " Size:" $d(normalSize / SZ_MB) " MB" Endln);
-    Cout("User memory base: " $x(userBase) " Size:" $d(userSize / SZ_MB) " MB" Endln);
+    LOG_I("DMA memory base: " $x(MEM_DMA_BASE) " Size:" $d(MEM_DMA_SIZE / SZ_MB) " MB");
+    LOG_I("Normal memory base: " $x(MEM_NORMAL_BASE) " Size:" $d(normalSize / SZ_MB) " MB");
+    LOG_I("User memory base: " $x(userBase) " Size:" $d(userSize / SZ_MB) " MB");
 
     /* init page zone */
     PageInitZone(PZ_DMA, (void *)MEM_DMA_BASE, MEM_DMA_SIZE);
@@ -125,7 +128,7 @@ PRIVATE void PageInit(void)
     MMU_SetPageTable((Uint)kernelMMU.table);
     MMU_Enable();
 
-    Cout("MMU enabled\n");
+    LOG_I("MMU enabled");
 
     /* init memory allocator */
     PageHeapInit();

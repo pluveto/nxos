@@ -17,7 +17,7 @@
 #define IDT_LIMIT       0x000007ff
 #define IDT_PADDR       0x003F0800
 
-#define IDT_VADDR       (CONFIG_KERNEL_VADDR_START + IDT_PADDR)
+#define IDT_VADDR       (CONFIG_KERNEL_VSTART + IDT_PADDR)
 
 #define MAX_IDT_NR (IDT_LIMIT/8)
 

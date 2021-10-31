@@ -11,7 +11,6 @@
 
 #include "BuddyCommon.h"
 #include <MM/Buddy.h>
-#include <Assert.h>
 
 PRIVATE void BuddyAddPage(BuddySystem* system, Page* page)
 {
@@ -59,11 +58,13 @@ PRIVATE Size PageToPFN(BuddySystem* system, Page* page)
     return diff;
 }
 
+#if 0
 PRIVATE Page* PageFromPFN(BuddySystem* system, Size pfn)
 {
     ASSERT(system);
     return &system->map[pfn];
 }
+#endif
 
 PRIVATE int IsValidPFN(BuddySystem* system, Size pfn)
 {
@@ -93,6 +94,7 @@ PRIVATE BuddySystem* BuddyCreateFromMemory(void *mem)
     return system;
 }
 
+#if 0
 PRIVATE void BuddyDebug(BuddySystem* system)
 {
 #ifdef BUDDY_DEBUG
@@ -101,16 +103,17 @@ PRIVATE void BuddyDebug(BuddySystem* system)
     int order;
     for (order = MAX_PAGE_ORDER - 1; order >= 0; order--)
     {
-        Cout($d(system->count[order]) Endln);
+        LOG_D($d(system->count[order]));
     }
-    Cout("\n");
+    LOG_D("\n");
 #endif
 }
+#endif
 
 PUBLIC BuddySystem* BuddyCreate(void *mem, Size size)
 {
     ASSERT(mem && size);
-    // Cout("mem:" $x(mem) " size:" $x(size) Endln);
+    LOG_I("mem:" $x(mem) " size:" $x(size));
     if (!(mem && size))
     {
         return NULL;
@@ -176,7 +179,7 @@ PRIVATE Page* BuddyLocateFree(BuddySystem* system, int order)
         Size bitmap = system->bitmap & (~0UL << order);
         if (!bitmap)
         {
-            Cout("Cannot find free page!" Endln);
+            LOG_E("Cannot find free page!");
             return NULL;
         }
 
@@ -184,7 +187,7 @@ PRIVATE Page* BuddyLocateFree(BuddySystem* system, int order)
         ASSERT(order >= 0);
     }
 
-    return ListLastOwner(&system->pageBuddy[order], Page, list);
+    return ListLastEntry(&system->pageBuddy[order], Page, list);
 }
 
 PRIVATE void PageSplit(BuddySystem* system, Page* page, int order)
@@ -257,7 +260,7 @@ PUBLIC void *BuddyAllocPage(BuddySystem* system, Size count)
 
     if (count == 0UL)
     {
-        Cout("count == 0" Endln);
+        LOG_E("count == 0");
         return NULL;
     }
 
@@ -267,7 +270,7 @@ PUBLIC void *BuddyAllocPage(BuddySystem* system, Size count)
 
     if (!page)
     {
-        Cout("Failed to call BuddyLocateFree" Endln);
+        LOG_E("Failed to call BuddyLocateFree");
         return NULL;
     }
     return PagePrepareUsed(system, page, order);
@@ -283,7 +286,7 @@ PUBLIC void BuddyFreePage(BuddySystem* system, void *ptr)
 
         if (DoPageFree(page))
         {
-            Cout("Double free!" Endln);
+            LOG_E("Double free!");
             return;
         }
         page = PageMerge(system, page);

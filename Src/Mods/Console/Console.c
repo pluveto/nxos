@@ -12,6 +12,8 @@
 #include <Mods/Console/Console.h>
 #include <Utils/Memory.h>
 
+#include <Utils/Log.h>
+
 PRIVATE char *I2A(long num, char *str, U8 radix, int small)
 {
     char *index;
@@ -102,6 +104,6 @@ PUBLIC char *NumberToString(long n, int radix, int small)
 
 void AssertionFailure(char *exp, char *file, char *baseFile, int line)
 {
-	Cout("\nAssert(" $(exp) ") failed:\nfile: " $(file) "\nbase_file: " $(baseFile) "\nln: " $d(line) Endln);
+	LOG_E("\nAssert(" $(exp) ") failed:\nfile: " $(file) "\nbase_file: " $(baseFile) "\nln: " $d(line) Endln);
 	while (1);
 }

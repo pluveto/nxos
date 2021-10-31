@@ -17,6 +17,10 @@
 #include <HAL.h>
 #include <PIC.h>
 
+#define LOG_LEVEL LOG_DBG
+#define LOG_NAME "Interrupt"
+#include <Utils/Log.h>
+
 /* irq table for external interrupt */
 PRIVATE IRQ_Info irqInfoTable[MAX_INTR_NR];
 
@@ -47,7 +51,7 @@ PRIVATE char *exceptionName[] = {
 PRIVATE OS_Error DefaultExceptionHandler(U32 irq, void *arg)
 {
     char *name = irqInfoTable[irq].name;
-    Cout("Exception: vector/0x" $x(irq) " Name: " $s(name) " handled!" Endln);
+    LOG_E("Exception: vector/0x" $x(irq) " Name: " $s(name) " handled!" Endln);
 
     while (1);
     return OS_EOK;
@@ -56,7 +60,7 @@ PRIVATE OS_Error DefaultExceptionHandler(U32 irq, void *arg)
 PRIVATE OS_Error DefaultExternalHandler(U32 irq, void *arg)
 {
     char *name = irqInfoTable[irq].name;
-    Cout("External: vector/0x" $x(irq) " Name: " $s(name) " handled!" Endln);
+    LOG_I("External: vector/0x" $x(irq) " Name: " $s(name) " handled!" Endln);
     return OS_EOK;
 }
 
@@ -89,7 +93,7 @@ PUBLIC void InterruptDispatch(void *stackFrame)
 
     if (vector < EXCEPTION_BASE || vector >= MAX_INTR_NR)
     {
-        Cout("unknown intr vector " $x(vector) Endln);
+        LOG_E("unknown intr vector " $x(vector) Endln);
         return;
     }
     /* call handler with different vector */
@@ -123,7 +127,7 @@ PUBLIC void InterruptDispatch(void *stackFrame)
     }
     else
     {
-        Cout("uninstall intr vector " $x(vector) Endln);
+        LOG_W("uninstall intr vector " $x(vector) Endln);
         while (1);
     }
 }

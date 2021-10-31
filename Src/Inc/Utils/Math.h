@@ -6,7 +6,7 @@
  * 
  * Change Logs:
  * Date           Author            Notes
- * 2021-10-256    JasonHu           Init
+ * 2021-10-25     JasonHu           Init
  */
 
 #ifndef __UTILS_MATH__

@@ -10,7 +10,7 @@
  */
 
 #include <HAL.h>
-#include <Mods/Console/Console.h>
+#include <Utils/Debug.h>
 
 PUBLIC int OS_Main(void)
 {

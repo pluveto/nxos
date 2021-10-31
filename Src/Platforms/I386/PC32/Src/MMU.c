@@ -13,13 +13,17 @@
 #include <Regs.h>
 #include <Mods/Console/Console.h>
 
+#define LOG_LEVEL LOG_INFO
+#define LOG_NAME "MMU"
+#include <Utils/Log.h>
+
 PUBLIC void MMU_EarlyMap(MMU *mmu, Addr virStart, Size size)
 {
     virStart = virStart & PAGE_ADDR_MASK;
     Addr phyStart = virStart;
     Addr virEnd = virStart + PAGE_ALIGNUP(size);
 
-    Cout("OS map early on [" $p(virStart) "~" $p(virEnd) "]\n");
+    LOG_I("OS map early on [" $p(virStart) "~" $p(virEnd) "]");
     
     MMU_PDE *pdt = (MMU_PDE *)mmu->table;
     

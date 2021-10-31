@@ -11,7 +11,7 @@
 
 #include <MM/Buddy.h>
 #include <MM/Page.h>
-#include <Assert.h>
+#include <Utils/Debug.h>
 
 PRIVATE BuddySystem *buddySystem[PZ_NR]; 
 

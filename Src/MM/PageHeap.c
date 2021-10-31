@@ -15,6 +15,10 @@
 #include <Mods/Console/Console.h>
 #include <Utils/Memory.h>
 
+#define LOG_LEVEL LOG_INFO
+#define LOG_NAME "PageHeap"
+#include <Utils/Debug.h>
+
 PRIVATE PageHeap pageHeap;
 PRIVATE SpanMark *spanMark;
 PRIVATE void *spanBaseAddr;
@@ -100,12 +104,12 @@ PUBLIC void *PageHeapAlloc(Size count)
 {
     if (!count)
     {
-        Cout("alloc page count is 0!" Endln);
+        LOG_E("alloc page count is 0!");
         return NULL;
     }
     else if (count > PAGE_HEAP_MAX_PAGES)
     {
-        Cout("alloc page count beyond " $d(PAGE_HEAP_MAX_PAGES) Endln);
+        LOG_E("alloc page count beyond " $d(PAGE_HEAP_MAX_PAGES));
         return NULL;
     }
     
@@ -130,7 +134,7 @@ PUBLIC void *PageHeapAlloc(Size count)
         void *span = PageAllocVirtual(count);
         if (span == NULL)
         {
-            Cout("no enough memroy to allocate for " $d(count) "pages!" Endln);
+            LOG_E("no enough memroy to allocate for " $d(count) "pages!");
             return NULL;
         }
         MarkSpan(span, count);
@@ -140,7 +144,7 @@ PUBLIC void *PageHeapAlloc(Size count)
     if (isLargeSpan)
     {
         /* use best fit to alloc a span */
-        ListForEachOwner (spanNode, &pageHeap.largeSpanFreeList, list)
+        ListForEachEntry (spanNode, &pageHeap.largeSpanFreeList, list)
         {
             if (spanNodeBest == NULL)
             {
@@ -155,7 +159,7 @@ PUBLIC void *PageHeapAlloc(Size count)
     else
     {
         /* use first fit to alloc a span */
-        spanNodeBest = ListFirstOwner(&pageHeap.spanFreeList[count], Span, list);
+        spanNodeBest = ListFirstEntry(&pageHeap.spanFreeList[count], Span, list);
     }
     /* del span node from list */
     ListDelInit(&spanNodeBest->list);
@@ -167,7 +171,7 @@ PUBLIC void PageHeapFree(void *page)
 {
     if (page == NULL)
     {
-        Cout("free NULL page!" Endln);
+        LOG_E("free NULL page!");
         return;
     }
 
@@ -176,7 +180,7 @@ PUBLIC void PageHeapFree(void *page)
 
     if (!count)
     {
-        Cout("span count is 0!" Endln);
+        LOG_E("span count is 0!");
         return;
     }
 
@@ -214,21 +218,22 @@ PUBLIC void PageHeapFree(void *page)
     }
 }
 
+#ifdef CONFIG_PAGE_HEAP_TEST
 PRIVATE void PageHeapLarge(void)
 {
     void *span = PageHeapAlloc(128);
-    Cout("span: " $p(span) Endln);
+    LOG_D("span: " $p(span));
     PageHeapFree(span);
     span = PageHeapAlloc(128);
-    Cout("span: " $p(span) Endln);
+    LOG_D("span: " $p(span));
     PageHeapFree(span);
 
     span = PageHeapAlloc(256);
-    Cout("span: " $p(span) Endln);
+    LOG_D("span: " $p(span));
     PageHeapFree(span + PAGE_SIZE);
     
     span = PageHeapAlloc(256);
-    Cout("span: " $p(span) Endln);
+    LOG_D("span: " $p(span));
     PageHeapFree(span + PAGE_SIZE);
 
     void *table[100];
@@ -237,13 +242,13 @@ PRIVATE void PageHeapLarge(void)
     for (i = 0; i < 100; i++)
     {
         table[i] = PageHeapAlloc(128 + i);
-        Cout("alloc span: " $p(table[i]) Endln);
+        LOG_D("alloc span: " $p(table[i]));
         Set(table[i], 0x5a, PAGE_SIZE * 128 + i);
     }
 
     for (i = 0; i < 100; i++)
     {
-        Cout("free span: " $p(table[i]) Endln);
+        LOG_D("free span: " $p(table[i]));
         PageHeapFree(table[i]);
     }
     
@@ -252,17 +257,17 @@ PRIVATE void PageHeapLarge(void)
 PRIVATE void PageHeapSmall(void)
 {
     void *span = PageHeapAlloc(1);
-    Cout("span: " $p(span) Endln);
+    LOG_D("span: " $p(span));
     PageHeapFree(span);
     span = PageHeapAlloc(1);
-    Cout("span: " $p(span) Endln);
+    LOG_D("span: " $p(span));
     PageHeapFree(span);
 
     span = PageHeapAlloc(10);
-    Cout("span: " $p(span) Endln);
+    LOG_D("span: " $p(span));
     PageHeapFree(span);
     span = PageHeapAlloc(10);
-    Cout("span: " $p(span) Endln);
+    LOG_D("span: " $p(span));
     PageHeapFree(span);
 
     void *table[128];
@@ -271,26 +276,26 @@ PRIVATE void PageHeapSmall(void)
     for (i = 1; i <= 128; i++)
     {
         table[i] = PageHeapAlloc(i);
-        Cout("alloc span: " $p(table[i]) Endln);
+        LOG_D("alloc span: " $p(table[i]));
         Set(table[i], 0x5a, PAGE_SIZE * i);
     }
 
     for (i = 1; i <= 128; i++)
     {
-        Cout("free span: " $p(table[i]) Endln);
+        LOG_D("free span: " $p(table[i]));
         PageHeapFree(table[i]);
     }
 
     for (i = 1; i <= 128; i++)
     {
         table[i] = PageHeapAlloc(i);
-        Cout("alloc span: " $p(table[i]) Endln);
+        LOG_D("alloc span: " $p(table[i]));
         Set(table[i], 0x5a, PAGE_SIZE * i);
     }
 
     for (i = 1; i <= 128; i++)
     {
-        Cout("free span: " $p(table[i]) Endln);
+        LOG_D("free span: " $p(table[i]));
         PageHeapFree(table[i]);
     }
 }
@@ -302,37 +307,38 @@ PRIVATE void PageHeapOnePage(void)
     for (i = 0; i < 1024; i++)
     {
         table[i] = PageHeapAlloc(1);
-        Cout("alloc span: " $p(table[i]) Endln);
+        LOG_D("alloc span: " $p(table[i]));
         Set(table[i], 0x5a, PAGE_SIZE);
     }
 
     for (i = 0; i < 1024; i++)
     {
-        Cout("free span: " $p(table[i]) Endln);
+        LOG_D("free span: " $p(table[i]));
         PageHeapFree(table[i]);
     }
     for (i = 0; i < 1024; i++)
     {
         table[i] = PageHeapAlloc(1);
-        Cout("alloc span: " $p(table[i]) Endln);
+        LOG_D("alloc span: " $p(table[i]));
         Set(table[i], 0x5a, PAGE_SIZE);
     }
 
     for (i = 0; i < 1024; i++)
     {
-        Cout("free span: " $p(table[i]) Endln);
+        LOG_D("free span: " $p(table[i]));
         PageHeapFree(table[i]);
     }
 }
 
 PRIVATE void PageHeapTest(void)
 {
-    Cout("PageHeap test" Endln);
+    LOG_D("PageHeap test");
 
     PageHeapLarge();
     PageHeapSmall();
     PageHeapOnePage();
 }
+#endif /* CONFIG_PAGE_HEAP_TEST */
 
 PUBLIC void PageHeapInit(void)
 {
@@ -343,12 +349,12 @@ PUBLIC void PageHeapInit(void)
     }
     ListInit(&pageHeap.largeSpanFreeList);
     spanBaseAddr = PageZoneGetBase(PZ_NORMAL);
-    Cout("span base addr:" $p(spanBaseAddr) Endln);
+    LOG_I("span base addr:" $p(spanBaseAddr));
 
     Size pages = PageZoneGetPages(PZ_NORMAL);
     /* alloc span mark array */
     Size spanMarkPages = DIV_ROUND_UP(pages * sizeof(SpanMark), PAGE_SIZE);
-    Cout("span mark used page:" $d(spanMarkPages) Endln);
+    LOG_I("span mark used page:" $d(spanMarkPages));
 
     spanMark = PageAllocVirtual(spanMarkPages);
     if (spanMark == NULL)
@@ -357,5 +363,7 @@ PUBLIC void PageHeapInit(void)
     }
     Zero(spanMark, spanMarkPages * PAGE_SIZE);
 
-    // PageHeapTest();
+#ifdef CONFIG_PAGE_HEAP_TEST
+    PageHeapTest();
+#endif /* CONFIG_PAGE_HEAP_TEST */
 }
