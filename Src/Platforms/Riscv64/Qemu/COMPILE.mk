@@ -9,4 +9,5 @@
 # 2021-10-1      JasonHu           Init
 ##
 
-CROSS_COMPILE	?= riscv-none-embed-
+# modify compiler here
+CROSS_COMPILE	:= riscv-none-embed-

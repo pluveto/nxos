@@ -10,7 +10,7 @@
 ##
 
 ifeq ($(HOSTOS), windows)
-CROSS_COMPILE	?= x86_64-elf-
+CROSS_COMPILE	:= x86_64-elf-
 else
-CROSS_COMPILE	?= 
+CROSS_COMPILE	:= 
 endif

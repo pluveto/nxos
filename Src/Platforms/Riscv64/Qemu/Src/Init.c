@@ -10,16 +10,13 @@
  */
 
 #include <XBook.h>
-#include <Platforms/Init.h>
+
+#define LOG_LEVEL LOG_INFO
+#define LOG_NAME "INIT"
 #include <Utils/Debug.h>
 
-INTERFACE int PlatformInit(void)
+INTERFACE OS_Error PlatformInit(void)
 {
     LOG_I("Hello, QEMU Riscv64!");
-    U32 i = 0;
-    for (;;)
-    {
-        i++;
-    }
     return 0;
 }

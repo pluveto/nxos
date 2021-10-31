@@ -14,19 +14,7 @@
 
 #include <XBook.h>
 #include <Utils/List.h>
-#include <Page.h>
-
-#ifndef PAGE_SHIFT
-#error "Please define PAGE_SHIFT in Page.h!"
-#endif
-
-#ifndef PAGE_SIZE
-#error "Please define PAGE_SIZE in Page.h!"
-#endif
-
-#ifndef PAGE_MASK
-#error "Please define PAGE_MASK in Page.h!"
-#endif
+#include <MM/Page.h>
 
 #define MAX_PAGE_ORDER 20
 

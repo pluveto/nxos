@@ -20,7 +20,6 @@
 enum PageZone
 {
     PZ_NORMAL = 0,
-    PZ_DMA,
     PZ_USER,
     PZ_NR,  /* Must be last member */
 };

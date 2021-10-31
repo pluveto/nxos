@@ -12,19 +12,19 @@
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "Buddy"
 #include <Utils/Debug.h>
+#include <Utils/Bitops.h>
 #include <XBook.h>
 
 #define BUDDY_ASSERT(x, msg) ASSERT((x) && (msg))
 
 INLINE int BuddyFFS(U32 word)
 {
-    return __builtin_ffs(word) - 1;
+    return FFS(word) - 1;
 }
 
 INLINE int BuddyFLS(U32 word)
 {
-    const int bit = word ? 32 - __builtin_clz(word) : 0;
-    return bit - 1;
+    return FLS(word) - 1;
 }
 
 /* Possibly 64-bit version of BuddyFLS. */

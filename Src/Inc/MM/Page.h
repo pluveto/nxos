@@ -15,6 +15,21 @@
 #include <XBook.h>
 #include <Page.h>   /* Platfrom page */
 
+#ifndef CONFIG_PAGE_SHIFT
+#define PAGE_SHIFT CONFIG_PAGE_SHIFT
+#else
+#define PAGE_SHIFT 12
+#endif
+
+#define PAGE_SIZE   (1U << PAGE_SHIFT)
+#define PAGE_MASK   (PAGE_SIZE - 1UL)
+
+#define PAGE_UMASK  (~PAGE_MASK)
+#define PAGE_ADDR_MASK PAGE_UMASK
+
+#define PAGE_ALIGNUP(value) (((value) + PAGE_MASK) & PAGE_UMASK)
+#define PAGE_ALIGNDOWN(value) ((value) & PAGE_UMASK)
+
 PUBLIC void PageInitZone(PageZone zone, void *mem, Size size);
 PUBLIC void *PageAllocInZone(PageZone zone, Size count);
 PUBLIC void PageFreeInZone(PageZone zone, void *ptr);

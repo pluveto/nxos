@@ -6,11 +6,14 @@
  * 
  * Change Logs:
  * Date           Author            Notes
- * 2021-9-17      JasonHu           Init
+ * 2021-10-31     JasonHu           Init
  */
 
 #ifndef __OS_CONFIG__
 #define __OS_CONFIG__
+
+/* config cpu bit width */
+#define CONFIG_64BIT
 
 /* OS normal config */
 #define CONFIG_TICKS_PER_SECOND 100

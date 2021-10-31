@@ -12,7 +12,7 @@
 #
 # Override default variables.
 #
-CFLAGS		+= -fno-builtin -fno-stack-protector -nostdinc 
+CFLAGS		+= -fno-builtin -fno-stack-protector
 MCFLAGS		+= -march=i386
 LDFLAGS 	+= -no-pie -nostartfile -n 
 
