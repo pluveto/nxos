@@ -93,4 +93,19 @@
 #define DIV_ROUND_UP(x, step) (((x) + (step) - 1) / (step))
 #define DIV_ROUND_DOWN(x, step) ((x) / (step))
 
+/**
+ * calc array element count
+ */
+#define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
+
+/**
+ * weak symble
+ */
+#define WEAK_SYM __attribute__((weak))
+
+#define SECTION(x)          __attribute__((section(x)))
+#define UNUSED              __attribute__((unused))
+#define USED                __attribute__((used))
+#define ALIGN(n)            __attribute__((aligned(n)))
+
 #endif  /* __XBOOK_DEFINES__ */

@@ -14,6 +14,8 @@
 #define LOG_LEVEL LOG_INFO
 #include <Utils/Debug.h>
 
+#include <Mods/UTest/UTest.h>
+
 PUBLIC int OS_Main(void)
 {
     /* platfrom init */
@@ -23,7 +25,11 @@ PUBLIC int OS_Main(void)
     }
     
     LOG_I("Hello, NXOS!");
+
     HAL_InterruptEnable();
+    
+    UTestCallInit();
+
     while (1);
     // SPIN("OS_Main");
     return 0;

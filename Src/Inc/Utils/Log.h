@@ -48,9 +48,11 @@
 #define LOG_MOD_LEVEL LOG_LEVEL
 #endif
 #else
-#ifndef LOG_MOD_LEVEL
+#ifdef CONFIG_LOG_LEVEL
+#define LOG_MOD_LEVEL CONFIG_LOG_LEVEL
+#else
 #define LOG_MOD_LEVEL LOG_WARNING
-#endif
+#endif /* CONFIG_LOG_LEVEL */
 #endif /* LOG_LEVEL */
 
 /**

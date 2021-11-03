@@ -17,5 +17,6 @@
 PUBLIC void *Set(void *dst, U8 value, Size sz);
 PUBLIC void Copy(void *dst, void *src, Size sz);
 PUBLIC void *Zero(void *dst, Size sz);
+PUBLIC int CompareN(const void *s1, const void *s2, Size nBytes);
 
 #endif  /* __UTILS_MEMORY__ */

@@ -40,4 +40,11 @@ typedef signed long         SSize;
 
 typedef int PtrDiff;
 
+enum Bool
+{
+    FALSE = 0,
+    TRUE,
+};
+typedef enum Bool Bool;
+
 #endif  /* __XBOOK_TYPES__ */

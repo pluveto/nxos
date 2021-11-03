@@ -26,27 +26,29 @@ SECTIONS {
         *(.text)
         *(.init.text)
 		*(.exit.text)
+        
+        . = ALIGN(4);
+        PROVIDE(__initCallStart = .);
+        KEEP(*(.initCall0.text))
+        KEEP(*(.initCall1.text))
+        KEEP(*(.initCall2.text))
+        PROVIDE(__initCallEnd = .);
+
+        . = ALIGN(4);
+        PROVIDE(__exitCallStart = .);
+        KEEP(*(.exitcall0.text))
+        KEEP(*(.exitcall1.text))
+        KEEP(*(.exitcall2.text))
+        PROVIDE(__exitCallEnd = .);
+    
+        /* section information for utest */
+        . = ALIGN(4);
+        PROVIDE(__UTestCaseTableStart = .);
+        KEEP(*(UTestCaseTable))
+        PROVIDE(__UTestCaseTableEnd = .);
     }
     __textEnd = .;
 
-    .initcall ALIGN(8) :
-	{
-		PROVIDE(__initcall_start = .);
-		KEEP(*(.initcall_0.text))
-        KEEP(*(.initcall_1.text))
-        KEEP(*(.initcall_2.text))
-		PROVIDE(__initcall_end = .);
-	}
-
-	.exitcall ALIGN(8) :
-	{
-		PROVIDE(__exitcall_start = .);
-		KEEP(*(.exitcall_0.text))
-		KEEP(*(.exitcall_1.text))
-		KEEP(*(.exitcall_2.text))
-		PROVIDE(__exitcall_end = .);
-	}
-    
 	. = ALIGN(4);
     __rodataStart = .;
     .rodata : { *(.rodata) *(.rodata.*) }

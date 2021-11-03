@@ -12,6 +12,8 @@
 #ifndef __OS_CONFIG__
 #define __OS_CONFIG__
 
+#define CONFIG_LOG_LEVEL LOG_DBG
+
 /* OS normal config */
 #define CONFIG_TICKS_PER_SECOND 100
 #define CONFIG_IRQ_NAME_LEN 48
