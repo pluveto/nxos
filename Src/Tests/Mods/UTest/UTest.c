@@ -69,8 +69,8 @@ TEST(Test3)
 
 TEST(Test4)
 {
-    ASSERT_TRUE(0);
-    ASSERT_FALSE(1);
+    EXPECT_TRUE(0);
+    EXPECT_FALSE(1);
 }
 
 TEST_SETUP(Test)

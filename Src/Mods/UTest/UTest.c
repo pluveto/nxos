@@ -13,6 +13,7 @@
 #include <Mods/UTest/UTest.h>
 #include <Utils/String.h>
 #include <Utils/Memory.h>
+#include <Utils/Debug.h>
 
 PRIVATE UTestCase *testCaseTable = NULL;
 PRIVATE Size testCaseCount;
@@ -132,7 +133,7 @@ __TestCaseContinue:
 
 }
 
-PUBLIC void UTestAssert(int value, const char *file, int line, const char *func, const char *msg)
+PUBLIC void UTestAssert(int value, const char *file, int line, const char *func, const char *msg, Bool dieAction)
 {
     if (value)
     {
@@ -145,67 +146,74 @@ PUBLIC void UTestAssert(int value, const char *file, int line, const char *func,
         localUtestSum.hasError = TRUE;
         localUtestSum.failedNum++;
         LOG_E("[  FAILED  ] [   point  ] Failure at:" $(file) " Line:" $d(line) " Message:" $(msg));
+        if (dieAction)
+        {
+            /* TODO: exit thread? */
+            PANIC("Assert!");
+        }
     }
 }
 
-PUBLIC void UTestAssertString(const char *a, const char *b, Bool equal, const char *file, int line, const char *func, const char *msg)
+PUBLIC void UTestAssertString(const char *a, const char *b, Bool equal, 
+    const char *file, int line, const char *func, const char *msg, Bool dieAction)
 {
     if (a == NULL || b == NULL)
     {
-        UTestAssert(0, file, line, func, msg);
+        UTestAssert(0, file, line, func, msg, dieAction);
     }
 
     if (equal)
     {
         if (StrCmp(a, b) == 0)
         {
-            UTestAssert(1, file, line, func, msg);
+            UTestAssert(1, file, line, func, msg, dieAction);
         }
         else
         {
-            UTestAssert(0, file, line, func, msg);
+            UTestAssert(0, file, line, func, msg, dieAction);
         }
     }
     else
     {
         if (StrCmp(a, b) == 0)
         {
-            UTestAssert(0, file, line, func, msg);
+            UTestAssert(0, file, line, func, msg, dieAction);
         }
         else
         {
-            UTestAssert(1, file, line, func, msg);
+            UTestAssert(1, file, line, func, msg, dieAction);
         }
     }
 }
 
-PUBLIC void UTestAssertBuf(const char *a, const char *b, Size sz, Bool equal, const char *file, int line, const char *func, const char *msg)
+PUBLIC void UTestAssertBuf(const char *a, const char *b, Size sz, Bool equal,
+    const char *file, int line, const char *func, const char *msg, Bool dieAction)
 {
     if (a == NULL || b == NULL)
     {
-        UTestAssert(0, file, line, func, msg);
+        UTestAssert(0, file, line, func, msg, dieAction);
     }
 
     if (equal)
     {
         if (CompareN(a, b, sz) == 0)
         {
-            UTestAssert(1, file, line, func, msg);
+            UTestAssert(1, file, line, func, msg, dieAction);
         }
         else
         {
-            UTestAssert(0, file, line, func, msg);
+            UTestAssert(0, file, line, func, msg, dieAction);
         }
     }
     else
     {
         if (CompareN(a, b, sz) == 0)
         {
-            UTestAssert(0, file, line, func, msg);
+            UTestAssert(0, file, line, func, msg, dieAction);
         }
         else
         {
-            UTestAssert(1, file, line, func, msg);
+            UTestAssert(1, file, line, func, msg, dieAction);
         }
     }
 }
