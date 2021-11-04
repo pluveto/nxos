@@ -203,11 +203,11 @@ PUBLIC void *HeapAlloc(Size size)
     return (void *)objectNode;
 }
 
-PUBLIC void HeapFree(void *object)
+PUBLIC OS_Error HeapFree(void *object)
 {
     if (object == NULL) /* can't free NULL object */
     {
-        return;
+        return OS_EINVAL;
     }
     
     /* object to page, then to span */
@@ -228,14 +228,14 @@ PUBLIC void HeapFree(void *object)
             /* if len is too long, free to page heap */
             if (ListLength(&middleSizeCache.spanFreeList) + 1 >= MAX_MIDDLE_OBJECT_THRESOLD) 
             {
-                PageHeapFree(span);
+                return PageHeapFree(span);
             }
             else    /* free to span free list */
             {
                 Span *spanNode = (Span *) span;
                 ListAdd(&spanNode->list, &middleSizeCache.spanFreeList);
             }
-            return;
+            return OS_EOK;
         }
     }
     else    /* free to small cache */
@@ -258,7 +258,7 @@ PUBLIC void HeapFree(void *object)
             /* free span to page heap */
             if (ListLength(&cache->spanFreeList) + 1 >= MAX_SMALL_SPAN_THRESOLD)
             {
-                PageHeapFree(span);
+                return PageHeapFree(span);
             }
             else    /* add span to span list */
             {
@@ -272,6 +272,7 @@ PUBLIC void HeapFree(void *object)
             ListAdd(&objectNode->list, &cache->objectFreeList);
         }
     }
+    return OS_EOK;
 }
 
 PUBLIC Size HeapGetObjectSize(void *object)

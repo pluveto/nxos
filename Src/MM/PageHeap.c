@@ -166,12 +166,12 @@ PUBLIC void *PageHeapAlloc(Size count)
     return (void *)spanNodeBest;
 }
 
-PUBLIC void PageHeapFree(void *page)
+PUBLIC OS_Error PageHeapFree(void *page)
 {
     if (page == NULL)
     {
         LOG_E("free NULL page!");
-        return;
+        return OS_EINVAL;
     }
 
     void *span = PageToSpan(page);
@@ -180,7 +180,7 @@ PUBLIC void PageHeapFree(void *page)
     if (!count)
     {
         LOG_E("span count is 0!");
-        return;
+        return OS_EPERM;
     }
 
     List *listHead;
@@ -215,6 +215,7 @@ PUBLIC void PageHeapFree(void *page)
         spanNode->pageCount = count;
         ListAdd(&spanNode->list, listHead);
     }
+    return OS_EOK;
 }
 
 #ifdef CONFIG_PAGE_HEAP_TEST

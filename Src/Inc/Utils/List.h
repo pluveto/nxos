@@ -177,6 +177,19 @@ INLINE int ListLength(List *head)
     return n;
 }
 
+INLINE int ListFind(List *list, List *head)
+{
+    List *node;
+    ListForEach(node, head)
+    {
+        if (node == list)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 #define ListForEachPrev(pos, head) \
        for (pos = (head)->prev; pos != (head); pos = pos->prev)
 

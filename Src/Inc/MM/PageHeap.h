@@ -70,7 +70,7 @@ typedef struct PageHeap PageHeap;
 
 PUBLIC void PageHeapInit(void);
 PUBLIC void *PageHeapAlloc(Size count);
-PUBLIC void PageHeapFree(void *page);
+PUBLIC OS_Error PageHeapFree(void *page);
 
 PUBLIC void *PageToSpan(void *page);
 PUBLIC Size PageToSpanCount(void *span);

@@ -7,6 +7,7 @@
  * Change Logs:
  * Date           Author            Notes
  * 2021-11-2      JasonHu           Init
+ * 2021-11-5      JasonHu           Add StrCopy,StrLen test
  */
 
 #include <Utils/String.h>

@@ -66,7 +66,19 @@ typedef struct SmallCacheObject SmallCacheObject;
 PUBLIC void HeapCacheInit(void);
 
 PUBLIC void *HeapAlloc(Size size);
-PUBLIC void HeapFree(void *object);
+PUBLIC OS_Error HeapFree(void *object);
 PUBLIC Size HeapGetObjectSize(void *object);
+
+INLINE OS_Error __HeapFreeSatety(void **object)
+{
+    OS_Error err = HeapFree(*object);
+    if (err == OS_EOK)
+    {
+        *object = NULL;
+    }
+    return err;
+}
+
+#define HeapFreeSatety(p) __HeapFreeSatety(&(p))
 
 #endif /* __MM_HEAP_CACHE__ */
