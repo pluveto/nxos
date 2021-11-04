@@ -10,18 +10,29 @@
  */
 
 #include <Utils/String.h>
+#include <Utils/Log.h>
 
-PUBLIC char *StrCopy(char *dst, char *src)
+PUBLIC char *StrCopy(const char *dst, const char *src)
 {
-    char *dstPtr = dst;		       
+    if (dst == NULL || src == NULL)
+    {
+        LOG_D("NULL arg: " $(__func__));
+        return NULL;
+    }
+    char *dstPtr = (char *) dst;
     while ((*dstPtr++ = *src++))
     {
     }
-    return dst;
+    return (char *)dst;
 }
 
-PUBLIC char StrCmp(const char* a, const char* b)
-{  
+PUBLIC char StrCmp(const char *a, const char *b)
+{
+    if (a == NULL || b == NULL)
+    {
+        LOG_D("NULL arg: " $(__func__));
+        return 0;
+    }
     while (*a != 0 && *a == *b)
     {
         a++;
@@ -32,6 +43,11 @@ PUBLIC char StrCmp(const char* a, const char* b)
 
 PUBLIC int StrLen(const char *str)
 {
+    if (str == NULL)
+    {
+        LOG_D("NULL arg: " $(__func__));
+        return 0;
+    }
     const char *p = str;
     while(*p++);
     return (p - str - 1);

@@ -44,7 +44,18 @@ PRIVATE char *exceptionName[] = {
     "#AC Alignment Check Exception",
     "#MC Machine-Check Exception",
     "#XF SIMD Floating-Point Exception",
-    "Unknown Exception"
+    "Unknown Exception",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
 };
 
 PRIVATE OS_Error DefaultExceptionHandler(U32 irq, void *arg)

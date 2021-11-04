@@ -14,8 +14,8 @@
 
 #include <XBook.h>
 
-PUBLIC char *StrCopy(char *dst, char *src);
-PUBLIC char StrCmp(const char* a, const char* b);
+PUBLIC char *StrCopy(const char *dst, const char *src);
+PUBLIC char StrCmp(const char *a, const char *b);
 PUBLIC int StrLen(const char *str);
 
 #endif  /* __UTILS_STRING__ */
