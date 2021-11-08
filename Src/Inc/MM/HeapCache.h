@@ -79,6 +79,6 @@ INLINE OS_Error __HeapFreeSatety(void **object)
     return err;
 }
 
-#define HeapFreeSatety(p) __HeapFreeSatety(&(p))
+#define HeapFreeSatety(p) __HeapFreeSatety((void **)(&(p)))
 
 #endif /* __MM_HEAP_CACHE__ */

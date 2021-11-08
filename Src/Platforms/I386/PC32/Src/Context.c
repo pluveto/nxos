@@ -26,10 +26,10 @@ PRIVATE void ThreadEntry(HAL_ThreadHandler handler, void *arg, void (*texit)())
     PANIC("Thread execute done, should never be here!" Endln);
 }
 
-INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackBase, void *exit)
+INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackTop, void *exit)
 {
     U8 *stack;
-    stack = stackBase + sizeof(Uint);
+    stack = stackTop + sizeof(Uint);
     stack = (U8 *)ALIGN_DOWN((Uint)stack, sizeof(Uint));
     stack -= sizeof(HAL_TrapFrame);
     stack -= sizeof(HAL_Context);

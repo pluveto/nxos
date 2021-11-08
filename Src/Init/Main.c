@@ -16,6 +16,7 @@
 
 #include <Mods/UTest/UTest.h>
 #include <Sched/Thread.h>
+#include <Sched/Sched.h>
 
 PUBLIC int OS_Main(void)
 {
@@ -28,6 +29,7 @@ PUBLIC int OS_Main(void)
     LOG_I("Hello, NXOS!");
 
     InitThread();
+    SchedToFirstThread();
     while (1);
     
     HAL_InterruptEnable();
