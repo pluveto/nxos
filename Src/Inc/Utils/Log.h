@@ -68,11 +68,11 @@
  */
 #ifdef LOG_COLOR
 #define __LOG_COLOR(n) Cout("\033["#n"m")
-#define __LOG_BEGIN(logName, color) Cout("\033["#color"m[" logName "/" LOG_MOD_NAME "] ")
+#define __LOG_BEGIN(logName, color) Cout("\033["#color"m[" logName "-" LOG_MOD_NAME "] ")
 #define __LOG_END Cout("\033[0m" CON_NEWLINE)
 #else
 #define __LOG_COLOR(n)
-#define __LOG_BEGIN(logName, color) Cout("[" logName "/" LOG_MOD_NAME "] ")
+#define __LOG_BEGIN(logName, color) Cout("[" logName "-" LOG_MOD_NAME "] ")
 #define __LOG_END Cout(CON_NEWLINE)
 #endif /* LOG_COLOR */
 
@@ -105,25 +105,25 @@
  * Log api
  */
 #if (LOG_MOD_LEVEL >= LOG_DBG)
-#define LOG_D(...)      LOG_LINE("D", 0, __VA_ARGS__)
+#define LOG_D(...)      LOG_LINE("DBG", 0, __VA_ARGS__)
 #else
 #define LOG_D(...)
 #endif
 
 #if (LOG_MOD_LEVEL >= LOG_INFO)
-#define LOG_I(...)      LOG_LINE("I", 32, __VA_ARGS__)
+#define LOG_I(...)      LOG_LINE("INFO", 32, __VA_ARGS__)
 #else
 #define LOG_I(...)
 #endif
 
 #if (LOG_MOD_LEVEL >= LOG_WARNING)
-#define LOG_W(...)      LOG_LINE("W", 33, __VA_ARGS__)
+#define LOG_W(...)      LOG_LINE("WARN", 33, __VA_ARGS__)
 #else
 #define LOG_W(...)
 #endif
 
 #if (LOG_MOD_LEVEL >= LOG_ERROR)
-#define LOG_E(...)      LOG_LINE("E", 31, __VA_ARGS__)
+#define LOG_E(...)      LOG_LINE("ERR", 31, __VA_ARGS__)
 #else
 #define LOG_E(...)
 #endif

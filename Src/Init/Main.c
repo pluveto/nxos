@@ -15,6 +15,7 @@
 #include <Utils/Debug.h>
 
 #include <Mods/UTest/UTest.h>
+#include <Sched/Thread.h>
 
 PUBLIC int OS_Main(void)
 {
@@ -26,6 +27,9 @@ PUBLIC int OS_Main(void)
     
     LOG_I("Hello, NXOS!");
 
+    InitThread();
+    while (1);
+    
     HAL_InterruptEnable();
     
     UTestCallInit();

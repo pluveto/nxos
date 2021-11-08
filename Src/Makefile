@@ -75,6 +75,7 @@ SRCDIRS		+=	Mods/
 SRCDIRS		+=	Utils/
 SRCDIRS		+=	MM/
 SRCDIRS		+=	Tests/
+SRCDIRS		+=	Sched/
 
 #
 # XBuild variables
