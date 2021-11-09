@@ -49,12 +49,14 @@ PUBLIC char *NumberToString(long n, int radix, int small, int pad, char padChar)
 
 #define Cout(x, ...) \
         do { \
-            char *args[] = {x, ##__VA_ARGS__}; \
-            int i; \
-            for (i = 0; i < sizeof(args)/sizeof(args[0]); i++) \
+            Uint _level = HAL_InterruptSaveLevel(); \
+            char *_args[] = {x, ##__VA_ARGS__}; \
+            int _i; \
+            for (_i = 0; _i < sizeof(_args)/sizeof(_args[0]); _i++) \
             { \
-                ConsoleOutStr(args[i]); \
+                ConsoleOutStr(_args[_i]); \
             } \
+            HAL_InterruptRestoreLevel(_level); \
         } while (0)
 
 #endif  /* __MODS_CONSOLE_HEADER__ */

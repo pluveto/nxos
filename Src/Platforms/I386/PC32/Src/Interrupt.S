@@ -12,6 +12,7 @@
 .text
 
 .extern InterruptDispatch
+.extern ReSchedCheck
 
 /* cpu no error code, need push by hand */
 .macro CPU_TrapEntryNoErrCode p1
@@ -152,6 +153,9 @@ CPU_SyscallEntry:
 SyscallExit:
 .global InterruptExit
 InterruptExit:
+    call ReSchedCheck   /* check sched */
+
+    /* do interrupt stack restore  */
     addl $4, %esp               /* skip intr no */
 
     popal

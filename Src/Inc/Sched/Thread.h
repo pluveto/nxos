@@ -20,10 +20,22 @@
 
 typedef void (*ThreadHandler)(void *arg);
 
+enum ThreadState
+{
+    THREAD_INIT,
+    THREAD_READY,
+    THREAD_RUNNING,
+    THREAD_SLEEP,
+    THREAD_DEEPSLEEP,
+    THREAD_EXIT,
+};
+typedef enum ThreadState ThreadState;
+
 struct Thread
 {
     List list;
     List globalList;
+    ThreadState state;
     Uint32 tid;     /* thread id */
     U8 *stack;      /* stack base */
     Size stackSize; 
@@ -31,6 +43,8 @@ struct Thread
     ThreadHandler handler;
     void *threadArg;
     U32 timeslice;
+    U32 ticks;
+    U32 needSched;
     char name[THREAD_NAME_LEN];
 };
 typedef struct Thread Thread;
@@ -45,6 +59,7 @@ PUBLIC Thread *ThreadCreate(const char *name, ThreadHandler handler, void *arg);
 
 
 PUBLIC void ThreadExit(void);
+PUBLIC Thread *ThreadSelf(void);
 
 PUBLIC void InitThread(void);
 

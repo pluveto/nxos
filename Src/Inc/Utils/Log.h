@@ -87,10 +87,12 @@
 #define LOG_LINE(logName, color, ...) \
     do \
     { \
+        Uint _level = HAL_InterruptSaveLevel(); \
         LOG_TIMELINE \
         __LOG_BEGIN(logName, color); \
         Cout(__VA_ARGS__); \
         __LOG_END; \
+        HAL_InterruptRestoreLevel(_level); \
     } \
     while (0)
 #define __LOG_RAW(...) LOG_TIMELINE \

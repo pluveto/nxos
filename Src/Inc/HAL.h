@@ -37,6 +37,8 @@ INTERFACE OS_Error HAL_IRQAck(IRQ_Number irqno);
 
 INTERFACE void HAL_InterruptEnable(void);
 INTERFACE void HAL_InterruptDisable(void);
+INTERFACE Uint HAL_InterruptSaveLevel(void);
+INTERFACE void HAL_InterruptRestoreLevel(Uint level);
 
 /* Conosle HAL */
 INTERFACE void HAL_ConsoleOutChar(char ch);

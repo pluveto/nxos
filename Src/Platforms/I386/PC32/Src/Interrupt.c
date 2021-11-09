@@ -198,10 +198,22 @@ INTERFACE OS_Error HAL_IRQAck(IRQ_Number irqno)
 
 INTERFACE void HAL_InterruptEnable(void)
 {
-    CASM ("sti");
+    CASM("sti");
 }
 
 INTERFACE void HAL_InterruptDisable(void)
 {
-    CASM ("cli");
+    CASM("cli");
+}
+
+INTERFACE Uint HAL_InterruptSaveLevel(void)
+{
+    Uint level;
+    CASM("pushfl; popl %0; cli":"=g" (level): :"memory");
+    return level;
+}
+
+INTERFACE void HAL_InterruptRestoreLevel(Uint level)
+{
+    CASM("pushl %0; popfl": :"g" (level):"memory", "cc");
 }

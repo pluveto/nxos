@@ -15,5 +15,8 @@
 #include <XBook.h>
 
 PUBLIC void SchedToFirstThread(void);
+PUBLIC void SchedWithInterruptDisabled(void);
+PUBLIC void SchedYield(void);
+PUBLIC void ReSchedCheck(void);
 
 #endif /* __XBOOK_SCHED___ */
