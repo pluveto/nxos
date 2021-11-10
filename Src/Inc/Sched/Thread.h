@@ -37,9 +37,9 @@ struct Thread
     List globalList;
     ThreadState state;
     Uint32 tid;     /* thread id */
-    U8 *stack;      /* stack base */
+    U8 *stackBase;      /* stack base */
     Size stackSize; 
-    U8 *stackTop;   /* stack top */
+    U8 *stack;   /* stack top */
     ThreadHandler handler;
     void *threadArg;
     U32 timeslice;
@@ -55,8 +55,10 @@ PUBLIC OS_Error ThreadInit(Thread *thread,
     const char *name, 
     ThreadHandler handler, void *arg,
     U8 *stack, Size stackSize);
-PUBLIC Thread *ThreadCreate(const char *name, ThreadHandler handler, void *arg);
+PUBLIC OS_Error ThreadDeInit(Thread *thread);
 
+PUBLIC Thread *ThreadCreate(const char *name, ThreadHandler handler, void *arg);
+PUBLIC OS_Error ThreadDestroy(Thread *thread);
 
 PUBLIC void ThreadExit(void);
 PUBLIC Thread *ThreadSelf(void);

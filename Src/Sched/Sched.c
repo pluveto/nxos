@@ -25,7 +25,7 @@ PUBLIC void SchedToFirstThread(void)
     ListDel(&thread->list);
     thread->state = THREAD_RUNNING;
     currentThread = thread;
-    HAL_ContextSwitchNext((Addr)&thread->stackTop);
+    HAL_ContextSwitchNext((Addr)&thread->stack);
 }
 
 /**
@@ -71,11 +71,11 @@ PUBLIC void SchedWithInterruptDisabled(void)
     if (prev)
     {
         // LOG_D("Sched prev:" $d(prev->tid) " next:" $d(next->tid));
-        HAL_ContextSwitchPrevNext((Addr)&prev->stackTop, (Addr)&next->stackTop);
+        HAL_ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
     }
     else
     {
-        HAL_ContextSwitchNext((Addr)&next->stackTop);
+        HAL_ContextSwitchNext((Addr)&next->stack);
     }
     
     HAL_InterruptEnable();

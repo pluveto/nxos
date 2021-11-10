@@ -28,6 +28,11 @@ PUBLIC OS_Error ThreadInit(Thread *thread,
     ThreadHandler handler, void *arg,
     U8 *stack, Size stackSize)
 {
+    if (thread == NULL || name == NULL || handler == NULL || stack == NULL || !stackSize)
+    {
+        return OS_EINVAL;
+    }
+
     ListInit(&thread->list);
     ListInit(&thread->globalList);
     StrCopy(thread->name, name);
@@ -42,10 +47,24 @@ PUBLIC OS_Error ThreadInit(Thread *thread,
     thread->timeslice = 3;
     thread->ticks = thread->timeslice;
     thread->needSched = 0;
-    thread->stack = stack;
+    thread->stackBase = stack;
     thread->stackSize = stackSize;
-    thread->stackTop = thread->stack + stackSize;
-    thread->stackTop = HAL_ContextInit(handler, arg, thread->stackTop, (void *)ThreadExit);
+    thread->stack = thread->stackBase + stackSize;
+    thread->stack = HAL_ContextInit(handler, arg, thread->stack, (void *)ThreadExit);
+    return OS_EOK;
+}
+
+PUBLIC OS_Error ThreadDeInit(Thread *thread)
+{
+    if (thread == NULL)
+    {
+        return OS_EINVAL;
+    }
+    if (thread->stackBase == NULL)
+    {
+        return OS_EFAULT;
+    }
+    ThreadIdFree(thread->tid);    
     return OS_EOK;
 }
 
@@ -59,16 +78,40 @@ PUBLIC Thread *ThreadCreate(const char *name, ThreadHandler handler, void *arg)
     U8 *stack = MemAlloc(THREAD_STACK_SIZE_DEFAULT);
     if (stack == NULL)
     {
-        MemFreeSafety(thread);
+        MemFree(thread);
         return NULL;
     }
     if (ThreadInit(thread, name, handler, arg, stack, THREAD_STACK_SIZE_DEFAULT) != OS_EOK)
     {
-        MemFreeSafety(stack);
-        MemFreeSafety(thread);
+        MemFree(stack);
+        MemFree(thread);
         return NULL;
     }
     return thread;
+}
+
+PUBLIC OS_Error ThreadDestroy(Thread *thread)
+{
+    if (thread == NULL)
+    {
+        return OS_EINVAL;
+    }
+    U8 *stackBase = thread->stackBase;
+    if (stackBase == NULL)
+    {
+        return OS_EFAULT;
+    }
+
+    OS_Error err = ThreadDeInit(thread);
+    if (err != OS_EOK)
+    {
+        return err;
+    }
+
+    MemFree(stackBase);
+
+    MemFree(thread);
+    return OS_EOK;
 }
 
 PUBLIC OS_Error ThreadRun(Thread *thread)
@@ -115,7 +158,7 @@ PRIVATE void IdleThread(void *arg)
 PRIVATE void TestThread1(void *arg)
 {
     LOG_I("Hello, test thread 1: " $p(arg) "\n");
-    Thread *self = ThreadSelf();
+    // Thread *self = ThreadSelf();
     int i = 0;
     while (1)
     {
@@ -155,6 +198,21 @@ PRIVATE void TestThread(void)
     thread = ThreadCreate("test thread 2", TestThread2, (void *) 0x1234abcd);
     ASSERT(thread != NULL);
     ASSERT(ThreadRun(thread) == OS_EOK);
+
+    thread = ThreadCreate("test thread 3", TestThread2, (void *) 0x1234abcd);
+    ASSERT(thread != NULL);
+    ASSERT(ThreadDestroy(thread) == OS_EOK);
+
+    Thread threadObject;
+    U8 stackBuf[512];
+    OS_Error err;
+    err = ThreadInit(&threadObject, "thread object", TestThread2, NULL, stackBuf, 512);
+    ASSERT(err == OS_EOK);
+
+    err = ThreadDeInit(&threadObject);
+    ASSERT(err == OS_EOK);
+
+    LOG_D("thread test done.");    
 }
 
 PUBLIC void InitThread(void)
