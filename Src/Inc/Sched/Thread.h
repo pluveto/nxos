@@ -45,23 +45,20 @@ struct Thread
     U32 timeslice;
     U32 ticks;
     U32 needSched;
+    U32 isTerminated;
     char name[THREAD_NAME_LEN];
 };
 typedef struct Thread Thread;
 
 PUBLIC Thread *currentThread;
 
-PUBLIC OS_Error ThreadInit(Thread *thread, 
-    const char *name, 
-    ThreadHandler handler, void *arg,
-    U8 *stack, Size stackSize);
-PUBLIC OS_Error ThreadDeInit(Thread *thread);
-
 PUBLIC Thread *ThreadCreate(const char *name, ThreadHandler handler, void *arg);
 PUBLIC OS_Error ThreadDestroy(Thread *thread);
 
+PUBLIC OS_Error ThreadTerminate(Thread *thread);
 PUBLIC void ThreadExit(void);
 PUBLIC Thread *ThreadSelf(void);
+PUBLIC Thread *ThreadFindById(U32 tid);
 
 PUBLIC void InitThread(void);
 

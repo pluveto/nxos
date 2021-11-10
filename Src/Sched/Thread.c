@@ -20,10 +20,24 @@
 
 /* TODO: add lock lock for thread list */
 PUBLIC List globalThreadList;
+PUBLIC List exitThreadList;
 PUBLIC List threadReadyList;
 PUBLIC Thread *currentThread = NULL;
 
-PUBLIC OS_Error ThreadInit(Thread *thread, 
+PUBLIC Thread *ThreadFindById(U32 tid)
+{
+    Thread *thread;
+    ListForEachEntry (thread, &globalThreadList, globalList)
+    {
+        if (thread->tid == tid)
+        {
+            return thread;
+        }
+    }
+    return NULL;
+}
+
+PRIVATE OS_Error ThreadInit(Thread *thread, 
     const char *name,
     ThreadHandler handler, void *arg,
     U8 *stack, Size stackSize)
@@ -54,7 +68,7 @@ PUBLIC OS_Error ThreadInit(Thread *thread,
     return OS_EOK;
 }
 
-PUBLIC OS_Error ThreadDeInit(Thread *thread)
+PRIVATE OS_Error ThreadDeInit(Thread *thread)
 {
     if (thread == NULL)
     {
@@ -126,14 +140,51 @@ PUBLIC OS_Error ThreadRun(Thread *thread)
     return OS_EOK;
 }
 
+PUBLIC OS_Error ThreadTerminate(Thread *thread)
+{
+    if (thread == NULL)
+    {
+        return OS_EINVAL;
+    }
+    Uint level = HAL_InterruptSaveLevel();
+    thread->isTerminated = 1;
+    HAL_InterruptRestoreLevel(level);
+    return OS_EOK;
+}
+
+/**
+ * release resource the thread hold.
+ */
+PRIVATE void ThreadReleaseResouce(Thread *thread)
+{
+    /* free tid */
+    ThreadIdFree(thread->tid);
+
+    /* NOTE: add other resource here. */
+}
+
+/**
+ * release resouce must for a thread run
+ */
+PRIVATE void ThreadReleaseSelf(Thread *thread)
+{
+    /* free stack */
+    MemFree(thread->stackBase);
+    /* free thread struct */
+    MemFree(thread);
+}
+
 PUBLIC void ThreadExit(void)
 {
     /* free thread resource */
     Thread *thread = ThreadSelf();
 
-    ThreadIdFree(thread->tid); 
-    ListDel(&thread->globalList);
+    /* release the resource here that not the must for a thread! */
+    ThreadReleaseResouce(thread);
 
+    /* thread exit from global list */
+    ListDel(&thread->globalList);
+    
     SchedExit();
     PANIC("Thread Exit should never arrival here!");
 }
@@ -143,6 +194,10 @@ PUBLIC Thread *ThreadSelf(void)
     return currentThread;
 }
 
+
+/**
+ * system idle thread on per cpu.
+ */
 PRIVATE void IdleThread(void *arg)
 {
     LOG_I("Hello, idle thread\n");
@@ -153,6 +208,32 @@ PRIVATE void IdleThread(void *arg)
         i++;
         SchedYield();
     }
+}
+
+/**
+ * system deamon thread for all cpus 
+ */
+PRIVATE void DaemonThread(void *arg)
+{
+    LOG_I("Daemon thread started.\n");
+    Thread *thread, *safe;
+    while (1)
+    {
+        HAL_InterruptDisable();
+        ListForEachEntrySafe (thread, safe, &exitThreadList, globalList)
+        {
+            LOG_D("daemon release thread:" $d(thread->tid));
+            /* del from exit list */
+            ListDel(&thread->globalList);
+
+            ThreadReleaseSelf(thread);
+        }
+        HAL_InterruptEnable();
+
+        /* do delay or timeout */
+        SchedYield();
+    }
+    
 }
 
 PRIVATE void TestThread1(void *arg)
@@ -189,6 +270,41 @@ PRIVATE void TestThread2(void *arg)
     LOG_I("thread exit: " $s(self->name));
 }
 
+PRIVATE void TestThread3(void *arg)
+{
+    LOG_I("Hello, test thread 3: " $p(arg) "\n");
+    
+    /* wait terminate */
+    while (1)
+    {
+        
+    }
+}
+
+PRIVATE U32 thread3ID;
+
+PRIVATE void TestThread4(void *arg)
+{
+    LOG_I("Hello, test thread 4: " $p(arg) "\n");
+    Thread *target = ThreadFindById(thread3ID);
+    ASSERT(target != NULL);
+    int i = 0;
+    while (1)
+    {
+        i++;
+        // LOG_I("Thread: " $(self->name) " tid: " $d(self->tid) ".");
+        if (i == 100)
+        {
+            LOG_D("terminate thread:" $d(target->tid));
+            ThreadTerminate(target);
+        }
+        if (i == 1000)
+        {
+            return;
+        }
+    }
+}
+
 PRIVATE void TestThread(void)
 {
     Thread *thread = ThreadCreate("test thread 1", TestThread1, (void *) 0x1234abcd);
@@ -199,18 +315,19 @@ PRIVATE void TestThread(void)
     ASSERT(thread != NULL);
     ASSERT(ThreadRun(thread) == OS_EOK);
 
+    thread = ThreadCreate("test thread 3", TestThread3, (void *) 0x1234abcd);
+    ASSERT(thread != NULL);
+    ASSERT(ThreadRun(thread) == OS_EOK);
+
+    thread3ID = thread->tid;
+    
+    thread = ThreadCreate("test thread 4", TestThread4, (void *) 0x1234abcd);
+    ASSERT(thread != NULL);
+    ASSERT(ThreadRun(thread) == OS_EOK);
+
     thread = ThreadCreate("test thread 3", TestThread2, (void *) 0x1234abcd);
     ASSERT(thread != NULL);
     ASSERT(ThreadDestroy(thread) == OS_EOK);
-
-    Thread threadObject;
-    U8 stackBuf[512];
-    OS_Error err;
-    err = ThreadInit(&threadObject, "thread object", TestThread2, NULL, stackBuf, 512);
-    ASSERT(err == OS_EOK);
-
-    err = ThreadDeInit(&threadObject);
-    ASSERT(err == OS_EOK);
 
     LOG_D("thread test done.");    
 }
@@ -219,6 +336,7 @@ PUBLIC void InitThread(void)
 {
     InitThreadID();
     ListInit(&globalThreadList);
+    ListInit(&exitThreadList);
     ListInit(&threadReadyList);
     currentThread = NULL;
 
@@ -227,5 +345,10 @@ PUBLIC void InitThread(void)
     ASSERT(thread != NULL);
     ASSERT(ThreadRun(thread) == OS_EOK);
 
+    /* init daemon thread */
+    thread = ThreadCreate("daemon", DaemonThread, NULL);
+    ASSERT(thread != NULL);
+    ASSERT(ThreadRun(thread) == OS_EOK);
+    
     TestThread();
 }

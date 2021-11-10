@@ -17,6 +17,7 @@
 
 IMPORT List globalThreadList;
 IMPORT List threadReadyList;
+IMPORT List exitThreadList;
 
 PUBLIC void SchedToFirstThread(void)
 {
@@ -38,26 +39,9 @@ PUBLIC void SchedWithInterruptDisabled(void)
     /* put prev into list */
     prev = currentThread;
 
-    /* according state to set info */
-    if (prev->state == THREAD_RUNNING || prev->state == THREAD_READY)
+    if (prev->state == THREAD_EXIT)
     {
-        if (prev->state == THREAD_RUNNING)
-        {
-            prev->ticks = prev->timeslice;  /* reset ticks */
-            prev->state = THREAD_READY;
-        }
-        ListAddTail(&prev->list, &threadReadyList);
-    }
-    else if (prev->state == THREAD_EXIT)
-    {
-        prev = NULL;    /* set null */
-        /* need free prev thread and stack */
-        // LOG_D("Thread Exit");
-    }
-    else
-    {
-        /* error state */
-        PANIC("Thread sched with errnor state");
+        prev = NULL;    /* not save prev context */
     }
     
     /* get next from list */
@@ -84,24 +68,42 @@ PUBLIC void SchedWithInterruptDisabled(void)
 PUBLIC void SchedYield(void)
 {
     HAL_InterruptDisable();
+    /* put thread to tail of ready list */
     currentThread->state = THREAD_READY;
+    ListAddTail(&currentThread->list, &threadReadyList);
     SchedWithInterruptDisabled();
 }
 
 PUBLIC void SchedExit(void)
 {
     HAL_InterruptDisable();
+
+    /* set exit state, del from global list and add to exit list */
     currentThread->state = THREAD_EXIT;
+    LOG_D("Thread exit: " $d(currentThread->tid));
+    ListAdd(&currentThread->globalList, &exitThreadList);
     SchedWithInterruptDisabled();
 }
 
 PUBLIC void ReSchedCheck(void)
 {
     Thread *thread = currentThread;
+    if (thread->isTerminated)
+    {
+        LOG_D("call terminate: " $d(thread->tid));
+        thread->isTerminated = 0;
+        ThreadExit();
+    }
     if (thread->needSched)
     {
         HAL_InterruptDisable();
         thread->needSched = 0;
+
+        /* put thread to tail of thread and reset ticks from timeslice */
+        thread->ticks = thread->timeslice;
+        thread->state = THREAD_READY;
+        ListAddTail(&thread->list, &threadReadyList);
+
         SchedWithInterruptDisabled();
     }
 }
