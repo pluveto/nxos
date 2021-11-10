@@ -1,4 +1,4 @@
-下一代文书操作系统内核。Next XBook Operate System (NXOS)
+下一代文书操作系统内核。Next XBook Operating System (NXOS)
 
 多平台支持列表：
 
