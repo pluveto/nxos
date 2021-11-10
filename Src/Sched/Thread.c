@@ -85,7 +85,13 @@ PUBLIC OS_Error ThreadRun(Thread *thread)
 
 PUBLIC void ThreadExit(void)
 {
+    /* free thread resource */
+    Thread *thread = ThreadSelf();
 
+    ThreadIdFree(thread->tid); 
+    ListDel(&thread->globalList);
+
+    SchedExit();
     PANIC("Thread Exit should never arrival here!");
 }
 
@@ -110,9 +116,15 @@ PRIVATE void TestThread1(void *arg)
 {
     LOG_I("Hello, test thread 1: " $p(arg) "\n");
     Thread *self = ThreadSelf();
+    int i = 0;
     while (1)
     {
-        LOG_I("Thread: " $(self->name) " tid: " $d(self->tid) ".");    
+        // LOG_I("Thread: " $(self->name) " tid: " $d(self->tid) ".");
+        i++;
+        if (i > 100)
+        {
+            ThreadExit();
+        }
     }
 }
 
@@ -121,10 +133,17 @@ PRIVATE void TestThread2(void *arg)
     LOG_I("Hello, test thread 2: " $p(arg) "\n");
     
     Thread *self = ThreadSelf();
+    int i = 0;
     while (1)
     {
-        LOG_I("Thread: " $(self->name) " tid: " $d(self->tid) ".");    
+        i++;
+        // LOG_I("Thread: " $(self->name) " tid: " $d(self->tid) ".");
+        if (i > 100)
+        {
+            break;
+        }
     }
+    LOG_I("thread exit: " $s(self->name));
 }
 
 PRIVATE void TestThread(void)

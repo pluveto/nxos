@@ -39,24 +39,27 @@ PUBLIC void SchedWithInterruptDisabled(void)
     prev = currentThread;
 
     /* according state to set info */
-    if (prev->state == THREAD_RUNNING)
+    if (prev->state == THREAD_RUNNING || prev->state == THREAD_READY)
     {
-        prev->ticks = prev->timeslice;  /* reset ticks */
-        prev->state = THREAD_READY;
-        LOG_D("sched running");
+        if (prev->state == THREAD_RUNNING)
+        {
+            prev->ticks = prev->timeslice;  /* reset ticks */
+            prev->state = THREAD_READY;
+        }
+        ListAddTail(&prev->list, &threadReadyList);
     }
-    else if (prev->state == THREAD_READY)
+    else if (prev->state == THREAD_EXIT)
     {
-        /* do nothing */
-        LOG_D("sched yiled");
+        prev = NULL;    /* set null */
+        /* need free prev thread and stack */
+        // LOG_D("Thread Exit");
     }
     else
     {
         /* error state */
         PANIC("Thread sched with errnor state");
     }
-    ListAddTail(&prev->list, &threadReadyList);
-
+    
     /* get next from list */
     next = ListFirstEntry(&threadReadyList, Thread, list);
     ListDel(&next->list);
@@ -65,9 +68,15 @@ PUBLIC void SchedWithInterruptDisabled(void)
     /* set current */
     currentThread = next;
 
-    // LOG_D("Sched prev:" $d(prev->tid) " next:" $d(next->tid));
-    /* do switch */
-    HAL_ContextSwitchPrevNext((Addr)&prev->stackTop, (Addr)&next->stackTop);
+    if (prev)
+    {
+        // LOG_D("Sched prev:" $d(prev->tid) " next:" $d(next->tid));
+        HAL_ContextSwitchPrevNext((Addr)&prev->stackTop, (Addr)&next->stackTop);
+    }
+    else
+    {
+        HAL_ContextSwitchNext((Addr)&next->stackTop);
+    }
     
     HAL_InterruptEnable();
 }
@@ -76,6 +85,13 @@ PUBLIC void SchedYield(void)
 {
     HAL_InterruptDisable();
     currentThread->state = THREAD_READY;
+    SchedWithInterruptDisabled();
+}
+
+PUBLIC void SchedExit(void)
+{
+    HAL_InterruptDisable();
+    currentThread->state = THREAD_EXIT;
     SchedWithInterruptDisabled();
 }
 

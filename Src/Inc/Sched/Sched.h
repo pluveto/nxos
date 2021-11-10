@@ -18,5 +18,6 @@ PUBLIC void SchedToFirstThread(void);
 PUBLIC void SchedWithInterruptDisabled(void);
 PUBLIC void SchedYield(void);
 PUBLIC void ReSchedCheck(void);
+PUBLIC void SchedExit(void);
 
 #endif /* __XBOOK_SCHED___ */
