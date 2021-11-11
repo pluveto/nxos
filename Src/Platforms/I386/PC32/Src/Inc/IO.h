@@ -12,8 +12,8 @@
 #ifndef __PLATFORM_IO__
 #define __PLATFORM_IO__
 
-#include <Types.h>
-#include <Defines.h>
+#include <XBook/Types.h>
+#include <XBook/Defines.h>
 
 INLINE U8 IO_In8(U16 port)
 {

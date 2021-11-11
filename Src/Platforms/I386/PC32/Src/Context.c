@@ -10,7 +10,7 @@
  */
 
 #include <Context.h>
-#include <HAL.h>
+#include <XBook/HAL.h>
 #include <Interrupt.h>
 #include <Utils/Debug.h>
 

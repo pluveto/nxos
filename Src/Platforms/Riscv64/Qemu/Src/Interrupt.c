@@ -10,7 +10,7 @@
  */
 
 #include <XBook.h>
-#include <HAL.h>
+#include <XBook/HAL.h>
 #include <Regs.h>
 
 void HAL_InterruptDisable(void)

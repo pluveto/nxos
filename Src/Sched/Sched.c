@@ -13,7 +13,7 @@
 
 #include <Sched/Sched.h>
 #include <Sched/Thread.h>
-#include <HAL.h>
+#include <XBook/HAL.h>
 
 IMPORT List globalThreadList;
 IMPORT List threadReadyList;

@@ -12,8 +12,8 @@
 #ifndef __PLATFROM_REGS__
 #define __PLATFROM_REGS__
 
-#include <Types.h>
-#include <Defines.h>
+#include <XBook/Types.h>
+#include <XBook/Defines.h>
 
 #define EFLAGS_MBS    (1 << 1)
 #define EFLAGS_IF_1   (1 << 9)

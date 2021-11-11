@@ -9,7 +9,7 @@
  * 2021-10-3      JasonHu           Init
  */
 
-#include <HAL.h>
+#include <XBook/HAL.h>
 #define LOG_NAME "Main"
 #define LOG_LEVEL LOG_INFO
 #include <Utils/Debug.h>

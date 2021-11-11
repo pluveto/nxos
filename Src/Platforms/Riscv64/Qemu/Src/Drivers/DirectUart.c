@@ -10,7 +10,7 @@
  */
 
 #include <XBook.h>
-#include <HAL.h>
+#include <XBook/HAL.h>
 #include <SBI.h>
 
 INTERFACE void HAL_ConsoleOutChar(char ch)

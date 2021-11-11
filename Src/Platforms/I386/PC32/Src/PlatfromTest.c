@@ -10,7 +10,7 @@
  */
 
 #include <XBook.h>
-#include <HAL.h>
+#include <XBook/HAL.h>
 #include <Context.h>
 #include <MM/Page.h>
 #include <Platfrom.h>

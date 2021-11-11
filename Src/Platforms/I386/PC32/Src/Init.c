@@ -10,7 +10,7 @@
  */
 
 #include <XBook.h>
-#include <HAL.h>
+#include <XBook/HAL.h>
 #include <Utils/List.h>
 #include <Utils/Memory.h>
 

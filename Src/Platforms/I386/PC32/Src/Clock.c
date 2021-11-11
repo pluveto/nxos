@@ -11,7 +11,7 @@
 
 #include <Clock.h>
 #include <IO.h>
-#include <HAL.h>
+#include <XBook/HAL.h>
 #include <Interrupt.h>
 #include <Mods/Time/Clock.h>
 

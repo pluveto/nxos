@@ -12,7 +12,7 @@
 #ifndef __DIRECT_UART_HEADER__
 #define __DIRECT_UART_HEADER__
 
-#include <Defines.h>
+#include <XBook/Defines.h>
 
 /* direct means not use driver framework */
 
