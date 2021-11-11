@@ -63,7 +63,7 @@ typedef Uint32 MMU_PTE; /* page table entry */
 
 struct MMU
 {
-    NOOPT U32 *table;
+    VOLATILE U32 *table;
     Addr virStart;
     Addr earlyEnd;
     Addr virEnd;

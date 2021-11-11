@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  * 
  * Contains: Log utils
- *           Reference rt-thread rtdb.h
  * 
  * Change Logs:
  * Date           Author            Notes

@@ -29,13 +29,14 @@ PUBLIC int OS_Main(void)
     LOG_I("Hello, NXOS!");
 
     InitThread();
+    
+    UTestInit();
+    
     SchedToFirstThread();
     while (1);
     
     HAL_InterruptEnable();
     
-    UTestCallInit();
-
     while (1);
     // SPIN("OS_Main");
     return 0;

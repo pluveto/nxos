@@ -88,7 +88,7 @@
 /**
  * Make sure no compile optimization
  */
-#define NOOPT volatile 
+#define VOLATILE __volatile__ 
 
 #define DIV_ROUND_UP(x, step) (((x) + (step) - 1) / (step))
 #define DIV_ROUND_DOWN(x, step) ((x) / (step))

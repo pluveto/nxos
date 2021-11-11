@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Buddy system from Ginkgo OS
+ * Contains: Buddy system
  * 
  * Change Logs:
  * Date           Author            Notes

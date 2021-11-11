@@ -44,13 +44,13 @@ struct UTestSum
 typedef struct UTestSum UTestSum;
 
 #define TEST(name) \
-    void Utest##name(void)
+    PRIVATE void Utest##name(void)
 
 #define TEST_SETUP(name) \
-    void Utest##name##Setup(void)
+    PRIVATE void Utest##name##Setup(void)
 
 #define TEST_CLEAN(name) \
-    void Utest##name##Clean(void)
+    PRIVATE void Utest##name##Clean(void)
 
 #define TEST_TABLE(name) \
     USED PRIVATE UTest __UTestCase##name##Table[] =  
@@ -103,6 +103,6 @@ typedef struct UTestSum UTestSum;
         .unitCount = ARRAY_SIZE(__UTestCase##name##Table) \
     }
 
-PUBLIC void UTestCallInit(void);
+PUBLIC void UTestInit(void);
 
 #endif  /* __MODS_UTEST__ */

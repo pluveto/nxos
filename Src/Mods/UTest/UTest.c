@@ -24,7 +24,7 @@ PRIVATE UTestSum utestCaseSum = {FALSE, 0, 0};
 IMPORT const Addr __UTestCaseTableStart;
 IMPORT const Addr __UTestCaseTableEnd;
 
-PUBLIC void UTestCallInit(void)
+PUBLIC void UTestInit(void)
 {
     utestCaseSum.hasError = FALSE;
     utestCaseSum.passedNum = 0;
@@ -37,13 +37,13 @@ PUBLIC void UTestCallInit(void)
     int testIndex;
     for (testCaseIndex = 0; testCaseIndex < testCaseCount; testCaseIndex++)
     {
-        LOG_I("[==========] [ test case] Running " $d(testCaseTable->unitCount) " tests from test case (" $s(testCaseTable->caseName) ").");
+        LOG_I("[==========] [ testcase ] Running " $d(testCaseTable->unitCount) " tests from test case (" $s(testCaseTable->caseName) ").");
         if (testCaseTable->setup != NULL)
         {
-            LOG_I("[----------] [ test case] Global test (" $(testCaseTable->caseName) ") set-up.");
+            LOG_I("[----------] [ testcase ] Global test (" $(testCaseTable->caseName) ") set-up.");
             if (testCaseTable->setup() != OS_EOK)
             {
-                LOG_E("[  FAILED  ] [ test case] Global test (" $(testCaseTable->caseName) ") set-up.");
+                LOG_E("[  FAILED  ] [ testcase ] Global test (" $(testCaseTable->caseName) ") set-up.");
                 utestCaseSum.failedNum++;
                 goto __TestCaseContinue;
             }
@@ -103,28 +103,28 @@ PUBLIC void UTestCallInit(void)
             {
                 utestCaseSum.failedNum++;
             }
-            LOG_I("[   SUM    ] [ test case] " $d(testCaseTable->unitCount) " tests finshed. " \
+            LOG_I("[   SUM    ] [ testcase ] " $d(testCaseTable->unitCount) " tests finshed. " \
                 $d(utestSum.passedNum) "/" $d(testCaseTable->unitCount) " are passed. " \
                 $d(utestSum.failedNum) "/" $d(testCaseTable->unitCount) " are failed.");
 
         }
         else
         {
-            LOG_E("[  FAILED  ] [ test case] " $(testCaseTable->caseName));
+            LOG_E("[  FAILED  ] [ testcase ] " $(testCaseTable->caseName));
         }
 
         if (testCaseTable->clean != NULL)
         {
-            LOG_I("[----------] [ test case] Global test (" $(testCaseTable->caseName) ") tear-down.");
+            LOG_I("[----------] [ testcase ] Global test (" $(testCaseTable->caseName) ") tear-down.");
             if (testCaseTable->clean() != OS_EOK)
             {
-                LOG_E("[  FAILED  ] [ test case] Global test (" $(testCaseTable->caseName) ") tear-down.");
+                LOG_E("[  FAILED  ] [ testcase ] Global test (" $(testCaseTable->caseName) ") tear-down.");
                 utestCaseSum.failedNum++;
                 goto __TestCaseContinue;
             }
         }
 __TestCaseContinue:
-        LOG_I("[==========] [ test case] " $d(testIndex > 0 ? testIndex + 1 : 0) " tests from test case (" $s(testCaseTable->caseName) ") ran.");
+        LOG_I("[==========] [ testcase ] " $d(testIndex > 0 ? testIndex + 1 : 0) " tests from test case (" $s(testCaseTable->caseName) ") ran.");
         testCaseTable++;
     }
     LOG_I("[   SUM    ] " $d(testCaseCount) " test cases finshed. " \

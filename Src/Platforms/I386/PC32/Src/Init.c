@@ -43,7 +43,7 @@ PRIVATE void ClearBSS(void);
 
 PUBLIC MMU kernelMMU;
 
-PRIVATE NOOPT U32 kernelTable[PAGE_SIZE / sizeof(U32)] CALIGN(PAGE_SIZE);
+PRIVATE VOLATILE U32 kernelTable[PAGE_SIZE / sizeof(U32)] CALIGN(PAGE_SIZE);
 
 INTERFACE OS_Error PlatformInit(void)
 {
