@@ -13,7 +13,12 @@
 #define __XBOOK_ATOMIC__
 
 #include <XBook.h>
-#include <HAL/Atomic.h>
+
+struct HAL_Atomic
+{
+    VOLATILE int value;
+};
+typedef struct HAL_Atomic HAL_Atomic;
 
 INTERFACE void HAL_AtomicSet(HAL_Atomic *atomic, int value);
 INTERFACE int HAL_AtomicGet(HAL_Atomic *atomic);
