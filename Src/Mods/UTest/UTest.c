@@ -15,6 +15,8 @@
 #include <Utils/Memory.h>
 #include <Utils/Debug.h>
 
+#include <Sched/Thread.h>
+
 PRIVATE UTestCase *testCaseTable = NULL;
 PRIVATE Size testCaseCount;
 PRIVATE UTestSum localUtestSum = {FALSE, 0, 0};
@@ -24,7 +26,7 @@ PRIVATE UTestSum utestCaseSum = {FALSE, 0, 0};
 IMPORT const Addr __UTestCaseTableStart;
 IMPORT const Addr __UTestCaseTableEnd;
 
-PUBLIC void UTestInit(void)
+PRIVATE void UTestInvoke(void)
 {
     utestCaseSum.hasError = FALSE;
     utestCaseSum.passedNum = 0;
@@ -216,4 +218,19 @@ PUBLIC void UTestAssertBuf(const char *a, const char *b, Size sz, Bool equal,
             UTestAssert(1, file, line, func, msg, dieAction);
         }
     }
+}
+
+PRIVATE void UTestEntry(void)
+{
+    /* call utest */
+    UTestInvoke();
+}
+
+PUBLIC void UTestInit(void)
+{
+#ifdef CONFIG_UTEST_INVOKE
+    Thread *thread = ThreadCreate("UTest", UTestEntry, NULL);
+    ASSERT(thread != NULL);
+    ASSERT(ThreadRun(thread) == OS_EOK);
+#endif /* CONFIG_UTEST_INVOKE */
 }

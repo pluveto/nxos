@@ -9,7 +9,7 @@
  * 2021-11-13     JasonHu           Init
  */
 
-#include <Sched/SpinLock.h>
+#include <Sched/Spin.h>
 #include <Mods/UTest/UTest.h>
 
 TEST(SpinInit)

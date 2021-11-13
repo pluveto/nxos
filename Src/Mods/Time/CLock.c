@@ -42,3 +42,22 @@ PUBLIC void ClockTickGo(void)
         thread->needSched = 1; /* mark sched */
     }
 }
+
+PUBLIC OS_Error ClockTickDelay(ClockTick ticks)
+{
+    ClockTick start = ClockTickGet();
+    while (ClockTickGet() < start + ticks)
+    {
+        /* do nothing to delay */
+
+        /**
+         * TODO: add thread state check
+         * 
+         * if (thread exit flags == 1)
+         * {
+         *     return OS_ETIMEOUT
+         * }
+        */
+    }
+    return OS_EOK; 
+}

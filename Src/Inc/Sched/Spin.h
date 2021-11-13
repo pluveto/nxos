@@ -2,27 +2,26 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: tick spin lock
+ * Contains: busy spin lock
  * 
  * Change Logs:
  * Date           Author            Notes
  * 2021-11-13     JasonHu           Init
  */
 
-#ifndef __SPIN_LOCK___
-#define __SPIN_LOCK___
+#ifndef __SCHED_SPIN___
+#define __SCHED_SPIN___
 
 #include <XBook.h>
 #include <XBook/Atomic.h>
 
-#define SPIN_LOCK_MAGIC 0x5a5af0f0
+#define SPIN_MAGIC 0x10000001
 #define SPIN_LOCK_VALUE 1
-
 
 struct Spin
 {
     HAL_Atomic value;
-    U32 magic;
+    U32 magic;  /* magic for spin init */
 };
 typedef struct Spin Spin;
 
@@ -32,19 +31,19 @@ INLINE OS_Error SpinInit(Spin *lock)
     {
         return OS_EINVAL;
     }
-    if (lock->magic == SPIN_LOCK_MAGIC)
+    if (lock->magic == SPIN_MAGIC)
     {
         return OS_EFAULT;
     }
 
     HAL_AtomicSet(&lock->value, 0);
-    lock->magic = SPIN_LOCK_MAGIC;
+    lock->magic = SPIN_MAGIC;
     return OS_EOK;
 }
 
 INLINE OS_Error SpinLock(Spin *lock, Bool forever)
 {
-    if (lock == NULL || lock->magic != SPIN_LOCK_MAGIC)
+    if (lock == NULL || lock->magic != SPIN_MAGIC)
     {
         return OS_EFAULT;
     }
@@ -66,7 +65,7 @@ INLINE OS_Error SpinLock(Spin *lock, Bool forever)
 
 INLINE OS_Error SpinUnlock(Spin *lock)
 {
-    if (lock == NULL || lock->magic != SPIN_LOCK_MAGIC)
+    if (lock == NULL || lock->magic != SPIN_MAGIC)
     {
         return OS_EFAULT;
     }
@@ -74,4 +73,4 @@ INLINE OS_Error SpinUnlock(Spin *lock)
     return OS_EOK;
 }
 
-#endif /* __SPIN_LOCK___ */
+#endif /* __SCHED_SPIN___ */

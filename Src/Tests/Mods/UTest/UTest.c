@@ -67,12 +67,6 @@ TEST(Test3)
     ASSERT_BUFNE(buf1, buf2, 32);
 }
 
-TEST(Test4)
-{
-    EXPECT_TRUE(0);
-    EXPECT_FALSE(1);
-}
-
 TEST_SETUP(Test)
 {
     ASSERT_TRUE(1);
@@ -90,7 +84,6 @@ TEST_TABLE(UTest)
     TEST_UNIT(Test1),
     TEST_UNIT(Test2),
     TEST_UNIT(Test3),
-    TEST_UNIT(Test4),
 };
 
 TEST_CASE_SETUP(UTest)

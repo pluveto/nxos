@@ -37,4 +37,8 @@
 /* #define CONFIG_PAGE_HEAP_TEST */
 /* #define CONFIG_PAGE_CACHE_TEST */
 
+#define CONFIG_MUTEX_TEST
+
+/* #define CONFIG_UTEST_INVOKE */
+
 #endif  /* __OS_CONFIG__ */
