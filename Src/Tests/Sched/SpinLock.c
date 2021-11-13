@@ -12,61 +12,62 @@
 #include <Sched/SpinLock.h>
 #include <Mods/UTest/UTest.h>
 
-TEST(SpinLockInit)
+TEST(SpinInit)
 {
-    SpinLock lock;
-    EXPECT_NE(SpinLockInit(NULL), OS_EOK);
-    EXPECT_EQ(SpinLockInit(&lock), OS_EOK);
-    EXPECT_NE(SpinLockInit(&lock), OS_EOK);
+    Spin lock;
+    EXPECT_NE(SpinInit(NULL), OS_EOK);
+    EXPECT_EQ(SpinInit(&lock), OS_EOK);
+    EXPECT_NE(SpinInit(&lock), OS_EOK);
 }
 
-TEST(SpinLockLock)
+TEST(SpinLock)
 {
-    SpinLock lock;
-    SpinLock lockNoInit;
+    Spin lock;
+    Spin lockNoInit;
 
-    EXPECT_EQ(SpinLockInit(&lock), OS_EOK);
+    EXPECT_EQ(SpinInit(&lock), OS_EOK);
 
-    EXPECT_NE(SpinLockLock(NULL), OS_EOK);
-    EXPECT_NE(SpinLockLock(&lockNoInit), OS_EOK);
+    EXPECT_NE(SpinLock(NULL, TRUE), OS_EOK);
+    EXPECT_NE(SpinLock(&lockNoInit, TRUE), OS_EOK);
 
-    EXPECT_EQ(SpinLockLock(&lock), OS_EOK);
+    EXPECT_EQ(SpinLock(&lock, TRUE), OS_EOK);
+    EXPECT_NE(SpinLock(&lock, FALSE), OS_EOK);
 }
 
-TEST(SpinLockUnlock)
+TEST(SpinUnlock)
 {
-    SpinLock lock;
-    SpinLock lockNoInit;
+    Spin lock;
+    Spin lockNoInit;
     
-    EXPECT_EQ(SpinLockInit(&lock), OS_EOK);
+    EXPECT_EQ(SpinInit(&lock), OS_EOK);
 
-    EXPECT_NE(SpinLockUnlock(NULL), OS_EOK);
-    EXPECT_NE(SpinLockUnlock(&lockNoInit), OS_EOK);
+    EXPECT_NE(SpinUnlock(NULL), OS_EOK);
+    EXPECT_NE(SpinUnlock(&lockNoInit), OS_EOK);
 
-    EXPECT_EQ(SpinLockLock(&lock), OS_EOK);
-    EXPECT_EQ(SpinLockUnlock(&lock), OS_EOK);
+    EXPECT_EQ(SpinLock(&lock, TRUE), OS_EOK);
+    EXPECT_EQ(SpinUnlock(&lock), OS_EOK);
 }
 
-TEST(SpinLockLockAndUnlock)
+TEST(SpinLockAndUnlock)
 {
-    SpinLock lock;
+    Spin lock;
     
-    EXPECT_EQ(SpinLockInit(&lock), OS_EOK);
+    EXPECT_EQ(SpinInit(&lock), OS_EOK);
 
     int i;
     for (i = 0; i < 12; i++)
     {
-        EXPECT_EQ(SpinLockLock(&lock), OS_EOK);
-        EXPECT_EQ(SpinLockUnlock(&lock), OS_EOK);
+        EXPECT_EQ(SpinLock(&lock, TRUE), OS_EOK);
+        EXPECT_EQ(SpinUnlock(&lock), OS_EOK);
     }
 }
 
-TEST_TABLE(SpinLock)
+TEST_TABLE(Spin)
 {
-    TEST_UNIT(SpinLockInit),
-    TEST_UNIT(SpinLockLock),
-    TEST_UNIT(SpinLockUnlock),
-    TEST_UNIT(SpinLockLockAndUnlock),
+    TEST_UNIT(SpinInit),
+    TEST_UNIT(SpinLock),
+    TEST_UNIT(SpinUnlock),
+    TEST_UNIT(SpinLockAndUnlock),
 };
 
-TEST_CASE(SpinLock);
+TEST_CASE(Spin);

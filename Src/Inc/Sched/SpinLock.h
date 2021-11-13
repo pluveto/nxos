@@ -14,19 +14,19 @@
 
 #include <XBook.h>
 #include <XBook/Atomic.h>
-#include <XBook/HAL.h>
 
 #define SPIN_LOCK_MAGIC 0x5a5af0f0
+#define SPIN_LOCK_VALUE 1
 
-struct SpinLock
+
+struct Spin
 {
-    HAL_Atomic currentTick;
-    HAL_Atomic nextTick;
+    HAL_Atomic value;
     U32 magic;
 };
-typedef struct SpinLock SpinLock;
+typedef struct Spin Spin;
 
-INLINE OS_Error SpinLockInit(SpinLock *lock)
+INLINE OS_Error SpinInit(Spin *lock)
 {
     if (lock == NULL)
     {
@@ -37,39 +37,40 @@ INLINE OS_Error SpinLockInit(SpinLock *lock)
         return OS_EFAULT;
     }
 
-    HAL_AtomicSet(&lock->currentTick, 0);
-    HAL_AtomicSet(&lock->nextTick, 0);
+    HAL_AtomicSet(&lock->value, 0);
     lock->magic = SPIN_LOCK_MAGIC;
     return OS_EOK;
 }
 
-INLINE OS_Error SpinLockLock(SpinLock *lock)
+INLINE OS_Error SpinLock(Spin *lock, Bool forever)
 {
     if (lock == NULL || lock->magic != SPIN_LOCK_MAGIC)
     {
         return OS_EFAULT;
     }
 
-    /* get a tick for me */
-    VOLATILE int myTick = HAL_AtomicSwap(&lock->nextTick, HAL_AtomicGet(&lock->nextTick) + 1);   /* return old tick value */
-
-    /* wait my tick equal to current tick to try get lock */
-    while (HAL_AtomicGet(&lock->currentTick) != myTick)
+    do
     {
-        /* do nothing to wait. */
-    }
-    /* current tick equal to my tick */
+        if (HAL_AtomicCAS(&lock->value, 0, SPIN_LOCK_VALUE) == 0)
+        {
+            break;
+        }
+        if (forever == FALSE)
+        {
+            return OS_ETIMEOUT;
+        }
+    } while (1);
+
     return OS_EOK;
 }
 
-INLINE OS_Error SpinLockUnlock(SpinLock *lock)
+INLINE OS_Error SpinUnlock(Spin *lock)
 {
     if (lock == NULL || lock->magic != SPIN_LOCK_MAGIC)
     {
         return OS_EFAULT;
     }
-    /* increase current tick to release lock */
-    HAL_AtomicInc(&lock->currentTick);
+    HAL_AtomicSet(&lock->value, 0);
     return OS_EOK;
 }
 
