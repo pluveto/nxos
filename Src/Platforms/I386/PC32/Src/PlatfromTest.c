@@ -31,7 +31,7 @@ U8 *threadSP2;
 
 void thread_entry1(void *arg)
 {
-    LOG_D("Thread 1..." $x(arg));
+    LOG_D("Thread 1... %x", arg);
     
     while (1)
     {
@@ -42,7 +42,7 @@ void thread_entry1(void *arg)
 
 void thread_entry2(void *arg)
 {
-    LOG_D("Thread 2..." $x(arg));
+    LOG_D("Thread 2... %x", arg);
 
     while (1)
     {
@@ -65,8 +65,7 @@ PRIVATE void ConsoleTest(void)
     char *s = "hello";
     int a = 12345678;
     int b = 0x12345678;
-    LOG_D(s, " 16:" $x(0x12345678) " 10:" $d(0x12345678) "a:" $d(a) "b:" $X(b) " End.");
-
+    LOG_D("%s 16:%x 10:%d a:%d b:%X", s, 0x12345678, 0x12345678, a, b);
     ASSERT(a == 12345678);   
 }
 #endif
@@ -82,13 +81,13 @@ PRIVATE void PageTest(void)
     {
         void *buf = PageAlloc(i + 1);
         Zero(buf, PAGE_SIZE);
-        LOG_D("Alloc:" $x(buf));
+        LOG_D("Alloc: %x" buf);
         bufs[i] = buf; 
     }
 
     for (i = 0; i < 16; i++)
     {
-        LOG_D("Free:" $x(bufs[i]));
+        LOG_D("Free: %x" bufs[i]);
         if (bufs[i])
         {
             PageFree(bufs[i]);
@@ -98,7 +97,7 @@ PRIVATE void PageTest(void)
     {
         void *buf = PageAlloc(i + 1);
         Zero(buf, PAGE_SIZE);
-        LOG_D("Alloc:" $x(buf));
+        LOG_D("Alloc: %x", buf);
         bufs[i] = buf; 
     }
 
@@ -106,13 +105,13 @@ PRIVATE void PageTest(void)
     {
         void *buf = PageAllocInZone(PZ_DMA, i + 1);
         Zero(buf, PAGE_SIZE);
-        LOG_D("Alloc:" $x(buf));
+        LOG_D("Alloc: %x", buf);
         bufs[i] = buf; 
     }
 
     for (i = 0; i < 16; i++)
     {
-        LOG_D("Free:" $x(bufs[i]));
+        LOG_D("Free: %x", bufs[i]);
         if (bufs[i])
         {
             PageFreeInZone(PZ_DMA, bufs[i]);
@@ -122,7 +121,7 @@ PRIVATE void PageTest(void)
     {
         void *buf = PageAllocInZone(PZ_DMA, i + 1);
         Zero(buf, PAGE_SIZE);
-        LOG_D("Alloc:" $x(buf));
+        LOG_D("Alloc: %x", buf);
         bufs[i] = buf; 
     }
 }

@@ -17,12 +17,11 @@
 #ifdef CONFIG_THREAD_TEST
 PRIVATE void TestThread1(void *arg)
 {
-    LOG_I("Hello, test thread 1: " $p(arg) "\n");
+    LOG_I("Hello, test thread 1: %p", arg);
     // Thread *self = ThreadSelf();
     int i = 0;
     while (1)
     {
-        // LOG_I("Thread: " $(self->name) " tid: " $d(self->tid) ".");
         i++;
         if (i > 100)
         {
@@ -33,14 +32,13 @@ PRIVATE void TestThread1(void *arg)
 
 PRIVATE void TestThread2(void *arg)
 {
-    LOG_I("Hello, test thread 2: " $p(arg) "\n");
+    LOG_I("Hello, test thread 2: %p", arg);
     
     Thread *self = ThreadSelf();
     int i = 0;
     while (1)
     {
         i++;
-        // LOG_I("Thread: " $(self->name) " tid: " $d(self->tid) ".");
         if (i > 100)
         {
             break;
@@ -51,7 +49,7 @@ PRIVATE void TestThread2(void *arg)
 
 PRIVATE void TestThread3(void *arg)
 {
-    LOG_I("Hello, test thread 3: " $p(arg) "\n");
+    LOG_I("Hello, test thread 3: %p", arg);
     
     /* wait terminate */
     while (1)
@@ -64,17 +62,16 @@ PRIVATE U32 thread3ID;
 
 PRIVATE void TestThread4(void *arg)
 {
-    LOG_I("Hello, test thread 4: " $p(arg) "\n");
+    LOG_I("Hello, test thread 4: %p", arg);
     Thread *target = ThreadFindById(thread3ID);
     ASSERT(target != NULL);
     int i = 0;
     while (1)
     {
         i++;
-        // LOG_I("Thread: " $(self->name) " tid: " $d(self->tid) ".");
         if (i == 100)
         {
-            LOG_D("terminate thread:" $d(target->tid));
+            LOG_D("terminate thread: %d", target->tid);
             ThreadTerminate(target);
         }
         if (i == 1000)

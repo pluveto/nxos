@@ -66,19 +66,18 @@
  * WHITE    37
  */
 #ifdef LOG_COLOR
-#define __LOG_COLOR(n) Cout("\033["#n"m")
-#define __LOG_BEGIN(logName, color) Cout("\033["#color"m[" logName "-" LOG_MOD_NAME "] ")
-#define __LOG_END Cout("\033[0m" CON_NEWLINE)
+#define __LOG_COLOR(n) Printf("\033[%sm", #n)
+#define __LOG_BEGIN(logName, color) Printf("\033[%sm[%s-%s] ", #color, logName, LOG_MOD_NAME)
+#define __LOG_END Printf("\033[0m" CON_NEWLINE)
 #else
 #define __LOG_COLOR(n)
-#define __LOG_BEGIN(logName, color) Cout("[" logName "-" LOG_MOD_NAME "] ")
-#define __LOG_END Cout(CON_NEWLINE)
+#define __LOG_BEGIN(logName, color) Printf("[%s-%s] ", logName, LOG_MOD_NAME)
+#define __LOG_END Printf(CON_NEWLINE)
 #endif /* LOG_COLOR */
 
 
 #ifdef CONFIG_DEBUG_TIMELINE
-#define LOG_TIMELINE Cout("[" $d_(ClockTickGetMilliSecond() / 1000, 10, ' ') "." \
-        $d_(ClockTickGetMilliSecond() % 1000, 3, '0') "] ") ;
+#define LOG_TIMELINE Printf("[%10d.%3d] ", ClockTickGetMilliSecond() / 1000, ClockTickGetMilliSecond() % 1000);
 #else
 #define LOG_TIMELINE
 #endif
@@ -89,17 +88,17 @@
         Uint _level = HAL_InterruptSaveLevel(); \
         LOG_TIMELINE \
         __LOG_BEGIN(logName, color); \
-        Cout(__VA_ARGS__); \
+        Printf(__VA_ARGS__); \
         __LOG_END; \
         HAL_InterruptRestoreLevel(_level); \
     } \
     while (0)
 #define __LOG_RAW(...) LOG_TIMELINE \
-        Cout(__VA_ARGS__)
+        Printf(__VA_ARGS__)
 
 #else
-#define LOG_LINE(logName, color, ...)
-#define __LOG_RAW(...)
+#define LOG_LINE(logName, color, fmt, ...)
+#define __LOG_RAW(fmt, ...)
 #endif /* LOG_ENABLE */
 
 /**

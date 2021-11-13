@@ -58,13 +58,13 @@ PRIVATE void TestThreadID(void)
     for (i = 0; i < 32; i++)
     {
         I32 id = ThreadIdAlloc();
-        LOG_D("alloc id:" $d(id));
+        LOG_D("alloc id: %d", id);
         ThreadIdFree(id);
     }
     for (i = 0; i < 32; i++)
     {
         I32 id = ThreadIdAlloc();
-        LOG_D("alloc id:" $d(id));
+        LOG_D("alloc id: %d", id);
     }
 
     ThreadIdFree(1);
@@ -75,7 +75,7 @@ PRIVATE void TestThreadID(void)
     for (i = 0; i < 4; i++)
     {
         I32 id = ThreadIdAlloc();
-        LOG_D("alloc id:" $d(id));
+        LOG_D("alloc id: %d", id);
         ThreadIdFree(id);
     }
 }

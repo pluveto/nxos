@@ -94,26 +94,10 @@ PRIVATE BuddySystem* BuddyCreateFromMemory(void *mem)
     return system;
 }
 
-#if 0
-PRIVATE void BuddyDebug(BuddySystem* system)
-{
-#ifdef BUDDY_DEBUG
-    ASSERT(system);
-
-    int order;
-    for (order = MAX_PAGE_ORDER - 1; order >= 0; order--)
-    {
-        LOG_D($d(system->count[order]));
-    }
-    LOG_D("\n");
-#endif
-}
-#endif
-
 PUBLIC BuddySystem* BuddyCreate(void *mem, Size size)
 {
     ASSERT(mem && size);
-    LOG_I("mem:" $x(mem) " size:" $x(size));
+    LOG_I("mem: %x size: %x", mem, size);
     if (!(mem && size))
     {
         return NULL;

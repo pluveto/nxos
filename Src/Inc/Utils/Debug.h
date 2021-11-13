@@ -29,7 +29,7 @@ void AssertionFailure(char *exp, char *file, char *baseFile, int line);
  * Spin here
  */
 #define SPIN(str) \
-        LOG_I(str, Endln "FILE:" $s(__FILE__) "\nFUNCTION:" $s(__FUNCTION__) "\nLINE:" $d(__LINE__)); \
+        LOG_I(str, Endln "FILE:%s\nFUNCTION:%s\nLINE:%d", __FILE__, __FUNCTION__, __LINE__); \
         for(;;)
 
 /**
@@ -37,7 +37,7 @@ void AssertionFailure(char *exp, char *file, char *baseFile, int line);
  */
 #define PANIC(str) \
         HAL_InterruptDisable(); \
-        LOG_E("!PANIC!" CON_NEWLINE); \
+        LOG_E("!PANIC!"); \
         SPIN(str)
 
 #endif  /* __UTILS_DEBUG__ */

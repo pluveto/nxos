@@ -54,7 +54,7 @@ PUBLIC void SchedWithInterruptDisabled(void)
 
     if (prev)
     {
-        // LOG_D("Sched prev:" $d(prev->tid) " next:" $d(next->tid));
+        // LOG_D("Sched prev: %d next: %d", prev->tid, next->tid);
         HAL_ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
     }
     else
@@ -80,7 +80,7 @@ PUBLIC void SchedExit(void)
 
     /* set exit state, del from global list and add to exit list */
     currentThread->state = THREAD_EXIT;
-    LOG_D("Thread exit: " $d(currentThread->tid));
+    LOG_D("Thread exit: %d", currentThread->tid);
     ListAdd(&currentThread->globalList, &exitThreadList);
     SchedWithInterruptDisabled();
 }
@@ -90,7 +90,7 @@ PUBLIC void ReSchedCheck(void)
     Thread *thread = currentThread;
     if (thread->isTerminated)
     {
-        LOG_D("call terminate: " $d(thread->tid));
+        LOG_D("call terminate: %d", thread->tid);
         thread->isTerminated = 0;
         ThreadExit();
     }

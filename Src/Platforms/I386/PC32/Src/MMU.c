@@ -22,7 +22,7 @@ PUBLIC void MMU_EarlyMap(MMU *mmu, Addr virStart, Size size)
     Addr phyStart = virStart;
     Addr virEnd = virStart + PAGE_ALIGNUP(size);
 
-    LOG_I("OS map early on [" $p(virStart) "~" $p(virEnd) "]");
+    LOG_I("OS map early on [%p~%p]", virStart, virEnd);
     
     MMU_PDE *pdt = (MMU_PDE *)mmu->table;
     

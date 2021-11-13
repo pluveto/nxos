@@ -23,7 +23,7 @@ PRIVATE void ThreadEntry(HAL_ThreadHandler handler, void *arg, void (*texit)())
     handler(arg);
     if (texit)
         texit();
-    PANIC("Thread execute done, should never be here!" Endln);
+    PANIC("Thread execute done, should never be here!");
 }
 
 INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackTop, void *exit)

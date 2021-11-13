@@ -51,6 +51,8 @@ INTERFACE OS_Error PlatformInit(void)
     
     HAL_DirectUartInit();
     
+    Printf("hello, world!\na=%x b=%d c=%c e=%s\n", 0x1234abcd, 123456789, 'A', "hello");
+    
     LOG_I("Hello, PC32!");
 
     CPU_InitGate();
@@ -81,7 +83,7 @@ PRIVATE void PageInit(void)
 {    
     U32 memSize = *(U32 *)GRUB2_READ_MEMORY_BYTES_ADDR;
     
-    LOG_I("Memory Size: " $x(memSize) " Bytes " $d(memSize / SZ_MB) " MB");
+    LOG_I("Memory Size: %x Bytes %d MB", memSize, memSize / SZ_MB);
 
     if (memSize == 0)
     {
@@ -89,7 +91,7 @@ PRIVATE void PageInit(void)
     }
     if (memSize < MEM_MIN_SIZE)
     {
-        LOG_E("Must has " $d(MEM_MIN_SIZE / SZ_MB) " MB memory!");
+        LOG_E("Must has %d MB memory!", MEM_MIN_SIZE / SZ_MB);
         PANIC("Memory too small");
     }
     
@@ -105,9 +107,9 @@ PRIVATE void PageInit(void)
     Addr userBase = MEM_NORMAL_BASE + normalSize;
     Size userSize = memSize - userBase;
 
-    LOG_I("DMA memory base: " $x(MEM_DMA_BASE) " Size:" $d(MEM_DMA_SIZE / SZ_MB) " MB");
-    LOG_I("Normal memory base: " $x(MEM_NORMAL_BASE) " Size:" $d(normalSize / SZ_MB) " MB");
-    LOG_I("User memory base: " $x(userBase) " Size:" $d(userSize / SZ_MB) " MB");
+    LOG_I("DMA memory base: %x Size:%d MB", MEM_DMA_BASE, MEM_DMA_SIZE / SZ_MB);
+    LOG_I("Normal memory base: %x Size:%d MB", MEM_NORMAL_BASE, normalSize / SZ_MB);
+    LOG_I("User memory base: %x Size:%d MB", userBase, userSize / SZ_MB);
 
     /* init page zone */
     PageInitZone(PZ_DMA, (void *)MEM_DMA_BASE, MEM_DMA_SIZE);

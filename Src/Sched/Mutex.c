@@ -12,6 +12,7 @@
 #include <Sched/Mutex.h>
 #include <XBook/HAL.h>
 #include <Sched/Sched.h>
+#include <Sched/Thread.h>
 
 #define MUTEX_MAGIC 0x10000002
 

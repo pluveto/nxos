@@ -16,7 +16,7 @@ PUBLIC char *StrCopy(const char *dst, const char *src)
 {
     if (dst == NULL || src == NULL)
     {
-        LOG_D("NULL arg: " $(__func__));
+        LOG_D("NULL arg: %s", __func__);
         return NULL;
     }
     char *dstPtr = (char *) dst;
@@ -30,7 +30,7 @@ PUBLIC char StrCmp(const char *a, const char *b)
 {
     if (a == NULL || b == NULL)
     {
-        LOG_D("NULL arg: " $(__func__));
+        LOG_D("NULL arg: %s", __func__);
         return 0;
     }
     while (*a != 0 && *a == *b)
@@ -45,7 +45,7 @@ PUBLIC int StrLen(const char *str)
 {
     if (str == NULL)
     {
-        LOG_D("NULL arg: " $(__func__));
+        LOG_D("NULL arg: %s", __func__);
         return 0;
     }
     const char *p = str;

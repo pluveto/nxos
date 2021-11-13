@@ -75,30 +75,23 @@ PRIVATE void HeapSizeClassInit(void)
     for (i = 8; i <= 16; i+=8)
     {
         sizeAarray[n].size = i;
-        LOG_D("[" $d(n) "] size: " $d(i));
         n++;
     }
     for (i = 32; i <= 128; i+=16)
     {
         sizeAarray[n].size = i;
-        LOG_D("[" $d(n) "] size: " $d(i));
         n++;
     }
     for (i = 128 + 128 / 8; i <= MAX_SMALL_OBJECT_SIZE; )
     {
         sizeAarray[n].size = i;
-        LOG_D("[" $d(n) "] size: " $d(i));
-        LOG_D("align down: " $d(AlignDownToPow2(i / 8)));
         i += AlignDownToPow2(i / 8);
         n++;
     }
 
-    LOG_D("Count: " $d(n));
-
     for (i = 0; i < MAX_SIZE_CLASS_NR; i++)
     {
         HeapCacheInitOne(&sizeAarray[i].cache, sizeAarray[i].size);
-        LOG_D("[" $d(i) "] size: " $d(sizeAarray[i].size));
     }
 
     HeapCacheInitOne(&middleSizeCache, 0);
@@ -161,7 +154,7 @@ PUBLIC void *HeapAlloc(Size size)
             span = (Span *)PageHeapAlloc(pageCount);
             if (span == NULL)
             {
-                LOG_E("no enough memory span!\n");
+                LOG_E("no enough memory span!");
                 return NULL;
             }
         }
@@ -336,13 +329,13 @@ PRIVATE void MiddleObjectTest(void)
     for (i = 256 + 1, j = 0; i < 1024; i += 16, j++)
     {
         buf[j] = HeapAlloc(i * SZ_KB);
-        LOG_D("alloc: " $p(buf[j]));
+        LOG_D("alloc: %p", buf[j]);
     }
 
     for (i = 256 + 1, j = 0; i < 1024; i += 16, j++)
     {
         HeapFree(buf[j]);
-        LOG_D("free: " $p(buf[j]));
+        LOG_D("free: %p", buf[j]);
     }
 }
 
@@ -351,31 +344,31 @@ PRIVATE void SmallObjectTest(void)
     /* small object */
     void *p = HeapAlloc(8);
     p = HeapAlloc(9);
-    LOG_D("Alloc & Free:" $p(p));
+    LOG_D("Alloc & Free: %p", p);
     HeapFree(p);
     p = HeapAlloc(16);
-    LOG_D("Alloc & Free:" $p(p));
+    LOG_D("Alloc & Free: %p", p);
     HeapFree(p);
     p = HeapAlloc(20);
-    LOG_D("Alloc & Free:" $p(p));
+    LOG_D("Alloc & Free: %p", p);
     HeapFree(p);
     p = HeapAlloc(28);
-    LOG_D("Alloc & Free:" $p(p));
+    LOG_D("Alloc & Free: %p", p);
     HeapFree(p);
     p = HeapAlloc(32);
-    LOG_D("Alloc & Free:" $p(p));
+    LOG_D("Alloc & Free: %p", p);
     HeapFree(p);
     p = HeapAlloc(48);
-    LOG_D("Alloc & Free:" $p(p));
+    LOG_D("Alloc & Free: %p", p);
     HeapFree(p);
     p = HeapAlloc(63);
-    LOG_D("Alloc & Free:" $p(p));
+    LOG_D("Alloc & Free: %p", p);
     HeapFree(p);
     p = HeapAlloc(72);
-    LOG_D("Alloc & Free:" $p(p));
+    LOG_D("Alloc & Free: %p", p);
     HeapFree(p);
     p = HeapAlloc(120);
-    LOG_D("Alloc & Free:" $p(p));
+    LOG_D("Alloc & Free: %p", p);
     HeapFree(p);
     p = HeapAlloc(250);
 
@@ -383,14 +376,14 @@ PRIVATE void SmallObjectTest(void)
     for (i = 0; i < 20; i++)
     {
         p = HeapAlloc(512);
-        LOG_D("Alloc & Free:" $p(p));
+        LOG_D("Alloc & Free: %p", p);
         HeapFree(p);
     }
     
     for (i = 0; i < 20; i++)
     {
         p = HeapAlloc(2048);
-        LOG_D("Alloc & Free:" $p(p));
+        LOG_D("Alloc & Free: %p", p);
         HeapFree(p);
     }
     
@@ -399,7 +392,7 @@ PRIVATE void SmallObjectTest(void)
         for (j = 0; j < 10; j++)
         {
             p = HeapAlloc(i);
-            LOG_D("Alloc & Free:" $p(p) " Size: " $d(HeapGetObjectSize(p)));
+            LOG_D("Alloc & Free:" %p " Size: %d" p, HeapGetObjectSize(p));
             HeapFree(p);
         }
     }

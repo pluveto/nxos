@@ -205,11 +205,10 @@ PUBLIC Thread *ThreadSelf(void)
  */
 PRIVATE void IdleThread(void *arg)
 {
-    LOG_I("Hello, idle thread\n");
+    LOG_I("Hello, idle thread");
     int i = 0;
     while (1)
     {
-        // LOG_I("Counter: " $d(i));
         i++;
         ThreadYield();
     }
@@ -227,7 +226,7 @@ PRIVATE void DaemonThread(void *arg)
         HAL_InterruptDisable();
         ListForEachEntrySafe (thread, safe, &exitThreadList, globalList)
         {
-            LOG_D("daemon release thread:" $d(thread->tid));
+            LOG_D("daemon release thread: %d", thread->tid);
             /* del from exit list */
             ListDel(&thread->globalList);
 
