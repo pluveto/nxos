@@ -63,7 +63,7 @@ PUBLIC Thread *ThreadFindById(U32 tid);
 PUBLIC OS_Error ThreadRun(Thread *thread);
 PUBLIC void ThreadYield(void);
 
-PUBLIC void InitThread(void);
+PUBLIC void ThreadsInit(void);
 PUBLIC void TestThread(void);
 
 #endif /* __SCHED_THREAD__ */

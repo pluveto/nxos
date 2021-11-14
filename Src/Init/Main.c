@@ -25,19 +25,21 @@ PUBLIC int OS_Main(void)
     {
         PANIC("Platfrom init failed!" Endln);
     }
-    
     LOG_I("Hello, NXOS!");
-
-    InitThread();
+    /* init page heap */
+    PageHeapInit();
     
+    /* init heap cache for MemAlloc & MemFree */
+    HeapCacheInit();
+
+    /* init thread */
+    ThreadsInit();
+    
+    /* init utest */
     UTestInit();
     
+    /* start sched */
     SchedToFirstThread();
-    while (1);
-    
-    HAL_InterruptEnable();
-    
-    while (1);
-    // SPIN("OS_Main");
+    PANIC("should never be here!");
     return 0;
 }

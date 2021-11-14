@@ -11,29 +11,29 @@
 
 #include <XBook.h>
 #include <XBook/HAL.h>
-#include <Utils/List.h>
 #include <Utils/Memory.h>
 
-#include <Drivers/DirectUart.h>
 #include <Segment.h>
 #include <Gate.h>
 #include <Interrupt.h>
 #include <TSS.h>
 #include <Clock.h>
 #include <Context.h>
+#include <Page.h>
+#include <Platfrom.h>
+#include <MMU.h>
+
+#include <Drivers/DirectUart.h>
 #include <MM/buddy.h>
 #include <MM/Page.h>
 #include <MM/PageHeap.h>
 #include <MM/HeapCache.h>
-#include <Page.h>
-#include <Platfrom.h>
-#include <MMU.h>
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "INIT"
 #include <Utils/Debug.h>
 
-IMPORT void PlatfromTest(void);
+PUBLIC void PlatfromTest(void);
 
 IMPORT Addr __bssStart;
 IMPORT Addr __bssEnd;
@@ -66,9 +66,8 @@ INTERFACE OS_Error PlatformInit(void)
         return OS_ERROR;
     }
     PageInit();
-    
+
     PlatfromTest();
-    
     return OS_EOK;
 }
 
@@ -79,6 +78,9 @@ PRIVATE void ClearBSS(void)
 
 #define GRUB2_READ_MEMORY_BYTES_ADDR (0x000001000)
 
+/**
+ * Init physic memory and map kernel on virtual memory.
+ */
 PRIVATE void PageInit(void)
 {    
     U32 memSize = *(U32 *)GRUB2_READ_MEMORY_BYTES_ADDR;
@@ -127,8 +129,4 @@ PRIVATE void PageInit(void)
     MMU_Enable();
 
     LOG_I("MMU enabled");
-
-    /* init memory allocator */
-    PageHeapInit();
-    HeapCacheInit();
 }

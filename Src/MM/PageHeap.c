@@ -13,6 +13,7 @@
 #include <MM/PageHeap.h>
 #include <MM/Buddy.h>
 #include <Utils/Memory.h>
+#include <Sched/Mutex.h>
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "PageHeap"
@@ -21,6 +22,7 @@
 PRIVATE PageHeap pageHeap;
 PRIVATE SpanMark *spanMark;
 PRIVATE void *spanBaseAddr;
+PRIVATE Mutex pageHeapLock;
 
 PRIVATE void *PageAllocVirtual(Size count)
 {
@@ -96,21 +98,8 @@ PUBLIC Size PageToSpanCount(void *span)
     return mark->count;
 }
 
-/**
- * alloc span from heap, if no free page, alloc from buddy system
- */
-PUBLIC void *PageHeapAlloc(Size count)
+PRIVATE void *DoPageHeapAlloc(Size count)
 {
-    if (!count)
-    {
-        LOG_E("alloc page count is 0!");
-        return NULL;
-    }
-    else if (count > PAGE_HEAP_MAX_PAGES)
-    {
-        LOG_E("alloc page count beyond %d", PAGE_HEAP_MAX_PAGES);
-        return NULL;
-    }
     
     int isLargeSpan = 0;
     List *listHead;
@@ -166,14 +155,30 @@ PUBLIC void *PageHeapAlloc(Size count)
     return (void *)spanNodeBest;
 }
 
-PUBLIC OS_Error PageHeapFree(void *page)
+/**
+ * alloc span from heap, if no free page, alloc from buddy system
+ */
+PUBLIC void *PageHeapAlloc(Size count)
 {
-    if (page == NULL)
+    if (!count)
     {
-        LOG_E("free NULL page!");
-        return OS_EINVAL;
+        LOG_E("alloc page count is 0!");
+        return NULL;
     }
+    else if (count > PAGE_HEAP_MAX_PAGES)
+    {
+        LOG_E("alloc page count beyond %d", PAGE_HEAP_MAX_PAGES);
+        return NULL;
+    }
+    
+    MutexLock(&pageHeapLock, TRUE);
+    void *ptr = DoPageHeapAlloc(count);
+    MutexUnlock(&pageHeapLock);
+    return ptr;
+}
 
+PRIVATE OS_Error DoPageHeapFree(void *page)
+{
     void *span = PageToSpan(page);
     Size count = PageToSpanCount(page);
 
@@ -216,6 +221,20 @@ PUBLIC OS_Error PageHeapFree(void *page)
         ListAdd(&spanNode->list, listHead);
     }
     return OS_EOK;
+}
+
+PUBLIC OS_Error PageHeapFree(void *page)
+{
+    if (page == NULL)
+    {
+        LOG_E("free NULL page!");
+        return OS_EINVAL;
+    }
+    
+    MutexLock(&pageHeapLock, TRUE);
+    OS_Error err = DoPageHeapFree(page);
+    MutexUnlock(&pageHeapLock);
+    return err;
 }
 
 #ifdef CONFIG_PAGE_HEAP_TEST
@@ -363,6 +382,7 @@ PUBLIC void PageHeapInit(void)
     }
     Zero(spanMark, spanMarkPages * PAGE_SIZE);
 
+    MutexInit(&pageHeapLock);
 #ifdef CONFIG_PAGE_HEAP_TEST
     PageHeapTest();
 #endif /* CONFIG_PAGE_HEAP_TEST */

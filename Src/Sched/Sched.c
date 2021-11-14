@@ -15,7 +15,6 @@
 #include <Sched/Thread.h>
 #include <XBook/HAL.h>
 
-IMPORT List globalThreadList;
 IMPORT List threadReadyList;
 IMPORT List exitThreadList;
 

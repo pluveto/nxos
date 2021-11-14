@@ -18,8 +18,10 @@
 
 PRIVATE struct ThreadID threadID;
 
-PUBLIC I32 ThreadIdAlloc(void)
+PUBLIC int ThreadIdAlloc(void)
 {
+    MutexLock(&threadID.idLock, TRUE);
+
     U32 nextID = threadID.nextID;
     do 
     {
@@ -35,20 +37,26 @@ PUBLIC I32 ThreadIdAlloc(void)
         }
         nextID = (nextID + 1) % MAX_THREAD_ID_NR;
     } while (nextID != threadID.nextID);
+
     /* nextID == threadID.nextID means no id free */
-    return (nextID != threadID.nextID) ? nextID : -1;
+    int id = (nextID != threadID.nextID) ? nextID : -1;
+    MutexUnlock(&threadID.idLock);
+    return id;
 }
 
-PUBLIC void ThreadIdFree(I32 id)
+PUBLIC void ThreadIdFree(int id)
 {
     if (id < 0 || id >= MAX_THREAD_ID_NR)
     {
         return;
     }
+    
+    MutexLock(&threadID.idLock, TRUE);
     U32 idx = id / 32;
     U32 odd = id % 32;
     ASSERT(threadID.maps[idx] & (1 << odd));
-    threadID.maps[idx] &= ~(1 << odd);   /* clear id */     
+    threadID.maps[idx] &= ~(1 << odd);   /* clear id */
+    MutexUnlock(&threadID.idLock);  
 }
 
 #ifdef TEST_THREAD_ID
@@ -81,12 +89,13 @@ PRIVATE void TestThreadID(void)
 }
 #endif
 
-PUBLIC void InitThreadID(void)
+PUBLIC void ThreadsInitID(void)
 {
     threadID.maps = MemAlloc(MAX_THREAD_ID_NR / 8);
     ASSERT(threadID.maps != NULL);
     Zero(threadID.maps, MAX_THREAD_ID_NR / 8);
     threadID.nextID = 0;
+    MutexInit(&threadID.idLock);
 #ifdef TEST_THREAD_ID
     TestThreadID();
 #endif

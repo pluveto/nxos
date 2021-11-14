@@ -14,6 +14,7 @@
 #include <MM/PageHeap.h>
 #include <MM/Buddy.h>
 #include <MM/Page.h>
+#include <Sched/Mutex.h>
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "HeapCache"
@@ -21,6 +22,7 @@
 
 PRIVATE struct SizeClass sizeAarray[MAX_SIZE_CLASS_NR];
 PRIVATE HeapCache middleSizeCache;
+PRIVATE Mutex heapCacheLock;
 
 PRIVATE Size AlignDownToPow2(Size size)
 {
@@ -115,12 +117,8 @@ INLINE HeapCache *SizeToCache(Size size)
     return cache;
 }
 
-PUBLIC void *HeapAlloc(Size size)
+PRIVATE void *DoHeapAlloc(Size size)
 {
-    if (!size)
-    {
-        return NULL;
-    }
     /* size align up with 8 */
     size = ALIGN_UP(size, 8);
 
@@ -196,7 +194,19 @@ PUBLIC void *HeapAlloc(Size size)
     return (void *)objectNode;
 }
 
-PUBLIC OS_Error HeapFree(void *object)
+PUBLIC void *HeapAlloc(Size size)
+{
+    if (!size)
+    {
+        return NULL;
+    }
+    MutexLock(&heapCacheLock, TRUE);
+    void *ptr = DoHeapAlloc(size);
+    MutexUnlock(&heapCacheLock);
+    return ptr;
+}
+
+PRIVATE OS_Error DoHeapFree(void *object)
 {
     if (object == NULL) /* can't free NULL object */
     {
@@ -268,19 +278,32 @@ PUBLIC OS_Error HeapFree(void *object)
     return OS_EOK;
 }
 
+PUBLIC OS_Error HeapFree(void *object)
+{
+    if (object == NULL) /* can't free NULL object */
+    {
+        return OS_EINVAL;
+    }
+    MutexLock(&heapCacheLock, TRUE);
+    OS_Error err = DoHeapFree(object);
+    MutexUnlock(&heapCacheLock);
+    return err;
+}
+
 PUBLIC Size HeapGetObjectSize(void *object)
 {
     if (object == NULL) /* can't free NULL object */
     {
         return 0;
     }
-    
+    MutexLock(&heapCacheLock, TRUE);
     /* object to page, then to span */
     void *page = (void *)(((Addr) object) & PAGE_UMASK);
     void *span = PageToSpan(page);
     /* NOTICE: page must be span page */
     Page *pageNode = PageFromPtr(PageZoneGetBuddySystem(PZ_NORMAL), span);
     ASSERT(pageNode != NULL);
+    MutexUnlock(&heapCacheLock);
     /* get class size from page */
     return pageNode->sizeClass;
 }
@@ -403,6 +426,7 @@ PRIVATE void SmallObjectTest(void)
 PUBLIC void HeapCacheInit(void)
 {
     HeapSizeClassInit();
+    MutexInit(&heapCacheLock);
 #ifdef CONFIG_PAGE_CACHE_TEST
     LargeObjectTest();
     MiddleObjectTest();

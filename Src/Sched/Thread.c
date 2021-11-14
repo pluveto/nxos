@@ -15,6 +15,7 @@
 #include <Sched/Thread.h>
 #include <Sched/ThreadID.h>
 #include <Sched/Sched.h>
+#include <Sched/Mutex.h>
 #include <MM/Alloc.h>
 #include <Utils/String.h>
 
@@ -199,7 +200,6 @@ PUBLIC Thread *ThreadSelf(void)
     return currentThread;
 }
 
-
 /**
  * system idle thread on per cpu.
  */
@@ -240,9 +240,9 @@ PRIVATE void DaemonThread(void *arg)
     
 }
 
-PUBLIC void InitThread(void)
+PUBLIC void ThreadsInit(void)
 {
-    InitThreadID();
+    ThreadsInitID();
     ListInit(&globalThreadList);
     ListInit(&exitThreadList);
     ListInit(&threadReadyList);

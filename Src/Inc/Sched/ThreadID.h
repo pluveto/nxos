@@ -13,6 +13,7 @@
 #define __SCHED_THREAD_ID__
 
 #include <XBook.h>
+#include <Sched/Mutex.h>
 
 // #define MAX_THREAD_ID_NR 0xffff
 #define MAX_THREAD_ID_NR 32
@@ -21,10 +22,11 @@ struct ThreadID
 {
     U32 *maps;
     U32 nextID;
+    Mutex idLock;
 };
 
-PUBLIC I32 ThreadIdAlloc(void);
-PUBLIC void ThreadIdFree(I32 id);
-PUBLIC void InitThreadID(void);
+PUBLIC int ThreadIdAlloc(void);
+PUBLIC void ThreadIdFree(int id);
+PUBLIC void ThreadsInitID(void);
 
 #endif /* __SCHED_THREAD_ID__ */

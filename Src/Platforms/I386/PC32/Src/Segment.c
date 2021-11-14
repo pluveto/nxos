@@ -12,7 +12,7 @@
 #include <Segment.h>
 #include <TSS.h>
 
-IMPORT void CPU_LoadGDT(Uint Size, Uint gdtr);
+PUBLIC void CPU_LoadGDT(Uint Size, Uint gdtr);
 
 struct CPU_Segment
 {
