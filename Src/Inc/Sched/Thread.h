@@ -14,9 +14,17 @@
 
 #include <Utils/List.h>
 
+#ifdef CONFIG_THREAD_NAME_LEN
+#define THREAD_NAME_LEN CONFIG_THREAD_NAME_LEN
+#else
 #define THREAD_NAME_LEN 32
+#endif
 
+#ifdef CONFIG_THREAD_STACK_SIZE
+#define THREAD_STACK_SIZE_DEFAULT CONFIG_THREAD_STACK_SIZE
+#else
 #define THREAD_STACK_SIZE_DEFAULT 4096
+#endif
 
 typedef void (*ThreadHandler)(void *arg);
 

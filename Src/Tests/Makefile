@@ -1,5 +1,2 @@
-SRC	+= Utils/
-SRC	+= Mods/
-SRC	+= MM/
-SRC	+= XBook/
-SRC	+= Sched/
+SRC	+= Utests/
+SRC	+= Integrations/

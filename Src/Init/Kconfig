@@ -1,0 +1,20 @@
+menu "Debug"
+config DEBUG
+    bool "Debug NXOS before release"
+    default y
+
+if DEBUG
+    config LOG_LEVEL
+        int "Log level(0: ERROR, 1: WARNING, 2: INFO, 3: DBG)"
+        default 3
+
+    config DEBUG_COLOR
+        bool "Log output with color"
+        default y
+
+    config DEBUG_TIMELINE
+        bool "Log output with timeline"
+        default y
+
+endif
+endmenu

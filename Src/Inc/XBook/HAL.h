@@ -21,11 +21,17 @@ INTERFACE OS_Error PlatformInit(void);
 typedef OS_Error (*IRQ_Handler)(U32 irqno, void *arg);
 typedef U32 IRQ_Number;
 
+#ifdef CONFIG_IRQ_NAME_LEN
+#define IRQ_NAME_LEN CONFIG_IRQ_NAME_LEN
+#else
+#define IRQ_NAME_LEN 48
+#endif
+
 struct IRQ_Info
 {
     IRQ_Handler handler;
     void *arg;
-    char name[CONFIG_IRQ_NAME_LEN];
+    char name[IRQ_NAME_LEN];
 };
 typedef struct IRQ_Info IRQ_Info;
 

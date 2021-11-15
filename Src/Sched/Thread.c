@@ -237,7 +237,6 @@ PRIVATE void DaemonThread(void *arg)
         /* do delay or timeout */
         ThreadYield();
     }
-    
 }
 
 PUBLIC void ThreadsInit(void)
@@ -257,6 +256,4 @@ PUBLIC void ThreadsInit(void)
     thread = ThreadCreate("daemon", DaemonThread, NULL);
     ASSERT(thread != NULL);
     ASSERT(ThreadRun(thread) == OS_EOK);
-    
-    TestThread();
 }

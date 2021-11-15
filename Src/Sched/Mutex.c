@@ -30,6 +30,9 @@ PUBLIC OS_Error MutexInit(Mutex *mutex)
     return OS_EOK;
 }
 
+/**
+ * forever: if true lock mutex forever, or not return OS_ETIMEOUT if lock falied
+ */
 PUBLIC OS_Error MutexLock(Mutex *mutex, Bool forever)
 {
     if (mutex == NULL || mutex->magic != MUTEX_MAGIC)

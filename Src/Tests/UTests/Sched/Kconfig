@@ -1,0 +1,7 @@
+config UTEST_SCHED_MUTEX
+    bool "Enable utest for mutex"
+    default n
+
+config UTEST_SCHED_SPIN
+    bool "Enable utest for spin"
+    default n

@@ -1,41 +1,18 @@
-/**
- * Copyright (c) 2018-2021, BookOS Development Team
- * SPDX-License-Identifier: Apache-2.0
- * 
- * Contains: Configure for each platform
- * 
- * Change Logs:
- * Date           Author            Notes
- * 2021-10-31     JasonHu           Init
- */
-
 #ifndef __OS_CONFIG__
 #define __OS_CONFIG__
-
-/* config cpu bit width */
-#define CONFIG_64BIT
-
-/* OS normal config */
-#define CONFIG_TICKS_PER_SECOND 100
+#define CONFIG_CPU_64BITS 1
+#define CONFIG_DEBUG 1
+#define CONFIG_LOG_LEVEL 3
+#define CONFIG_DEBUG_COLOR 1
+#define CONFIG_DEBUG_TIMELINE 1
 #define CONFIG_IRQ_NAME_LEN 48
-
-/* kernel virtual start addr */
-#define CONFIG_KERNEL_VSTART 0x0000000
-
-/* page shift */
+#define CONFIG_VADDR_START 0x00000000
 #define CONFIG_PAGE_SHIFT 12
-
-/* OS debug config */
-#define CONFIG_DEBUG
-#define CONFIG_DEBUG_COLOR
-#define CONFIG_DEBUG_TIMELINE
-
-/* OS test config */
-/* #define CONFIG_PLATFROM_TEST */
-/* #define CONFIG_THREAD_TEST */
-/* #define CONFIG_CONSOLE_TEST */
-/* #define CONFIG_PAGE_TEST */
-/* #define CONFIG_PAGE_HEAP_TEST */
-/* #define CONFIG_PAGE_CACHE_TEST */
-
-#endif  /* __OS_CONFIG__ */
+#define CONFIG_MAX_THREAD_NR 256
+#define CONFIG_THREAD_NAME_LEN 32
+#define CONFIG_THREAD_STACK_SIZE 4096
+#define CONFIG_PLATFROM_NAME "riscv64-qemu"
+#define CONFIG_PLATFROM_RISCV64_QEMU 1
+#define CONFIG_PRINT_BUF_LEN 256
+#define CONFIG_TICKS_PER_SECOND 100
+#endif

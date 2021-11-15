@@ -129,7 +129,7 @@ enum ctrl_mode_bits
 };
 
 #define TIMER_FREQ     1193180  /* clock frequency */
-#define COUNTER0_VALUE  (TIMER_FREQ / OS_TICKS_PER_SECOND)
+#define COUNTER0_VALUE  (TIMER_FREQ / TICKS_PER_SECOND)
 
 PRIVATE OS_Error ClockHandler(U32 irq, void *arg)
 {

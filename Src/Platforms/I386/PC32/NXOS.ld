@@ -32,6 +32,7 @@ SECTIONS {
         KEEP(*(.initCall0.text))
         KEEP(*(.initCall1.text))
         KEEP(*(.initCall2.text))
+        KEEP(*(.initCall9.text))
         PROVIDE(__initCallEnd = .);
 
         . = ALIGN(4);
@@ -46,6 +47,12 @@ SECTIONS {
         PROVIDE(__UTestCaseTableStart = .);
         KEEP(*(UTestCaseTable))
         PROVIDE(__UTestCaseTableEnd = .);
+        
+        /* section information for integration */
+        . = ALIGN(4);
+        PROVIDE(__IntegrationTableStart = .);
+        KEEP(*(IntegrationTable))
+        PROVIDE(__IntegrationTableEnd = .);
     }
     __textEnd = .;
 

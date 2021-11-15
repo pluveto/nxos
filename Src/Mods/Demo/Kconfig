@@ -1,0 +1,3 @@
+config DEMO_HAL_CONTEXT
+    bool "Enable hal context demo for porting platfrom"
+    default n

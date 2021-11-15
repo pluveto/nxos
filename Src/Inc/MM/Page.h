@@ -15,7 +15,7 @@
 #include <XBook.h>
 #include <Page.h>   /* Platfrom page */
 
-#ifndef CONFIG_PAGE_SHIFT
+#ifdef CONFIG_PAGE_SHIFT
 #define PAGE_SHIFT CONFIG_PAGE_SHIFT
 #else
 #define PAGE_SHIFT 12
@@ -41,7 +41,7 @@ PUBLIC void *PageZoneGetBuddySystem(PageZone zone);
 #define PageAlloc(size) PageAllocInZone(PZ_NORMAL, size)
 #define PageFree(ptr) PageFreeInZone(PZ_NORMAL, ptr)
 
-#define P2V(addr) ((addr) + CONFIG_KERNEL_VSTART)
-#define V2P(addr) ((addr) - CONFIG_KERNEL_VSTART)
+#define P2V(addr) ((addr) + VADDR_START)
+#define V2P(addr) ((addr) - VADDR_START)
 
 #endif /* __MM_PAGE__ */

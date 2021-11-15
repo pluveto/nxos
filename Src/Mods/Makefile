@@ -1,3 +1,5 @@
 SRC	+= Console/
 SRC	+= Time/
-SRC	+= UTest/
+SRC	+= Test/
+SRC	+= Drivers/
+SRC	+= Demo/

@@ -15,8 +15,11 @@
 #include <XBook.h>
 #include <Sched/Mutex.h>
 
-// #define MAX_THREAD_ID_NR 0xffff
-#define MAX_THREAD_ID_NR 32
+#ifdef CONFIG_MAX_THREAD_NR
+#define MAX_THREAD_NR CONFIG_MAX_THREAD_NR
+#else
+#define MAX_THREAD_NR 64
+#endif
 
 struct ThreadID
 {

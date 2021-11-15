@@ -1,0 +1,11 @@
+config MAX_THREAD_NR
+    int "Max thread numbers"
+    default 256
+
+config THREAD_NAME_LEN
+    int "thread name length"
+    default 32
+
+config THREAD_STACK_SIZE
+    int "default thread stack size (bytes)"
+    default 4096

@@ -35,7 +35,11 @@ void AssertionFailure(char *exp, char *file, char *baseFile, int line)
 	while (1);
 }
 
+#ifdef CONFIG_PRINT_BUF_LEN
+#define PRINT_BUF_LEN CONFIG_PRINT_BUF_LEN
+#else
 #define PRINT_BUF_LEN 256
+#endif
 
 void Printf(const char *fmt, ...)
 {

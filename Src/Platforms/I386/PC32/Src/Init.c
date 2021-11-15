@@ -59,7 +59,7 @@ INTERFACE OS_Error PlatformInit(void)
     CPU_InitSegment();
     CPU_InitTSS();
     CPU_InitInterrupt();
-    
+
     if (HAL_InitClock() != OS_EOK)
     {
         LOG_E("Init clock failed!");
@@ -67,7 +67,6 @@ INTERFACE OS_Error PlatformInit(void)
     }
     PageInit();
 
-    PlatfromTest();
     return OS_EOK;
 }
 

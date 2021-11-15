@@ -1,2 +1,7 @@
 .vscode/
 Tools/
+.config
+.config.old
+Scripts/Kconfiglib/__pycache__/*.pyc
+Src/Platforms/Kconfig
+Src/Inc/Configure.h

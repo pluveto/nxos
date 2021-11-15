@@ -14,8 +14,6 @@
 #include <Utils/Debug.h>
 #include <Utils/Memory.h>
 
-// #define TEST_THREAD_ID
-
 PRIVATE struct ThreadID threadID;
 
 PUBLIC int ThreadIdAlloc(void)
@@ -32,10 +30,10 @@ PUBLIC int ThreadIdAlloc(void)
             /* mark id used */
             threadID.maps[idx] |= (1 << odd);
             /* set next id */
-            threadID.nextID = (nextID + 1) % MAX_THREAD_ID_NR;
+            threadID.nextID = (nextID + 1) % MAX_THREAD_NR;
             break;
         }
-        nextID = (nextID + 1) % MAX_THREAD_ID_NR;
+        nextID = (nextID + 1) % MAX_THREAD_NR;
     } while (nextID != threadID.nextID);
 
     /* nextID == threadID.nextID means no id free */
@@ -46,7 +44,7 @@ PUBLIC int ThreadIdAlloc(void)
 
 PUBLIC void ThreadIdFree(int id)
 {
-    if (id < 0 || id >= MAX_THREAD_ID_NR)
+    if (id < 0 || id >= MAX_THREAD_NR)
     {
         return;
     }
@@ -59,44 +57,11 @@ PUBLIC void ThreadIdFree(int id)
     MutexUnlock(&threadID.idLock);  
 }
 
-#ifdef TEST_THREAD_ID
-PRIVATE void TestThreadID(void)
-{
-    int i;
-    for (i = 0; i < 32; i++)
-    {
-        I32 id = ThreadIdAlloc();
-        LOG_D("alloc id: %d", id);
-        ThreadIdFree(id);
-    }
-    for (i = 0; i < 32; i++)
-    {
-        I32 id = ThreadIdAlloc();
-        LOG_D("alloc id: %d", id);
-    }
-
-    ThreadIdFree(1);
-    ThreadIdFree(3);
-    ThreadIdFree(5);
-    ThreadIdFree(7);
-    
-    for (i = 0; i < 4; i++)
-    {
-        I32 id = ThreadIdAlloc();
-        LOG_D("alloc id: %d", id);
-        ThreadIdFree(id);
-    }
-}
-#endif
-
 PUBLIC void ThreadsInitID(void)
 {
-    threadID.maps = MemAlloc(MAX_THREAD_ID_NR / 8);
+    threadID.maps = MemAlloc(MAX_THREAD_NR / 8);
     ASSERT(threadID.maps != NULL);
-    Zero(threadID.maps, MAX_THREAD_ID_NR / 8);
+    Zero(threadID.maps, MAX_THREAD_NR / 8);
     threadID.nextID = 0;
     MutexInit(&threadID.idLock);
-#ifdef TEST_THREAD_ID
-    TestThreadID();
-#endif
 }

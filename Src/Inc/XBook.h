@@ -15,6 +15,7 @@
 #include <Configure.h>
 
 #if !defined(__ASSEMBLY__) && !defined(ASSEMBLY) 
+#include <XBook/Kernel.h>
 #include <XBook/Defines.h>
 #include <XBook/Types.h>
 #include <XBook/Error.h>

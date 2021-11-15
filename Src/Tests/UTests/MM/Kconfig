@@ -1,0 +1,3 @@
+config UTEST_HEAP_CACHE
+    bool "Enable utest for heap cache"
+    default n

@@ -58,13 +58,11 @@ PRIVATE Size PageToPFN(BuddySystem* system, Page* page)
     return diff;
 }
 
-#if 0
-PRIVATE Page* PageFromPFN(BuddySystem* system, Size pfn)
+USED PRIVATE Page* PageFromPFN(BuddySystem* system, Size pfn)
 {
     ASSERT(system);
     return &system->map[pfn];
 }
-#endif
 
 PRIVATE int IsValidPFN(BuddySystem* system, Size pfn)
 {

@@ -1,4 +1,4 @@
-下一代文书操作系统内核。Next XBook Operating System (NXOS)
+Next XBook Operating System (NXOS)
 
 多平台支持列表：
 
@@ -21,3 +21,5 @@
 [未来计划](Docs/Plan.md)  
 
 [测试](Docs/Test.md)  
+
+[菜单配置](Docs/Menuconfig.md)  

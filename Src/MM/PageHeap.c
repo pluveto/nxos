@@ -100,7 +100,6 @@ PUBLIC Size PageToSpanCount(void *span)
 
 PRIVATE void *DoPageHeapAlloc(Size count)
 {
-    
     int isLargeSpan = 0;
     List *listHead;
     Span *spanNode = NULL;
@@ -237,128 +236,6 @@ PUBLIC OS_Error PageHeapFree(void *page)
     return err;
 }
 
-#ifdef CONFIG_PAGE_HEAP_TEST
-PRIVATE void PageHeapLarge(void)
-{
-    void *span = PageHeapAlloc(128);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
-    span = PageHeapAlloc(128);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
-
-    span = PageHeapAlloc(256);
-    LOG_D("span: %p", span);
-    PageHeapFree(span + PAGE_SIZE);
-    
-    span = PageHeapAlloc(256);
-    LOG_D("span: %p", span);
-    PageHeapFree(span + PAGE_SIZE);
-
-    void *table[100];
-    
-    int i;
-    for (i = 0; i < 100; i++)
-    {
-        table[i] = PageHeapAlloc(128 + i);
-        LOG_D("alloc span: %p", table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE * 128 + i);
-    }
-
-    for (i = 0; i < 100; i++)
-    {
-        LOG_D("free span: %p", table[i]);
-        PageHeapFree(table[i]);
-    }
-    
-}
-
-PRIVATE void PageHeapSmall(void)
-{
-    void *span = PageHeapAlloc(1);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
-    span = PageHeapAlloc(1);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
-
-    span = PageHeapAlloc(10);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
-    span = PageHeapAlloc(10);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
-
-    void *table[128];
-    
-    int i;
-    for (i = 1; i <= 128; i++)
-    {
-        table[i] = PageHeapAlloc(i);
-        LOG_D("alloc span: %p", table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE * i);
-    }
-
-    for (i = 1; i <= 128; i++)
-    {
-        LOG_D("free span: %p", table[i]);
-        PageHeapFree(table[i]);
-    }
-
-    for (i = 1; i <= 128; i++)
-    {
-        table[i] = PageHeapAlloc(i);
-        LOG_D("alloc span: %p", table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE * i);
-    }
-
-    for (i = 1; i <= 128; i++)
-    {
-        LOG_D("free span: %p", table[i]);
-        PageHeapFree(table[i]);
-    }
-}
-
-PRIVATE void PageHeapOnePage(void)
-{
-    void *table[1024];
-    int i;
-    for (i = 0; i < 1024; i++)
-    {
-        table[i] = PageHeapAlloc(1);
-        LOG_D("alloc span: %p", table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE);
-    }
-
-    for (i = 0; i < 1024; i++)
-    {
-        LOG_D("free span: %p", table[i]);
-        PageHeapFree(table[i]);
-    }
-    for (i = 0; i < 1024; i++)
-    {
-        table[i] = PageHeapAlloc(1);
-        LOG_D("alloc span: %p", table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE);
-    }
-
-    for (i = 0; i < 1024; i++)
-    {
-        LOG_D("free span: %p", table[i]);
-        PageHeapFree(table[i]);
-    }
-}
-
-PRIVATE void PageHeapTest(void)
-{
-    LOG_D("PageHeap test");
-
-    PageHeapLarge();
-    PageHeapSmall();
-    PageHeapOnePage();
-}
-#endif /* CONFIG_PAGE_HEAP_TEST */
-
 PUBLIC void PageHeapInit(void)
 {
     int i;
@@ -383,7 +260,4 @@ PUBLIC void PageHeapInit(void)
     Zero(spanMark, spanMarkPages * PAGE_SIZE);
 
     MutexInit(&pageHeapLock);
-#ifdef CONFIG_PAGE_HEAP_TEST
-    PageHeapTest();
-#endif /* CONFIG_PAGE_HEAP_TEST */
 }

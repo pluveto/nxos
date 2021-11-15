@@ -1,0 +1,9 @@
+menu "Unit test"
+    depends on ENABLE_TEST_UTEST
+    source "$NXOS_SRC_DIR/Tests/UTests/Kconfig"
+endmenu
+
+menu "Integration test"
+    depends on ENABLE_TEST_INTEGRATION
+    source "$NXOS_SRC_DIR/Tests/Integrations/Kconfig"
+endmenu

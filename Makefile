@@ -33,12 +33,19 @@ NXOS_NAME ?= NXOS
 export NXOS_NAME
 
 #
+# Use kconfiglib
+#
+USE_KCONFIGLIB	:=y
+KCONFIGLIB_DIR	:= Scripts/Kconfiglib
+
+#
 # Get platform information about ARCH and MACH from PLATFORM variable.
 #
 ifeq ($(words $(subst -, , $(PLATFORM))), 2)
 ARCH			:= $(word 1, $(subst -, , $(PLATFORM)))
 MACH			:= $(word 2, $(subst -, , $(PLATFORM)))
 else
+# you can set default platfrom here
 ARCH			:= I386
 MACH			:= PC32
 #ARCH			:= Riscv64
@@ -71,9 +78,16 @@ export HOSTOS
 export USE_BUILD_DIR
 
 #
+# Kconfig path
+#
+CONFIG_OUT_FILE = ./Src/Inc/Configure.h
+CONFIG_OUT_FILE_PLATFORM = ./Src/Platforms/$(ARCH)/$(MACH)/Src/Inc/Configure.h
+CONFIG_IN_FILE = .config
+
+#
 # Cmds
 #
-.PHONY: all clean run
+.PHONY: all clean run prepare menuconfig
 
 #
 # Compile only
@@ -107,3 +121,31 @@ run: all
 #
 prepare: 
 	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) prepare
+
+#
+# menuconfig
+#
+menuconfig:
+ifeq ($(USE_KCONFIGLIB), y)
+	@python $(KCONFIGLIB_DIR)/menuconfig.py Kconfig
+	@python $(KCONFIGLIB_DIR)/genconfig.py --header-path=$(CONFIG_OUT_FILE).tmp
+	@echo "#ifndef __OS_CONFIG__" > $(CONFIG_OUT_FILE)
+	@echo "#define __OS_CONFIG__" >> $(CONFIG_OUT_FILE)
+	@cat $(CONFIG_OUT_FILE).tmp >> $(CONFIG_OUT_FILE)
+	@echo "#endif" >> $(CONFIG_OUT_FILE)
+	@rm -f $(CONFIG_OUT_FILE).tmp
+	@echo genconfig to $(CONFIG_OUT_FILE) .
+endif
+
+defconfig:
+	@-rm -f .config
+	@-rm -f .config.old
+	@-cp Src/Platforms/$(ARCH)/$(MACH)/defconfig ./.config
+	@-cp Src/Platforms/$(ARCH)/$(MACH)/Kconfig ./Src/Platforms/Kconfig
+	@echo update Kconfig from platform $(ARCH)-$(MACH) .
+
+saveconfig:
+	@-cp ./.config Src/Platforms/$(ARCH)/$(MACH)/defconfig
+	@-cp ./Src/Platforms/Kconfig ./Src/Platforms/$(ARCH)/$(MACH)/Kconfig 
+	@-cp $(CONFIG_OUT_FILE) $(CONFIG_OUT_FILE_PLATFORM)
+	@echo save Kconfig to platform $(ARCH)-$(MACH) .

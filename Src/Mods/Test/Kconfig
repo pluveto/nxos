@@ -1,0 +1,7 @@
+config ENABLE_TEST_UTEST
+    bool "Enable utest test"
+    default n
+
+config ENABLE_TEST_INTEGRATION
+    bool "Enable integration test"
+    default n

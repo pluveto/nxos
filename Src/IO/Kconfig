@@ -1,0 +1,3 @@
+config IRQ_NAME_LEN
+    int "irq name length"
+    default 48

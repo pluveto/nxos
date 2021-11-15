@@ -31,7 +31,7 @@ PUBLIC void ClockTickSet(ClockTick tick)
 PUBLIC void ClockTickGo(void)
 {
     systemClockTicks++;
-    if ((systemClockTicks % OS_TICKS_PER_SECOND) == 0)
+    if ((systemClockTicks % TICKS_PER_SECOND) == 0)
     {
         // LOG_I("1s");
     }

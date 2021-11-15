@@ -14,9 +14,11 @@
 #define LOG_LEVEL LOG_INFO
 #include <Utils/Debug.h>
 
-#include <Mods/UTest/UTest.h>
+#include <Mods/Test/UTest.h>
 #include <Sched/Thread.h>
 #include <Sched/Sched.h>
+#include <MM/HeapCache.h>
+#include <MM/PageHeap.h>
 
 PUBLIC int OS_Main(void)
 {
@@ -26,17 +28,18 @@ PUBLIC int OS_Main(void)
         PANIC("Platfrom init failed!" Endln);
     }
     LOG_I("Hello, NXOS!");
+
     /* init page heap */
     PageHeapInit();
     
     /* init heap cache for MemAlloc & MemFree */
     HeapCacheInit();
-
+    
     /* init thread */
     ThreadsInit();
     
-    /* init utest */
-    UTestInit();
+    /* init auto calls */
+    CallsInit();
     
     /* start sched */
     SchedToFirstThread();

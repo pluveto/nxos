@@ -17,11 +17,17 @@
 
 #define BUDDY_ASSERT(x, msg) ASSERT((x) && (msg))
 
+/**
+ * find first bit set
+ */
 INLINE int BuddyFFS(U32 word)
 {
     return FFS(word) - 1;
 }
 
+/**
+ * find last bit set
+ */
 INLINE int BuddyFLS(U32 word)
 {
     return FLS(word) - 1;
@@ -69,13 +75,11 @@ PRIVATE Size BuddyAlignUp(Size x, Size align)
     return (x + (align - 1)) & ~(align - 1);
 }
 
-#if 0
-PRIVATE Size BuddyAlignDown(Size x, Size align)
+USED PRIVATE Size BuddyAlignDown(Size x, Size align)
 {
     BUDDY_ASSERT(0 == (align & (align - 1)), "must align to a power of two");
     return x - (x & (align - 1));
 }
-#endif
 
 PRIVATE void *BuddyAlignPtr(const void *ptr, Size align)
 {
