@@ -109,6 +109,10 @@ else
 	@$(MAKE) -s -C Src clean
 endif
 	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) clean
+	@-rm -f .config
+	@-rm -f .config.old
+	@-rm -f ./Src/Platforms/Kconfig
+	@-rm -f ./Src/Inc/Configure.h
 
 #
 # Run OS
