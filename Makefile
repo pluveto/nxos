@@ -39,6 +39,11 @@ USE_KCONFIGLIB	:=y
 KCONFIGLIB_DIR	:= Scripts/Kconfiglib
 
 #
+# Enable GDB debug
+#
+GDB_DBG	?=n
+
+#
 # Get platform information about ARCH and MACH from PLATFORM variable.
 #
 ifeq ($(words $(subst -, , $(PLATFORM))), 2)
@@ -76,6 +81,7 @@ export MACH
 export ARCH
 export HOSTOS
 export USE_BUILD_DIR
+export GDB_DBG
 
 #
 # Kconfig path
@@ -87,7 +93,7 @@ CONFIG_IN_FILE = .config
 #
 # Cmds
 #
-.PHONY: all clean run prepare menuconfig
+.PHONY: all clean run prepare menuconfig defconfig saveconfig gdb
 
 #
 # Compile only
@@ -125,6 +131,12 @@ run: all
 #
 prepare: 
 	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) prepare
+
+#
+# GDB command
+#
+gdb:
+	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) gdb
 
 #
 # menuconfig

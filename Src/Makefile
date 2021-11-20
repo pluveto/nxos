@@ -17,8 +17,13 @@ sinclude ../Scripts/XBuild/env.mk
 #
 # Load default variables.
 #
-ASFLAGS			:= -g -ggdb -Wall -O0
-CFLAGS			:= -g -ggdb -Wall -O0
+ifeq ($(GDB_DBG),y)
+ASFLAGS			:= -g -ggdb -O0 -Wall
+CFLAGS			:= -g -ggdb -O0 -Wall
+else
+ASFLAGS			:= -Wall -O3
+CFLAGS			:= -Wall -O3
+endif
 LDFLAGS			:= -T $(srctree)/Platforms/$(ARCH)/$(MACH)/NXOS.ld -nostdlib -static
 MCFLAGS			:=
 

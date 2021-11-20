@@ -27,6 +27,7 @@ RM			:= rm
 # 
 MAKE		:= make
 QEMU 		:= qemu-system-i386
+DEBUGER		:= $(CROSS_COMPILE)gdb
 
 #
 # Qemu args configure
@@ -41,6 +42,10 @@ ifeq ($(QEMU_WINDOW),y)
 	QEMU_ARGS += -serial stdio
 else
 	QEMU_ARGS += -nographic
+endif
+
+ifeq ($(GDB_DBG),y)
+	QEMU_ARGS += -S -gdb tcp::10001,ipv4
 endif
 
 #
@@ -69,3 +74,10 @@ prepare:
 	-$(RM) -rf $(TOOL_DIR)
 	git clone https://gitee.com/BookOS/nxos-platform-pc32-tools $(TOOL_DIR)
 	echo "parpare done."
+
+# 
+# gdb debug
+# 
+gdb:
+	@echo gdb load file from $(ARCH)/$(MACH)/$(NXOS_NAME).elf
+	$(DEBUGER) $(NXOS_NAME).elf -x connect.gdb
