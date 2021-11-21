@@ -103,14 +103,16 @@ ifeq ($(USE_BUILD_DIR), y)
 define CUSTOM_TARGET_CMD
 echo [KERNEL] $@; \
 $(LD) $(X_LDFLAGS) -o $@ $(X_OBJS); \
-$(CP) $@ $(srctree)/Platforms/$(ARCH)/$(MACH)
+$(CP) $@ $(srctree)/Platforms/$(ARCH)/$(MACH); \
+$(CP) $@ ./
 endef # CUSTOM_TARGET_CMD
 
 else
 
 define CUSTOM_TARGET_CMD
 echo [KERNEL] $@; \
-$(LD) $(X_LDFLAGS) -o $@ $(X_OBJS)
+$(LD) $(X_LDFLAGS) -o $@ $(X_OBJS); \
+$(CP) $@ ./
 endef # CUSTOM_TARGET_CMD
 
 endif # USE_BUILD_DIR

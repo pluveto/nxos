@@ -23,6 +23,7 @@ enum OS_Error
     OS_ETIMEOUT,
     OS_EFAULT,
     OS_ENORES,
+    OS_EAGAIN,
     OS_ERROR_NR
 };
 typedef enum OS_Error OS_Error;

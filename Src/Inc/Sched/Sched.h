@@ -15,7 +15,7 @@
 #include <XBook.h>
 
 PUBLIC void SchedToFirstThread(void);
-PUBLIC void SchedWithInterruptDisabled(void);
+PUBLIC void SchedWithInterruptDisabled(Uint irqLevel);
 PUBLIC void SchedYield(void);
 PUBLIC void ReSchedCheck(void);
 PUBLIC void SchedExit(void);

@@ -31,7 +31,7 @@ PUBLIC void SchedToFirstThread(void)
 /**
  * NOTE: must disable interrupt before call this!
  */
-PUBLIC void SchedWithInterruptDisabled(void)
+PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
 {
     Thread *next, *prev;
 
@@ -54,6 +54,7 @@ PUBLIC void SchedWithInterruptDisabled(void)
     if (prev)
     {
         // LOG_D("Sched prev: %d next: %d", prev->tid, next->tid);
+        // LOG_D("Sched prev: %s next: %s", prev->name, next->name);
         HAL_ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
     }
     else
@@ -61,27 +62,27 @@ PUBLIC void SchedWithInterruptDisabled(void)
         HAL_ContextSwitchNext((Addr)&next->stack);
     }
     
-    HAL_InterruptEnable();
+    HAL_InterruptRestoreLevel(irqLevel);
 }
 
 PUBLIC void SchedYield(void)
 {
-    HAL_InterruptDisable();
+    Uint level = HAL_InterruptSaveLevel();
     /* put thread to tail of ready list */
     currentThread->state = THREAD_READY;
     ListAddTail(&currentThread->list, &threadReadyList);
-    SchedWithInterruptDisabled();
+    SchedWithInterruptDisabled(level);
 }
 
 PUBLIC void SchedExit(void)
 {
-    HAL_InterruptDisable();
+    Uint level = HAL_InterruptSaveLevel();
 
     /* set exit state, del from global list and add to exit list */
     currentThread->state = THREAD_EXIT;
     LOG_D("Thread exit: %d", currentThread->tid);
     ListAdd(&currentThread->globalList, &exitThreadList);
-    SchedWithInterruptDisabled();
+    SchedWithInterruptDisabled(level);
 }
 
 PUBLIC void ReSchedCheck(void)
@@ -95,7 +96,7 @@ PUBLIC void ReSchedCheck(void)
     }
     if (thread->needSched)
     {
-        HAL_InterruptDisable();
+        Uint level = HAL_InterruptSaveLevel();
         thread->needSched = 0;
 
         /* put thread to tail of thread and reset ticks from timeslice */
@@ -103,6 +104,6 @@ PUBLIC void ReSchedCheck(void)
         thread->state = THREAD_READY;
         ListAddTail(&thread->list, &threadReadyList);
 
-        SchedWithInterruptDisabled();
+        SchedWithInterruptDisabled(level);
     }
 }

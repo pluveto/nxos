@@ -19,6 +19,7 @@
 #include <Sched/Sched.h>
 #include <MM/HeapCache.h>
 #include <MM/PageHeap.h>
+#include <Mods/Time/Timer.h>
 
 PUBLIC int OS_Main(void)
 {
@@ -35,6 +36,9 @@ PUBLIC int OS_Main(void)
     /* init heap cache for MemAlloc & MemFree */
     HeapCacheInit();
     
+    /* init timer */
+    TimersInit();
+
     /* init thread */
     ThreadsInit();
     

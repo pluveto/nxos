@@ -1,1 +1,1 @@
-SRC	+= Clock.c
+SRC	+= *.c

@@ -10,6 +10,7 @@
  */
 
 #include <Mods/Time/Clock.h>
+#include <Mods/Time/Timer.h>
 #define LOG_LEVEL LOG_INFO 
 #include <Utils/Log.h>
 
@@ -35,10 +36,13 @@ PUBLIC void ClockTickGo(void)
     {
         // LOG_I("1s");
     }
+    TimerGo();
+
     Thread *thread = ThreadSelf();
     thread->ticks--;
     if (thread->ticks == 0)
     {
+        // LOG_I("thread:%s need sched", thread->name);
         thread->needSched = 1; /* mark sched */
     }
 }

@@ -25,52 +25,10 @@ struct Spin
 };
 typedef struct Spin Spin;
 
-INLINE OS_Error SpinInit(Spin *lock)
-{
-    if (lock == NULL)
-    {
-        return OS_EINVAL;
-    }
-    if (lock->magic == SPIN_MAGIC)
-    {
-        return OS_EFAULT;
-    }
-
-    HAL_AtomicSet(&lock->value, 0);
-    lock->magic = SPIN_MAGIC;
-    return OS_EOK;
-}
-
-INLINE OS_Error SpinLock(Spin *lock, Bool forever)
-{
-    if (lock == NULL || lock->magic != SPIN_MAGIC)
-    {
-        return OS_EFAULT;
-    }
-
-    do
-    {
-        if (HAL_AtomicCAS(&lock->value, 0, SPIN_LOCK_VALUE) == 0)
-        {
-            break;
-        }
-        if (forever == FALSE)
-        {
-            return OS_ETIMEOUT;
-        }
-    } while (1);
-
-    return OS_EOK;
-}
-
-INLINE OS_Error SpinUnlock(Spin *lock)
-{
-    if (lock == NULL || lock->magic != SPIN_MAGIC)
-    {
-        return OS_EFAULT;
-    }
-    HAL_AtomicSet(&lock->value, 0);
-    return OS_EOK;
-}
+PUBLIC OS_Error SpinInit(Spin *lock);
+PUBLIC OS_Error SpinLock(Spin *lock, Bool forever);
+PUBLIC OS_Error SpinUnlock(Spin *lock);
+PUBLIC OS_Error SpinLockIRQ(Spin *lock, Uint *level);
+PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, Uint level);
 
 #endif /* __SCHED_SPIN___ */

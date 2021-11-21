@@ -93,7 +93,7 @@ CONFIG_IN_FILE = .config
 #
 # Cmds
 #
-.PHONY: all clean run prepare menuconfig defconfig saveconfig gdb
+.PHONY: all clean run prepare menuconfig defconfig saveconfig gdb cleanAll
 
 #
 # Compile only
@@ -105,6 +105,12 @@ else
 	@$(MAKE) -s -C Src
 endif
 
+cleanAll: clean
+	@-rm -f .config
+	@-rm -f .config.old
+	@-rm -f ./Src/Platforms/Kconfig
+	@-rm -f ./Src/Inc/Configure.h
+
 #
 # Clean all targets
 #
@@ -115,10 +121,6 @@ else
 	@$(MAKE) -s -C Src clean
 endif
 	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) clean
-	@-rm -f .config
-	@-rm -f .config.old
-	@-rm -f ./Src/Platforms/Kconfig
-	@-rm -f ./Src/Inc/Configure.h
 
 #
 # Run OS

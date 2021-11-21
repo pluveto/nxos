@@ -63,7 +63,6 @@ PRIVATE void IntegrationEntry(void *arg)
 
 PUBLIC void IntegrationInit(void)
 {
-    Printf("IntegrationInit");
     Thread *thread = ThreadCreate("Integration", IntegrationEntry, NULL);
     ASSERT(thread != NULL);
     ASSERT(ThreadRun(thread) == OS_EOK);
