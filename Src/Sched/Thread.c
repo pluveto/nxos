@@ -20,15 +20,15 @@
 #include <Utils/String.h>
 
 /* TODO: add lock lock for thread list */
-PUBLIC List globalThreadList;
-PUBLIC List exitThreadList;
-PUBLIC List threadReadyList;
-PUBLIC Thread *currentThread = NULL;
+PUBLIC List ThreadGlobalList;
+PUBLIC List ThreadExitList;
+PUBLIC List ThreadReadyList;
+PUBLIC Thread *CurrentThread = NULL;
 
 PUBLIC Thread *ThreadFindById(U32 tid)
 {
     Thread *thread;
-    ListForEachEntry (thread, &globalThreadList, globalList)
+    ListForEachEntry (thread, &ThreadGlobalList, globalList)
     {
         if (thread->tid == tid)
         {
@@ -136,8 +136,8 @@ PUBLIC OS_Error ThreadRun(Thread *thread)
         return OS_EINVAL;
     }
     thread->state = THREAD_READY;
-    ListAdd(&thread->list, &threadReadyList);
-    ListAdd(&thread->globalList, &globalThreadList);
+    ListAdd(&thread->list, &ThreadReadyList);
+    ListAdd(&thread->globalList, &ThreadGlobalList);
     return OS_EOK;
 }
 
@@ -197,7 +197,7 @@ PUBLIC void ThreadExit(void)
 
 PUBLIC Thread *ThreadSelf(void)
 {
-    return currentThread;
+    return CurrentThread;
 }
 
 /**
@@ -223,10 +223,11 @@ PRIVATE void DaemonThread(void *arg)
     Thread *thread, *safe;
     while (1)
     {
+        /* TODO: lock thread instead interrupt disable */
         HAL_InterruptDisable();
-        ListForEachEntrySafe (thread, safe, &exitThreadList, globalList)
+        ListForEachEntrySafe (thread, safe, &ThreadExitList, globalList)
         {
-            LOG_D("daemon release thread: %d", thread->tid);
+            LOG_D("daemon release thread: %s/%d", thread->name, thread->tid);
             /* del from exit list */
             ListDel(&thread->globalList);
 
@@ -242,10 +243,10 @@ PRIVATE void DaemonThread(void *arg)
 PUBLIC void ThreadsInit(void)
 {
     ThreadsInitID();
-    ListInit(&globalThreadList);
-    ListInit(&exitThreadList);
-    ListInit(&threadReadyList);
-    currentThread = NULL;
+    ListInit(&ThreadGlobalList);
+    ListInit(&ThreadExitList);
+    ListInit(&ThreadReadyList);
+    CurrentThread = NULL;
 
     /* init idle thread */
     Thread *thread = ThreadCreate("idle/N", IdleThread, NULL);

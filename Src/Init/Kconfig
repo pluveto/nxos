@@ -18,3 +18,7 @@ if DEBUG
 
 endif
 endmenu
+
+config PLATFORM_THREAD
+    bool "Create a thread for platform"
+    default y

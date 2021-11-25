@@ -15,17 +15,19 @@
 #include <Sched/Thread.h>
 #include <XBook/HAL.h>
 
-IMPORT List threadReadyList;
-IMPORT List exitThreadList;
+IMPORT List ThreadReadyList;
+IMPORT List ThreadExitList;
 
 PUBLIC void SchedToFirstThread(void)
 {
     /* get a thread from ready list */
-    Thread *thread = ListFirstEntry(&threadReadyList, Thread, list);
+    Thread *thread = ListFirstEntry(&ThreadReadyList, Thread, list);
     ListDel(&thread->list);
     thread->state = THREAD_RUNNING;
-    currentThread = thread;
+    CurrentThread = thread;
     HAL_ContextSwitchNext((Addr)&thread->stack);
+    /* should never be here */
+    PANIC("Sched to first thread failed!");
 }
 
 /**
@@ -36,7 +38,7 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
     Thread *next, *prev;
 
     /* put prev into list */
-    prev = currentThread;
+    prev = CurrentThread;
 
     if (prev->state == THREAD_EXIT)
     {
@@ -44,24 +46,24 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
     }
     
     /* get next from list */
-    next = ListFirstEntry(&threadReadyList, Thread, list);
+    next = ListFirstEntry(&ThreadReadyList, Thread, list);
     ListDel(&next->list);
     next->state = THREAD_RUNNING;
 
     /* set current */
-    currentThread = next;
+    CurrentThread = next;
 
-    if (prev)
+    if (prev != NULL)
     {
+        ASSERT(prev && next);
         // LOG_D("Sched prev: %d next: %d", prev->tid, next->tid);
-        // LOG_D("Sched prev: %s next: %s", prev->name, next->name);
+        //LOG_D("Sched prev: %s next: %s", prev->name, next->name);
         HAL_ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
     }
     else
     {
         HAL_ContextSwitchNext((Addr)&next->stack);
     }
-    
     HAL_InterruptRestoreLevel(irqLevel);
 }
 
@@ -69,8 +71,8 @@ PUBLIC void SchedYield(void)
 {
     Uint level = HAL_InterruptSaveLevel();
     /* put thread to tail of ready list */
-    currentThread->state = THREAD_READY;
-    ListAddTail(&currentThread->list, &threadReadyList);
+    CurrentThread->state = THREAD_READY;
+    ListAddTail(&CurrentThread->list, &ThreadReadyList);
     SchedWithInterruptDisabled(level);
 }
 
@@ -79,15 +81,15 @@ PUBLIC void SchedExit(void)
     Uint level = HAL_InterruptSaveLevel();
 
     /* set exit state, del from global list and add to exit list */
-    currentThread->state = THREAD_EXIT;
-    LOG_D("Thread exit: %d", currentThread->tid);
-    ListAdd(&currentThread->globalList, &exitThreadList);
+    CurrentThread->state = THREAD_EXIT;
+    LOG_D("Thread exit: %d", CurrentThread->tid);
+    ListAdd(&CurrentThread->globalList, &ThreadExitList);
     SchedWithInterruptDisabled(level);
 }
 
 PUBLIC void ReSchedCheck(void)
 {
-    Thread *thread = currentThread;
+    Thread *thread = CurrentThread;
     if (thread->isTerminated)
     {
         LOG_D("call terminate: %d", thread->tid);
@@ -102,7 +104,7 @@ PUBLIC void ReSchedCheck(void)
         /* put thread to tail of thread and reset ticks from timeslice */
         thread->ticks = thread->timeslice;
         thread->state = THREAD_READY;
-        ListAddTail(&thread->list, &threadReadyList);
+        ListAddTail(&thread->list, &ThreadReadyList);
 
         SchedWithInterruptDisabled(level);
     }

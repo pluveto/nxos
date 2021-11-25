@@ -44,7 +44,7 @@ else
 	QEMU_ARGS += -nographic
 endif
 
-ifeq ($(GDB_DBG),y)
+ifeq ($(G),y)
 	QEMU_ARGS += -S -gdb tcp::10001,ipv4
 endif
 

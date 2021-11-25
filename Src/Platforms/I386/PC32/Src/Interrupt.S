@@ -37,15 +37,14 @@ CPU_TrapEntry\p1:
     call InterruptDispatch
     addl $4, %esp
 
-    movl $InterruptExit, %eax
-    jmp *%eax
+    jmp InterruptExit
 .endm
 
 /* cpu with error code */
 .macro CPU_TrapEntry p1
 .global CPU_TrapEntry\p1
 CPU_TrapEntry\p1:
-    nop;
+    nop
     pushl %ds
     pushl %es
     pushl %fs
@@ -59,12 +58,11 @@ CPU_TrapEntry\p1:
 
     pushl $\p1
     
-    pushl %esp;
+    pushl %esp
     call InterruptDispatch
-    addl $4, %esp;
+    addl $4, %esp
 
-    movl $InterruptExit, %eax
-    jmp *%eax
+    jmp InterruptExit
 .endm
 
 CPU_TrapEntryNoErrCode 0x00
@@ -145,15 +143,17 @@ CPU_SyscallEntry:
     */
 
     cli /* disable interrupt */
-
-    movl $InterruptExit, %eax
-    jmp *%eax
+    
+    jmp InterruptExit
 
 .global SyscallExit
 SyscallExit:
 .global InterruptExit
 InterruptExit:
+
+    sti
     call ReSchedCheck   /* check sched */
+    cli
 
     /* do interrupt stack restore  */
     addl $4, %esp               /* skip intr no */
@@ -167,4 +167,4 @@ InterruptExit:
 
     addl $4, %esp               /* skip error_code */
 
-    iret
+    iretl

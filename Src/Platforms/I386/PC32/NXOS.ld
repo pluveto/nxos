@@ -20,27 +20,28 @@ SECTIONS {
 
     /* code segment */
     . = ALIGN(4);
-    __textStart = .;
-    .text : {
+    __OS_TextStart = .;
+    .text : 
+    {
         *(.text.start)
         *(.text)
         *(.init.text)
 		*(.exit.text)
         
         . = ALIGN(4);
-        PROVIDE(__initCallStart = .);
+        PROVIDE(__InitCallStart = .);
         KEEP(*(.initCall0.text))
         KEEP(*(.initCall1.text))
         KEEP(*(.initCall2.text))
         KEEP(*(.initCall9.text))
-        PROVIDE(__initCallEnd = .);
+        PROVIDE(__InitCallEnd = .);
 
         . = ALIGN(4);
-        PROVIDE(__exitCallStart = .);
+        PROVIDE(__ExitCallStart = .);
         KEEP(*(.exitcall0.text))
         KEEP(*(.exitcall1.text))
         KEEP(*(.exitcall2.text))
-        PROVIDE(__exitCallEnd = .);
+        PROVIDE(__ExitCallEnd = .);
     
         /* section information for utest */
         . = ALIGN(4);
@@ -54,36 +55,32 @@ SECTIONS {
         KEEP(*(IntegrationTable))
         PROVIDE(__IntegrationTableEnd = .);
     }
-    __textEnd = .;
-
-	. = ALIGN(4);
-    __rodataStart = .;
-    .rodata : { *(.rodata) *(.rodata.*) }
-    __rodataEnd = .;
+    __OS_TextEnd = .;
 
 
     /* data segment */
     . = ALIGN(4);
-    __dataStart = .;
+    __OS_DataStart = .;
     .data :
     {
         *(.data)
         *(.data.*)
+        *(.rodata)
+        *(.rodata.*)
     }
-    __dataEnd = .;
+    __OS_DataEnd = .;
     
     /* bss segement */
     
     . = ALIGN(4);
-    __bssStart = .;
+    __OS_BssStart = .;
     .bss       :
     {
-    *(.bss)
-    *(.bss.*)
-    *(COMMON)
-    . = ALIGN(4);
+        *(.bss)
+        *(.bss.*)
+        *(COMMON)
     }
     . = ALIGN(4);
-    __bssEnd = .;
+    __OS_BssEnd = .;
 
 }

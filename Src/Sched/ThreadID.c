@@ -14,31 +14,31 @@
 #include <Utils/Debug.h>
 #include <Utils/Memory.h>
 
-PRIVATE struct ThreadID threadID;
+PRIVATE struct ThreadID ThreadIdObject;
 
 PUBLIC int ThreadIdAlloc(void)
 {
-    MutexLock(&threadID.idLock, TRUE);
+    MutexLock(&ThreadIdObject.idLock, TRUE);
 
-    U32 nextID = threadID.nextID;
+    U32 nextID = ThreadIdObject.nextID;
     do 
     {
         U32 idx = nextID / 32;
         U32 odd = nextID % 32;
-        if (!(threadID.maps[idx] & (1 << odd)))
+        if (!(ThreadIdObject.maps[idx] & (1 << odd)))
         {
             /* mark id used */
-            threadID.maps[idx] |= (1 << odd);
+            ThreadIdObject.maps[idx] |= (1 << odd);
             /* set next id */
-            threadID.nextID = (nextID + 1) % MAX_THREAD_NR;
+            ThreadIdObject.nextID = (nextID + 1) % MAX_THREAD_NR;
             break;
         }
         nextID = (nextID + 1) % MAX_THREAD_NR;
-    } while (nextID != threadID.nextID);
+    } while (nextID != ThreadIdObject.nextID);
 
-    /* nextID == threadID.nextID means no id free */
-    int id = (nextID != threadID.nextID) ? nextID : -1;
-    MutexUnlock(&threadID.idLock);
+    /* nextID == ThreadIdObject.nextID means no id free */
+    int id = (nextID != ThreadIdObject.nextID) ? nextID : -1;
+    MutexUnlock(&ThreadIdObject.idLock);
     return id;
 }
 
@@ -49,19 +49,19 @@ PUBLIC void ThreadIdFree(int id)
         return;
     }
     
-    MutexLock(&threadID.idLock, TRUE);
+    MutexLock(&ThreadIdObject.idLock, TRUE);
     U32 idx = id / 32;
     U32 odd = id % 32;
-    ASSERT(threadID.maps[idx] & (1 << odd));
-    threadID.maps[idx] &= ~(1 << odd);   /* clear id */
-    MutexUnlock(&threadID.idLock);  
+    ASSERT(ThreadIdObject.maps[idx] & (1 << odd));
+    ThreadIdObject.maps[idx] &= ~(1 << odd);   /* clear id */
+    MutexUnlock(&ThreadIdObject.idLock);  
 }
 
 PUBLIC void ThreadsInitID(void)
 {
-    threadID.maps = MemAlloc(MAX_THREAD_NR / 8);
-    ASSERT(threadID.maps != NULL);
-    Zero(threadID.maps, MAX_THREAD_NR / 8);
-    threadID.nextID = 0;
-    MutexInit(&threadID.idLock);
+    ThreadIdObject.maps = MemAlloc(MAX_THREAD_NR / 8);
+    ASSERT(ThreadIdObject.maps != NULL);
+    Zero(ThreadIdObject.maps, MAX_THREAD_NR / 8);
+    ThreadIdObject.nextID = 0;
+    MutexInit(&ThreadIdObject.idLock);
 }

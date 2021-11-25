@@ -13,7 +13,7 @@
 #include <MM/Page.h>
 #include <Utils/Debug.h>
 
-PRIVATE BuddySystem *buddySystem[PZ_NR]; 
+PRIVATE BuddySystem *BuddySystemArray[PZ_NR]; 
 
 /**
  * Init buddy memory allocator
@@ -21,36 +21,36 @@ PRIVATE BuddySystem *buddySystem[PZ_NR];
 PUBLIC void PageInitZone(PageZone zone, void *mem, Size size)
 {
     ASSERT(zone >= PZ_NORMAL && zone < PZ_NR && size > 0);
-    buddySystem[zone] = BuddyCreate(mem, size);
-    ASSERT(buddySystem[zone] != NULL);
+    BuddySystemArray[zone] = BuddyCreate(mem, size);
+    ASSERT(BuddySystemArray[zone] != NULL);
 }
 
 PUBLIC void *PageAllocInZone(PageZone zone, Size count)
 {
     ASSERT(zone >= PZ_NORMAL && zone < PZ_NR && count > 0);
-    return BuddyAllocPage(buddySystem[zone], count);
+    return BuddyAllocPage(BuddySystemArray[zone], count);
 }
 
 PUBLIC void PageFreeInZone(PageZone zone, void *ptr)
 {
     ASSERT(zone >= PZ_NORMAL && zone < PZ_NR && ptr != NULL);
-    BuddyFreePage(buddySystem[zone], ptr);
+    BuddyFreePage(BuddySystemArray[zone], ptr);
 }
 
 PUBLIC void *PageZoneGetBase(PageZone zone)
 {
     ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
-    return buddySystem[zone]->pageStart;
+    return BuddySystemArray[zone]->pageStart;
 }
 
 PUBLIC Size PageZoneGetPages(PageZone zone)
 {
     ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
-    return (buddySystem[zone]->maxPFN + 1);
+    return (BuddySystemArray[zone]->maxPFN + 1);
 }
 
 PUBLIC void *PageZoneGetBuddySystem(PageZone zone)
 {
     ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
-    return buddySystem[zone];
+    return BuddySystemArray[zone];
 }

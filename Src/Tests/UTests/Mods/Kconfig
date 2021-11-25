@@ -1,3 +1,7 @@
 config UTEST_MODS_UTEST
     bool "Enable utest for utest self"
     default n
+
+config UTEST_MODS_TIMER
+    bool "Enable utest for timer"
+    default n

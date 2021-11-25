@@ -17,7 +17,7 @@ sinclude ../Scripts/XBuild/env.mk
 #
 # Load default variables.
 #
-ifeq ($(GDB_DBG),y)
+ifeq ($(G),y)
 ASFLAGS			:= -g -ggdb -O0 -Wall
 CFLAGS			:= -g -ggdb -O0 -Wall
 else

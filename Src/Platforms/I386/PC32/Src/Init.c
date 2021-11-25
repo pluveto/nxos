@@ -35,8 +35,8 @@
 
 PUBLIC void PlatfromTest(void);
 
-IMPORT Addr __bssStart;
-IMPORT Addr __bssEnd;
+IMPORT Addr __OS_BssStart;
+IMPORT Addr __OS_BssEnd;
 
 PRIVATE void PageInit(void);
 PRIVATE void ClearBSS(void);
@@ -72,7 +72,7 @@ INTERFACE OS_Error PlatformInit(void)
 
 PRIVATE void ClearBSS(void)
 {
-    Zero(&__bssStart, &__bssEnd - &__bssStart);
+    Zero(&__OS_BssStart, &__OS_BssEnd - &__OS_BssStart);
 }
 
 #define GRUB2_READ_MEMORY_BYTES_ADDR (0x000001000)
@@ -128,4 +128,9 @@ PRIVATE void PageInit(void)
     MMU_Enable();
 
     LOG_I("MMU enabled");
+}
+
+INTERFACE void PlatformMain(void)
+{
+    LOG_I("PC32 platform main running...\n");
 }

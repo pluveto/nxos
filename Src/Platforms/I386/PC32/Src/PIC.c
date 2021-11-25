@@ -58,7 +58,7 @@ PUBLIC void PIC_Disable(U32 irq)
 PUBLIC void PIC_Ack(U32 irq)
 {
 	if (irq >= 8) { /* slaver */
-		IO_Out8(PIC_SLAVE_CTL,  PIC_EIO);
+		IO_Out8(PIC_SLAVE_CTL, PIC_EIO);
 	}
-	IO_Out8(PIC_MASTER_CTL,  PIC_EIO);
+	IO_Out8(PIC_MASTER_CTL, PIC_EIO);
 }

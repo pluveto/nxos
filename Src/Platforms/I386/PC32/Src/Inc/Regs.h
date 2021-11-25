@@ -40,7 +40,7 @@ INLINE void CPU_WriteCR3(U32 val)
     CASM("movl %0, %%cr3" : : "a" (val));
 }
 
-INLINE U32 CPU_ReadCR0()
+INLINE U32 CPU_ReadCR0(void)
 {
     U32 val;
     CASM("movl %%cr0, %0\n\t": "=a" (val));
@@ -50,6 +50,13 @@ INLINE U32 CPU_ReadCR0()
 INLINE void CPU_WriteCR0(U32 val)
 {
     CASM("movl %0, %%cr0\n\t": :"a" (val));
+}
+
+INLINE U32 CPU_ReadESP(void)
+{
+    U32 sp;
+    CASM("movl %%esp, %0\n\t": "=a" (sp));
+    return sp;
 }
 
 #endif  /* __PLATFROM_REGS__ */

@@ -19,40 +19,40 @@
 #include <Sched/Thread.h>
 #include <XBook/InitCall.h>
 
-PRIVATE Integration *integrationTable = NULL;
-PRIVATE Size integrationCount;
+PRIVATE Integration *IntegrationTable = NULL;
+PRIVATE Size IntegrationCount;
 
 IMPORT const Addr __IntegrationTableStart;
 IMPORT const Addr __IntegrationTableEnd;
 
 PRIVATE void IntegrationInvoke(void)
 {
-    integrationTable = (Integration *)&__IntegrationTableStart;
-    integrationCount = (Integration *) &__IntegrationTableEnd - integrationTable;
-    LOG_I("[==========] Total integrations: %d", integrationCount);
+    IntegrationTable = (Integration *)&__IntegrationTableStart;
+    IntegrationCount = (Integration *) &__IntegrationTableEnd - IntegrationTable;
+    LOG_I("[==========] Total integrations: %d", IntegrationCount);
     int integrationIndex;
     OS_Error err;
     Size passedTests = 0; 
-    for (integrationIndex = 0; integrationIndex < integrationCount; integrationIndex++)
+    for (integrationIndex = 0; integrationIndex < IntegrationCount; integrationIndex++)
     {
-        LOG_I("[==========] [ integration ] Running (%d/%d) test (%s).", integrationIndex + 1, integrationCount, integrationTable->integrationName);
-        err = integrationTable->func();
+        LOG_I("[==========] [ integration ] Running (%d/%d) test (%s).", integrationIndex + 1, IntegrationCount, IntegrationTable->integrationName);
+        err = IntegrationTable->func();
         if (err == OS_EOK)
         {
             passedTests++;
             LOG_I("[==========] [ integration ] (%d/%d) test ran with state %s .",
-                integrationIndex + 1, integrationCount, "success");
+                integrationIndex + 1, IntegrationCount, "success");
         }
         else
         {
             LOG_E("[==========] [ integration ] (%d/%d) test ran with state %s .",
-                integrationIndex + 1, integrationCount, "failed");
+                integrationIndex + 1, IntegrationCount, "failed");
             break;
         }
-        integrationTable++;
+        IntegrationTable++;
     }
     LOG_I("[  FINAL   ] %d integration test finshed. %d/%d are passed. %d/%d are failed.",
-        integrationCount, passedTests, integrationCount, integrationCount - passedTests, integrationCount);
+        IntegrationCount, passedTests, IntegrationCount, IntegrationCount - passedTests, IntegrationCount);
 }
 
 PRIVATE void IntegrationEntry(void *arg)

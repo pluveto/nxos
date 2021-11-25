@@ -19,10 +19,10 @@
 #define LOG_NAME "PageHeap"
 #include <Utils/Debug.h>
 
-PRIVATE PageHeap pageHeap;
-PRIVATE SpanMark *spanMark;
-PRIVATE void *spanBaseAddr;
-PRIVATE Mutex pageHeapLock;
+PRIVATE PageHeap PageHeapObject;
+PRIVATE SpanMark *SpanMarkMap;
+PRIVATE void *SpanBaseAddr;
+PRIVATE Mutex PageHeapLock;
 
 PRIVATE void *PageAllocVirtual(Size count)
 {
@@ -48,10 +48,10 @@ PRIVATE void PageFreeVirtual(void *ptr)
  */
 PRIVATE void MarkSpan(void *span, Size count)
 {
-    Addr dis = (Addr)span - (Addr)spanBaseAddr;
+    Addr dis = (Addr)span - (Addr)SpanBaseAddr;
     Size idx = dis >> PAGE_SHIFT;
 
-    SpanMark *mark = spanMark + idx;
+    SpanMark *mark = SpanMarkMap + idx;
     int i;
     for (i = 0; i < count; i++)
     {
@@ -66,10 +66,10 @@ PRIVATE void MarkSpan(void *span, Size count)
  */
 PRIVATE void ClearSpan(void *span, Size count)
 {
-    Addr dis = (Addr)span - (Addr)spanBaseAddr;
+    Addr dis = (Addr)span - (Addr)SpanBaseAddr;
     Size idx = dis >> PAGE_SHIFT;
 
-    SpanMark *mark = spanMark + idx;
+    SpanMark *mark = SpanMarkMap + idx;
 
     int i;
     for (i = 0; i < count; i++)
@@ -82,19 +82,19 @@ PRIVATE void ClearSpan(void *span, Size count)
 
 PUBLIC void *PageToSpan(void *page)
 {
-    Size dis = (Addr)page - (Addr)spanBaseAddr;
+    Size dis = (Addr)page - (Addr)SpanBaseAddr;
     Size idx = dis >> PAGE_SHIFT;
 
-    SpanMark *mark = spanMark + idx;
+    SpanMark *mark = SpanMarkMap + idx;
     return (void *)((Addr)page - mark->idx * PAGE_SIZE);
 }
 
 PUBLIC Size PageToSpanCount(void *span)
 {
-    Size dis = (Addr)span - (Addr)spanBaseAddr;
+    Size dis = (Addr)span - (Addr)SpanBaseAddr;
     Size idx = dis >> PAGE_SHIFT;
 
-    SpanMark *mark = spanMark + idx;
+    SpanMark *mark = SpanMarkMap + idx;
     return mark->count;
 }
 
@@ -108,11 +108,11 @@ PRIVATE void *DoPageHeapAlloc(Size count)
     if (count >= SMALL_SPAN_PAGES_MAX)    /* alloc from large list */
     {
         isLargeSpan = 1;
-        listHead = &pageHeap.largeSpanFreeList;
+        listHead = &PageHeapObject.largeSpanFreeList;
     }
     else    /* alloc from normal list */
     {
-        listHead = &pageHeap.spanFreeList[count];
+        listHead = &PageHeapObject.spanFreeList[count];
     }
 
     if (ListEmpty(listHead))
@@ -131,7 +131,7 @@ PRIVATE void *DoPageHeapAlloc(Size count)
     if (isLargeSpan)
     {
         /* use best fit to alloc a span */
-        ListForEachEntry (spanNode, &pageHeap.largeSpanFreeList, list)
+        ListForEachEntry (spanNode, &PageHeapObject.largeSpanFreeList, list)
         {
             if (spanNodeBest == NULL)
             {
@@ -146,7 +146,7 @@ PRIVATE void *DoPageHeapAlloc(Size count)
     else
     {
         /* use first fit to alloc a span */
-        spanNodeBest = ListFirstEntry(&pageHeap.spanFreeList[count], Span, list);
+        spanNodeBest = ListFirstEntry(&PageHeapObject.spanFreeList[count], Span, list);
     }
     /* del span node from list */
     ListDelInit(&spanNodeBest->list);
@@ -170,9 +170,9 @@ PUBLIC void *PageHeapAlloc(Size count)
         return NULL;
     }
     
-    MutexLock(&pageHeapLock, TRUE);
+    MutexLock(&PageHeapLock, TRUE);
     void *ptr = DoPageHeapAlloc(count);
-    MutexUnlock(&pageHeapLock);
+    MutexUnlock(&PageHeapLock);
     return ptr;
 }
 
@@ -193,7 +193,7 @@ PRIVATE OS_Error DoPageHeapFree(void *page)
     if (count >= SMALL_SPAN_PAGES_MAX)    /* free to large list */
     {
         maxThresold = LARGE_SPAN_FREE_THRESHOLD_MAX;
-        listHead = &pageHeap.largeSpanFreeList;
+        listHead = &PageHeapObject.largeSpanFreeList;
     }
     else    /* free from normal list */
     {
@@ -205,7 +205,7 @@ PRIVATE OS_Error DoPageHeapFree(void *page)
         {
             maxThresold = SMALL_SPAN_FREE_THRESHOLD_MAX;
         }
-        listHead = &pageHeap.spanFreeList[count];
+        listHead = &PageHeapObject.spanFreeList[count];
     }
 
     if (ListLength(listHead) >= maxThresold)    /* directly free */
@@ -230,34 +230,34 @@ PUBLIC OS_Error PageHeapFree(void *page)
         return OS_EINVAL;
     }
     
-    MutexLock(&pageHeapLock, TRUE);
+    MutexLock(&PageHeapLock, TRUE);
     OS_Error err = DoPageHeapFree(page);
-    MutexUnlock(&pageHeapLock);
+    MutexUnlock(&PageHeapLock);
     return err;
 }
 
 PUBLIC void PageHeapInit(void)
 {
     int i;
-    for (i = 0; i < sizeof(pageHeap.spanFreeList) / sizeof(pageHeap.spanFreeList[0]); i++)
+    for (i = 0; i < sizeof(PageHeapObject.spanFreeList) / sizeof(PageHeapObject.spanFreeList[0]); i++)
     {
-        ListInit(&pageHeap.spanFreeList[i]);
+        ListInit(&PageHeapObject.spanFreeList[i]);
     }
-    ListInit(&pageHeap.largeSpanFreeList);
-    spanBaseAddr = PageZoneGetBase(PZ_NORMAL);
-    LOG_I("span base addr: %p", spanBaseAddr);
+    ListInit(&PageHeapObject.largeSpanFreeList);
+    SpanBaseAddr = PageZoneGetBase(PZ_NORMAL);
+    LOG_I("span base addr: %p", SpanBaseAddr);
 
     Size pages = PageZoneGetPages(PZ_NORMAL);
     /* alloc span mark array */
     Size spanMarkPages = DIV_ROUND_UP(pages * sizeof(SpanMark), PAGE_SIZE);
     LOG_I("span mark used page: %d", spanMarkPages);
 
-    spanMark = PageAllocVirtual(spanMarkPages);
-    if (spanMark == NULL)
+    SpanMarkMap = PageAllocVirtual(spanMarkPages);
+    if (SpanMarkMap == NULL)
     {
         PANIC("alloc page for span mark failed!");
     }
-    Zero(spanMark, spanMarkPages * PAGE_SIZE);
+    Zero(SpanMarkMap, spanMarkPages * PAGE_SIZE);
 
-    MutexInit(&pageHeapLock);
+    MutexInit(&PageHeapLock);
 }

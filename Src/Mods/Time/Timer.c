@@ -17,15 +17,15 @@
 #define IDLE_TIMER_TIMEOUT  MAX_TIMER_TIMEOUT
 #define IDLE_TIMER_TIMEOUT_TICKS  (IDLE_TIMER_TIMEOUT / (1000 / TICKS_PER_SECOND))
 
-PRIVATE LIST_HEAD(timerListHead);
+PRIVATE LIST_HEAD(TimerListHead);
 
 /* timer tick is different with clock tick */
-PRIVATE ClockTick timerTick = 0;
+PRIVATE VOLATILE ClockTick TimerTicks = 0;
 
 /* next timeout tick */
-PRIVATE ClockTick nextTimeout = 0;
+PRIVATE VOLATILE ClockTick NextTimeoutTicks = 0;
 
-PRIVATE Timer idleTimer;
+PRIVATE Timer IdleTimer;
 
 PUBLIC OS_Error TimerInit(Timer *timer, Uint milliSecond, 
                           void (*handler)(struct Timer *, void *arg), void *arg, 
@@ -41,7 +41,7 @@ PUBLIC OS_Error TimerInit(Timer *timer, Uint milliSecond,
     timer->timeTicks = MILLISECOND_TO_TICKS(milliSecond);
     
     /* calc timeout here */
-    timer->timeout = timer->timeTicks + timerTick;
+    timer->timeout = timer->timeTicks + TimerTicks;
     
     timer->handler = handler;
     timer->arg = arg;
@@ -60,6 +60,7 @@ PUBLIC Timer *TimerCreate(Uint milliSecond,
     }
     if (TimerInit(timer, milliSecond, handler, arg, period) != OS_EOK)
     {
+        MemFree(timer);
         return NULL;
     }
     timer->flags |= TIMER_DYNAMIC;
@@ -75,14 +76,14 @@ PRIVATE void TimerRemove(Timer *timer, Bool onTimerList, Bool destroy)
 
         /* update next time */
         Timer *next;
-        ListForEachEntry(next, &timerListHead, list)
+        ListForEachEntry(next, &TimerListHead, list)
         {
-            if (next->timeout > timerTick)
+            if (next->timeout > TimerTicks)
             {
                 break;
             }
         }
-        nextTimeout = next->timeout;
+        NextTimeoutTicks = next->timeout;
     }
     if (destroy == TRUE)
     {
@@ -128,14 +129,14 @@ PUBLIC OS_Error TimerStart(Timer *timer)
     Uint level = HAL_InterruptSaveLevel();
 
     /* timeout is invalid */
-    if (IDLE_TIMER_TIMEOUT_TICKS - timer->timeTicks < timerTick)
+    if (IDLE_TIMER_TIMEOUT_TICKS - timer->timeTicks < TimerTicks)
     {
         HAL_InterruptRestoreLevel(level);
         return OS_EINVAL;
     }
 
     /* make sure not on the list */
-    if (ListFind(&timer->list, &timerListHead))
+    if (ListFind(&timer->list, &TimerListHead))
     {
         HAL_InterruptRestoreLevel(level);
         return OS_EAGAIN;
@@ -143,26 +144,26 @@ PUBLIC OS_Error TimerStart(Timer *timer)
     
     /* waiting timeout state */
     timer->state = TIMER_WAITING;
-    if (ListEmpty(&timerListHead))
+    if (ListEmpty(&TimerListHead))
     {
         /* inseart at head */
-        ListAdd(&timer->list, &timerListHead);
-        nextTimeout = timer->timeout;
+        ListAdd(&timer->list, &TimerListHead);
+        NextTimeoutTicks = timer->timeout;
     }
     else
     {
-        Timer *first = ListFirstEntry(&timerListHead, Timer, list);
+        Timer *first = ListFirstEntry(&TimerListHead, Timer, list);
         if (timer->timeout < first->timeout)
         {
             /* insert at head */
-            ListAdd(&timer->list, &timerListHead);
-            nextTimeout = timer->timeout;
+            ListAdd(&timer->list, &TimerListHead);
+            NextTimeoutTicks = timer->timeout;
         }
         else
         {
             /* insert after nearly timer */
             Timer *prev;
-            ListForEachEntry(prev, &timerListHead, list)
+            ListForEachEntry(prev, &TimerListHead, list)
             {
                 if (prev->timeout <= timer->timeout)
                 {
@@ -225,7 +226,7 @@ PRIVATE void TimerInvoke(Timer *timer)
         if (timer->flags & TIMER_PERIOD)
         {
             /* update timer timeout */
-            timer->timeout = timerTick + timer->timeTicks;
+            timer->timeout = TimerTicks + timer->timeTicks;
             timer->state = TIMER_WAITING;
         }
         else
@@ -245,34 +246,34 @@ PUBLIC void TimerGo(void)
     Timer *timer = NULL;
     Timer *next = NULL;
     
-    timerTick++;
+    TimerTicks++;
 
-    if (timerTick < nextTimeout)
+    if (TimerTicks < NextTimeoutTicks)
     {
         return;
     }
 
     Uint level = HAL_InterruptSaveLevel();
     
-    ListForEachEntrySafe(timer, next, &timerListHead, list)
+    ListForEachEntrySafe(timer, next, &TimerListHead, list)
     {
-        if (timer->timeout > timerTick) /* not timeout */
+        if (timer->timeout > TimerTicks) /* not timeout */
         {
             break;
         }
-        /* timeout == timerTick -> timeout! */
+        /* timeout == TimerTicks -> timeout! */
         TimerInvoke(timer);
     }
 
     /* find next timer */
-    ListForEachEntry(timer, &timerListHead, list)
+    ListForEachEntry(timer, &TimerListHead, list)
     {
-        if (timer->timeout > timerTick)
+        if (timer->timeout > TimerTicks)
         {
             break;
         }
     }
-    nextTimeout = timer->timeout;
+    NextTimeoutTicks = timer->timeout;
     HAL_InterruptRestoreLevel(level);
 }
 
@@ -282,10 +283,10 @@ PUBLIC void TimerGo(void)
  */
 PRIVATE void IdleTimerHandler(Timer *timer, void *arg)
 {
-    ClockTick delta = idleTimer.timeout;
-    timerTick -= delta;
+    ClockTick delta = IdleTimer.timeout;
+    TimerTicks -= delta;
     Timer *tmp;
-    ListForEachEntry (tmp, &timerListHead, list)
+    ListForEachEntry (tmp, &TimerListHead, list)
     {
         tmp->timeout -= delta;
     }
@@ -293,6 +294,6 @@ PRIVATE void IdleTimerHandler(Timer *timer, void *arg)
 
 PUBLIC void TimersInit(void)
 {
-    ASSERT(TimerInit(&idleTimer, IDLE_TIMER_TIMEOUT, IdleTimerHandler, NULL, TRUE) == OS_EOK);
-    ASSERT(TimerStart(&idleTimer) == OS_EOK);
+    ASSERT(TimerInit(&IdleTimer, IDLE_TIMER_TIMEOUT, IdleTimerHandler, NULL, TRUE) == OS_EOK);
+    ASSERT(TimerStart(&IdleTimer) == OS_EOK);
 }

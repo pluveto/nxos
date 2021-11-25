@@ -25,7 +25,7 @@ typedef void (*ExitCallHandler)(void);
 	__attribute__((__used__, __section__(".initCall" level ".text"))) = fn
 
 #define __DEFINE_EXITCALL(level, fn, id) \
-	PRIVATE const ExitCallHandler __exitCall##fn##Id \
+	PRIVATE const ExitCallHandler __ExitCall##fn##Id \
 	__attribute__((__used__, __section__(".exitCall" level ".text"))) = fn
 
 #define INITCALL(fn)		        __DEFINE_INITCALL("0", fn, 0)

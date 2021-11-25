@@ -20,9 +20,9 @@
 #define LOG_NAME "HeapCache"
 #include <Utils/Debug.h>
 
-PRIVATE struct SizeClass sizeAarray[MAX_SIZE_CLASS_NR];
-PRIVATE HeapCache middleSizeCache;
-PRIVATE Mutex heapCacheLock;
+PRIVATE struct SizeClass CacheSizeAarray[MAX_SIZE_CLASS_NR];
+PRIVATE HeapCache MiddleSizeCache;
+PRIVATE Mutex HeapCacheLock;
 
 PRIVATE Size AlignDownToPow2(Size size)
 {
@@ -76,27 +76,27 @@ PRIVATE void HeapSizeClassInit(void)
     int i;
     for (i = 8; i <= 16; i+=8)
     {
-        sizeAarray[n].size = i;
+        CacheSizeAarray[n].size = i;
         n++;
     }
     for (i = 32; i <= 128; i+=16)
     {
-        sizeAarray[n].size = i;
+        CacheSizeAarray[n].size = i;
         n++;
     }
     for (i = 128 + 128 / 8; i <= MAX_SMALL_OBJECT_SIZE; )
     {
-        sizeAarray[n].size = i;
+        CacheSizeAarray[n].size = i;
         i += AlignDownToPow2(i / 8);
         n++;
     }
 
     for (i = 0; i < MAX_SIZE_CLASS_NR; i++)
     {
-        HeapCacheInitOne(&sizeAarray[i].cache, sizeAarray[i].size);
+        HeapCacheInitOne(&CacheSizeAarray[i].cache, CacheSizeAarray[i].size);
     }
 
-    HeapCacheInitOne(&middleSizeCache, 0);
+    HeapCacheInitOne(&MiddleSizeCache, 0);
 }
 
 INLINE HeapCache *SizeToCache(Size size)
@@ -107,9 +107,9 @@ INLINE HeapCache *SizeToCache(Size size)
 
     for (; index < MAX_SIZE_CLASS_NR; index++)
     {
-        if (sizeAarray[index].size >= size)
+        if (CacheSizeAarray[index].size >= size)
         {
-            cache = &sizeAarray[index].cache;
+            cache = &CacheSizeAarray[index].cache;
             /* alloc in this cache */
             break;
         }
@@ -135,7 +135,7 @@ PRIVATE void *DoHeapAlloc(Size size)
         }
         else    /* alloc from middle cache */
         {
-            cache = &middleSizeCache;
+            cache = &MiddleSizeCache;
         }
     }
     else
@@ -162,7 +162,7 @@ PRIVATE void *DoHeapAlloc(Size size)
             ListDelInit(&span->list);            
         }
 
-        if (cache == &middleSizeCache)  /* return span if middle cache */
+        if (cache == &MiddleSizeCache)  /* return span if middle cache */
         {
             return (void *)span;
         }
@@ -200,9 +200,9 @@ PUBLIC void *HeapAlloc(Size size)
     {
         return NULL;
     }
-    MutexLock(&heapCacheLock, TRUE);
+    MutexLock(&HeapCacheLock, TRUE);
     void *ptr = DoHeapAlloc(size);
-    MutexUnlock(&heapCacheLock);
+    MutexUnlock(&HeapCacheLock);
     return ptr;
 }
 
@@ -229,14 +229,14 @@ PRIVATE OS_Error DoHeapFree(void *object)
         else    /* free to middle cache */
         {
             /* if len is too long, free to page heap */
-            if (ListLength(&middleSizeCache.spanFreeList) + 1 >= MAX_MIDDLE_OBJECT_THRESOLD) 
+            if (ListLength(&MiddleSizeCache.spanFreeList) + 1 >= MAX_MIDDLE_OBJECT_THRESOLD) 
             {
                 return PageHeapFree(span);
             }
             else    /* free to span free list */
             {
                 Span *spanNode = (Span *) span;
-                ListAdd(&spanNode->list, &middleSizeCache.spanFreeList);
+                ListAdd(&spanNode->list, &MiddleSizeCache.spanFreeList);
             }
             return OS_EOK;
         }
@@ -284,9 +284,9 @@ PUBLIC OS_Error HeapFree(void *object)
     {
         return OS_EINVAL;
     }
-    MutexLock(&heapCacheLock, TRUE);
+    MutexLock(&HeapCacheLock, TRUE);
     OS_Error err = DoHeapFree(object);
-    MutexUnlock(&heapCacheLock);
+    MutexUnlock(&HeapCacheLock);
     return err;
 }
 
@@ -296,14 +296,14 @@ PUBLIC Size HeapGetObjectSize(void *object)
     {
         return 0;
     }
-    MutexLock(&heapCacheLock, TRUE);
+    MutexLock(&HeapCacheLock, TRUE);
     /* object to page, then to span */
     void *page = (void *)(((Addr) object) & PAGE_UMASK);
     void *span = PageToSpan(page);
     /* NOTICE: page must be span page */
     Page *pageNode = PageFromPtr(PageZoneGetBuddySystem(PZ_NORMAL), span);
     ASSERT(pageNode != NULL);
-    MutexUnlock(&heapCacheLock);
+    MutexUnlock(&HeapCacheLock);
     /* get class size from page */
     return pageNode->sizeClass;
 }
@@ -311,5 +311,5 @@ PUBLIC Size HeapGetObjectSize(void *object)
 PUBLIC void HeapCacheInit(void)
 {
     HeapSizeClassInit();
-    MutexInit(&heapCacheLock);
+    MutexInit(&HeapCacheLock);
 }

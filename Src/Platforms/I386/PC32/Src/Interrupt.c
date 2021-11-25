@@ -128,7 +128,10 @@ PUBLIC void InterruptDispatch(void *stackFrame)
         if (handler != NULL)
         {
             handler(vector, arg);
-            HAL_IRQAck(vector);
+            if (HAL_IRQAck(vector) != OS_EOK)
+            {
+                LOG_E("IRQ %d ack failed!", vector);
+            }
         }
     }
     else if (vector >= SYSCALL_BASE && vector < SYSCALL_BASE + MAX_SYSCALL_NR)
@@ -208,7 +211,7 @@ INTERFACE void HAL_InterruptDisable(void)
 
 INTERFACE Uint HAL_InterruptSaveLevel(void)
 {
-    Uint level;
+    Uint level = 0;
     CASM("pushfl; popl %0; cli":"=g" (level): :"memory");
     return level;
 }

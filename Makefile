@@ -41,7 +41,7 @@ KCONFIGLIB_DIR	:= Scripts/Kconfiglib
 #
 # Enable GDB debug
 #
-GDB_DBG	?=n
+G	?=n
 
 #
 # Get platform information about ARCH and MACH from PLATFORM variable.
@@ -81,7 +81,7 @@ export MACH
 export ARCH
 export HOSTOS
 export USE_BUILD_DIR
-export GDB_DBG
+export G
 
 #
 # Kconfig path

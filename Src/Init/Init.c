@@ -13,10 +13,10 @@
 #include <Sched/Thread.h>
 #include <Utils/Debug.h>
 
-IMPORT InitCallHandler __initCallStart[];
-IMPORT InitCallHandler __initCallEnd[];
-IMPORT InitCallHandler __exitCallStart[];
-IMPORT InitCallHandler __exitCallEnd[];
+IMPORT InitCallHandler __InitCallStart[];
+IMPORT InitCallHandler __InitCallEnd[];
+IMPORT InitCallHandler __ExitCallStart[];
+IMPORT InitCallHandler __ExitCallEnd[];
 
 PUBLIC void CallInvoke(InitCallHandler start[], InitCallHandler end[])
 {
@@ -29,17 +29,28 @@ PUBLIC void CallInvoke(InitCallHandler start[], InitCallHandler end[])
 
 PUBLIC void InitCallInvoke(void)
 {
-    CallInvoke(__initCallStart, __initCallEnd);
+    CallInvoke(__InitCallStart, __InitCallEnd);
 }
 
 PUBLIC void ExitCallInvoke(void)
 {
-    CallInvoke(__exitCallStart, __exitCallEnd);
+    CallInvoke(__ExitCallStart, __ExitCallEnd);
 }
+
+#ifdef CONFIG_PLATFORM_THREAD
+WEAK_SYM void PlatformMain(void)
+{
+    LOG_I("Deafult platform main running...\n");
+}
+#endif
 
 PRIVATE void CallsEntry(void *arg)
 {
     InitCallInvoke();
+
+#ifdef CONFIG_PLATFORM_THREAD
+    PlatformMain();
+#endif
 }
 
 PUBLIC void CallsInit(void)

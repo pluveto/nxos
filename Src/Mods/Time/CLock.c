@@ -13,26 +13,28 @@
 #include <Mods/Time/Timer.h>
 #define LOG_LEVEL LOG_INFO 
 #include <Utils/Log.h>
+#include <Utils/Debug.h>
 
 #include <Sched/Thread.h>
 #include <Sched/Sched.h>
 
-PRIVATE ClockTick systemClockTicks;
+/* NOTE: must add VOLATILE here, avoid compiler optimization  */
+PRIVATE VOLATILE ClockTick SystemClockTicks;
 
 PUBLIC ClockTick ClockTickGet(void)
 {
-    return systemClockTicks;
+    return SystemClockTicks;
 }
 
 PUBLIC void ClockTickSet(ClockTick tick)
 {
-    systemClockTicks = tick;
+    SystemClockTicks = tick;
 }
 
 PUBLIC void ClockTickGo(void)
 {
-    systemClockTicks++;
-    if ((systemClockTicks % TICKS_PER_SECOND) == 0)
+    SystemClockTicks++;
+    if ((SystemClockTicks % TICKS_PER_SECOND) == 0)
     {
         // LOG_I("1s");
     }
@@ -45,12 +47,13 @@ PUBLIC void ClockTickGo(void)
         // LOG_I("thread:%s need sched", thread->name);
         thread->needSched = 1; /* mark sched */
     }
+    ASSERT(thread->ticks >= 0);
 }
 
 PUBLIC OS_Error ClockTickDelay(ClockTick ticks)
 {
     ClockTick start = ClockTickGet();
-    while (ClockTickGet() < start + ticks)
+    while (ClockTickGet() - start < ticks)
     {
         /* do nothing to delay */
 
