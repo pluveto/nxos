@@ -29,13 +29,19 @@ PRIVATE Timer IdleTimer;
 
 PUBLIC OS_Error TimerInit(Timer *timer, Uint milliSecond, 
                           void (*handler)(struct Timer *, void *arg), void *arg, 
-                          Bool period)
+                          int flags)
 {
-    if (timer == NULL || !milliSecond || handler == NULL)
+    if (timer == NULL || !milliSecond || handler == NULL || flags == 0)
     {
         return OS_EINVAL;
     }
-    timer->flags = (period == TRUE) ? TIMER_PERIOD : 0;
+
+    if (!(flags & (TIMER_ONESHOT | TIMER_PERIOD)) || (flags & TIMER_DYNAMIC))
+    {
+        return OS_EINVAL;
+    }
+
+    timer->flags = flags;
     timer->state = TIMER_INITED;
 
     timer->timeTicks = MILLISECOND_TO_TICKS(milliSecond);
@@ -51,14 +57,14 @@ PUBLIC OS_Error TimerInit(Timer *timer, Uint milliSecond,
 
 PUBLIC Timer *TimerCreate(Uint milliSecond, 
                           void (*handler)(struct Timer *, void *arg), void *arg, 
-                          Bool period)
+                          int flags)
 {
     Timer *timer = MemAlloc(sizeof(Timer));
     if (timer == NULL)
     {
         return NULL;
     }
-    if (TimerInit(timer, milliSecond, handler, arg, period) != OS_EOK)
+    if (TimerInit(timer, milliSecond, handler, arg, flags) != OS_EOK)
     {
         MemFree(timer);
         return NULL;

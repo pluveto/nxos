@@ -19,8 +19,9 @@
 /* 24 days */
 #define MAX_TIMER_TIMEOUT (24 * 24 * 60 * 60 * 1000)
 
-#define TIMER_DYNAMIC   0x01    /* timer create from memory heap */
+#define TIMER_ONESHOT   0x01    /* timer type is one shot */
 #define TIMER_PERIOD    0x02    /* timer type is period */
+#define TIMER_DYNAMIC   0x08    /* timer create from memory heap */
 
 enum TimerState
 {
@@ -38,7 +39,6 @@ struct Timer
     ClockTick timeout;  /* timeout ticks */ 
     ClockTick timeTicks;
     int flags;
-    Bool period;        /* period timer */
     void (*handler)(struct Timer *, void *arg);
     void *arg;
 };
@@ -46,11 +46,11 @@ typedef struct Timer Timer;
 
 PUBLIC OS_Error TimerInit(Timer *timer, Uint milliSecond, 
                           void (*handler)(struct Timer *, void *arg), void *arg, 
-                          Bool period);
+                          int flags);
                           
 PUBLIC Timer *TimerCreate(Uint milliSecond, 
                           void (*handler)(struct Timer *, void *arg), void *arg, 
-                          Bool period);
+                          int flags);
                           
 PUBLIC OS_Error TimerStart(Timer *timer);
 PUBLIC OS_Error TimerStop(Timer *timer);

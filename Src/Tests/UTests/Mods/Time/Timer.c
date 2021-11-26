@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: utest self test 
+ * Contains: utest for timer 
  * 
  * Change Logs:
  * Date           Author            Notes
@@ -13,7 +13,7 @@
 
 #include <Mods/Time/Timer.h>
 
-#ifdef CONFIG_UTEST_MODS_UTEST
+#ifdef CONFIG_UTEST_MODS_TIMER
 
 PRIVATE int TimerOneshotFlags = 0;
 
@@ -39,19 +39,19 @@ PRIVATE void TimerHandler2(Timer *timer, void *arg)
 
 TEST(TimerCreateAndDestroy)
 {
-    Timer *timer0 = TimerCreate(1000, TimerHandler, (void *)0x1234abcd, FALSE);
+    Timer *timer0 = TimerCreate(1000, TimerHandler, (void *)0x1234abcd, TIMER_ONESHOT);
     EXPECT_NOT_NULL(timer0);
 
-    Timer *timer1 = TimerCreate(1000, TimerHandler, (void *)0x1234abcd, FALSE);
+    Timer *timer1 = TimerCreate(1000, TimerHandler, (void *)0x1234abcd, TIMER_ONESHOT);
     EXPECT_NOT_NULL(timer1);
 
-    Timer *timer2 = TimerCreate(0, TimerHandler, (void *)0x1234abcd, FALSE);
+    Timer *timer2 = TimerCreate(0, TimerHandler, (void *)0x1234abcd, TIMER_ONESHOT);
     EXPECT_NULL(timer2);
 
-    Timer *timer3 = TimerCreate(10, NULL, (void *)0x1234abcd, FALSE);
+    Timer *timer3 = TimerCreate(10, NULL, (void *)0x1234abcd, TIMER_ONESHOT);
     EXPECT_NULL(timer3);
 
-    Timer *timer4 = TimerCreate(10, TimerHandler, NULL, TRUE);
+    Timer *timer4 = TimerCreate(10, TimerHandler, NULL, TIMER_PERIOD);
     EXPECT_NOT_NULL(timer4);
 
     EXPECT_NE(TimerDestroy(NULL), OS_EOK);
@@ -66,24 +66,54 @@ TEST(TimerStart)
 {
     TimerOneshotFlags = 0;
     EXPECT_NE(TimerStart(NULL), OS_EOK);
-    Timer *timer0 = TimerCreate(1000, TimerHandler, (void *)0x1234abcd, FALSE);
+    Timer *timer0 = TimerCreate(100, TimerHandler, (void *)0x1234abcd, TIMER_ONESHOT);
     EXPECT_NOT_NULL(timer0);
     EXPECT_EQ(TimerStart(timer0), OS_EOK);
-    ClockTickDelayMilliSecond(1500);
+    ClockTickDelayMilliSecond(150);
     EXPECT_EQ(TimerOneshotFlags, 2);
 
     TimerPeriodFlags = 0;
-    Timer *timer1 = TimerCreate(100, TimerHandler2, (void *)0x1234abcd, TRUE);
+    Timer *timer1 = TimerCreate(100, TimerHandler2, (void *)0x1234abcd, TIMER_PERIOD);
     EXPECT_NOT_NULL(timer1);
     EXPECT_EQ(TimerStart(timer1), OS_EOK);
-    ClockTickDelayMilliSecond(1500);
+    ClockTickDelayMilliSecond(1100);
     EXPECT_EQ(TimerPeriodFlags, TIMER_PERIOD_COUNT);
+}
+
+PRIVATE void TimerStopHandler(Timer *timer, void *arg)
+{
+    EXPECT_FALSE(1); /* should never occur! */
+}
+
+PRIVATE int StopTimerOccurTimes = 0;
+PRIVATE void TimerStopHandler2(Timer *timer, void *arg)
+{
+    StopTimerOccurTimes++;
+    EXPECT_EQ(TimerStop(timer), OS_EOK);
+    EXPECT_EQ(StopTimerOccurTimes, 1);
+}
+
+TEST(TimerStop)
+{
+    Timer *timer1 = TimerCreate(100, TimerStopHandler, NULL, TIMER_ONESHOT);
+    EXPECT_NOT_NULL(timer1);
+    EXPECT_EQ(TimerStart(timer1), OS_EOK);
+    ClockTickDelayMilliSecond(50);
+    /* stop timer before occur! */
+    EXPECT_EQ(TimerStop(timer1), OS_EOK);
+
+    StopTimerOccurTimes = 0;
+    Timer *timer2 = TimerCreate(100, TimerStopHandler2, NULL, TIMER_PERIOD);
+    EXPECT_NOT_NULL(timer2);
+    EXPECT_EQ(TimerStart(timer2), OS_EOK);
+    ClockTickDelayMilliSecond(200);
 }
 
 TEST_TABLE(Timer)
 {
     TEST_UNIT(TimerCreateAndDestroy),
     TEST_UNIT(TimerStart),
+    TEST_UNIT(TimerStop),
 };
 
 TEST_CASE(Timer);
