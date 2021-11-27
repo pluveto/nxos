@@ -77,7 +77,7 @@
 
 
 #ifdef CONFIG_DEBUG_TIMELINE
-#define LOG_TIMELINE Printf("[%10d.%03d] ", ClockTickGetMilliSecond() / 1000, ClockTickGetMilliSecond() % 1000);
+#define LOG_TIMELINE Printf("[%10d.%03d] ", ClockTickGetMillisecond() / 1000, ClockTickGetMillisecond() % 1000);
 #else
 #define LOG_TIMELINE
 #endif

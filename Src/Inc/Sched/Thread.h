@@ -13,6 +13,7 @@
 #define __SCHED_THREAD__
 
 #include <Utils/List.h>
+#include <Mods/Time/Timer.h>
 
 #ifdef CONFIG_THREAD_NAME_LEN
 #define THREAD_NAME_LEN CONFIG_THREAD_NAME_LEN
@@ -39,22 +40,38 @@ enum ThreadState
 };
 typedef enum ThreadState ThreadState;
 
+struct ThreadResource
+{
+    Timer *sleepTimer;
+};
+typedef struct ThreadResource ThreadResource;
+
 struct Thread
 {
+    /* thread list */
     List list;
     List globalList;
+
+    /* thread info */
     ThreadState state;
     Uint32 tid;     /* thread id */
-    U8 *stackBase;      /* stack base */
-    Size stackSize; 
-    U8 *stack;   /* stack top */
     ThreadHandler handler;
     void *threadArg;
+    char name[THREAD_NAME_LEN];
+    
+    /* thread stack */
+    U8 *stackBase;  /* stack base */
+    Size stackSize; 
+    U8 *stack;      /* stack top */
+    
+    /* thread sched */
     U32 timeslice;
     U32 ticks;
     U32 needSched;
     U32 isTerminated;
-    char name[THREAD_NAME_LEN];
+
+    /* thread resource */
+    ThreadResource resource;
 };
 typedef struct Thread Thread;
 
@@ -70,6 +87,9 @@ PUBLIC Thread *ThreadFindById(U32 tid);
 
 PUBLIC OS_Error ThreadRun(Thread *thread);
 PUBLIC void ThreadYield(void);
+
+PUBLIC OS_Error ThreadSleep(Uint microseconds);
+PUBLIC OS_Error ThreadWakeup(Thread *thread);
 
 PUBLIC void ThreadsInit(void);
 PUBLIC void TestThread(void);

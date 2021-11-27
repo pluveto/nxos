@@ -69,14 +69,14 @@ TEST(TimerStart)
     Timer *timer0 = TimerCreate(100, TimerHandler, (void *)0x1234abcd, TIMER_ONESHOT);
     EXPECT_NOT_NULL(timer0);
     EXPECT_EQ(TimerStart(timer0), OS_EOK);
-    ClockTickDelayMilliSecond(150);
+    ClockTickDelayMillisecond(150);
     EXPECT_EQ(TimerOneshotFlags, 2);
 
     TimerPeriodFlags = 0;
     Timer *timer1 = TimerCreate(100, TimerHandler2, (void *)0x1234abcd, TIMER_PERIOD);
     EXPECT_NOT_NULL(timer1);
     EXPECT_EQ(TimerStart(timer1), OS_EOK);
-    ClockTickDelayMilliSecond(1100);
+    ClockTickDelayMillisecond(1100);
     EXPECT_EQ(TimerPeriodFlags, TIMER_PERIOD_COUNT);
 }
 
@@ -98,15 +98,16 @@ TEST(TimerStop)
     Timer *timer1 = TimerCreate(100, TimerStopHandler, NULL, TIMER_ONESHOT);
     EXPECT_NOT_NULL(timer1);
     EXPECT_EQ(TimerStart(timer1), OS_EOK);
-    ClockTickDelayMilliSecond(50);
+    ClockTickDelayMillisecond(50);
     /* stop timer before occur! */
     EXPECT_EQ(TimerStop(timer1), OS_EOK);
-
+    EXPECT_EQ(TimerDestroy(timer1), OS_EOK);
+    
     StopTimerOccurTimes = 0;
     Timer *timer2 = TimerCreate(100, TimerStopHandler2, NULL, TIMER_PERIOD);
     EXPECT_NOT_NULL(timer2);
     EXPECT_EQ(TimerStart(timer2), OS_EOK);
-    ClockTickDelayMilliSecond(200);
+    ClockTickDelayMillisecond(200);
 }
 
 TEST_TABLE(Timer)

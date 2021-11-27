@@ -18,6 +18,7 @@
 #include <Sched/Mutex.h>
 #include <MM/Alloc.h>
 #include <Utils/String.h>
+#include <Mods/Time/Timer.h>
 
 /* TODO: add lock lock for thread list */
 PUBLIC List ThreadGlobalList;
@@ -66,6 +67,8 @@ PRIVATE OS_Error ThreadInit(Thread *thread,
     thread->stackSize = stackSize;
     thread->stack = thread->stackBase + stackSize;
     thread->stack = HAL_ContextInit(handler, arg, thread->stack, (void *)ThreadExit);
+    
+    thread->resource.sleepTimer = NULL;
     return OS_EOK;
 }
 
@@ -152,8 +155,14 @@ PUBLIC OS_Error ThreadTerminate(Thread *thread)
     {
         return OS_EINVAL;
     }
+    if (thread->state == THREAD_INIT || thread->state == THREAD_EXIT)
+    {
+        return OS_EPERM;
+    }
+
     Uint level = HAL_InterruptSaveLevel();
     thread->isTerminated = 1;
+    ThreadWakeup(thread);
     HAL_InterruptRestoreLevel(level);
     return OS_EOK;
 }
@@ -167,6 +176,11 @@ PRIVATE void ThreadReleaseResouce(Thread *thread)
     ThreadIdFree(thread->tid);
 
     /* NOTE: add other resource here. */
+    if (thread->resource.sleepTimer != NULL)
+    {
+        TimerStop(thread->resource.sleepTimer);
+        thread->resource.sleepTimer = NULL;
+    }
 }
 
 /**
@@ -198,6 +212,105 @@ PUBLIC void ThreadExit(void)
 PUBLIC Thread *ThreadSelf(void)
 {
     return CurrentThread;
+}
+
+/**
+ * must called when interrupt disabled
+ */
+PRIVATE void ThreadBlockInterruptDisabled(ThreadState state, Uint irqLevel)
+{
+    ASSERT(state == THREAD_SLEEP || state == THREAD_DEEPSLEEP);
+    CurrentThread->state = state;
+    SchedWithInterruptDisabled(irqLevel);
+}
+
+/**
+ * must called when interrupt disabled
+ * quickly: thread can be run quickly
+ */
+PRIVATE void ThreadUnblockInterruptDisabled(Thread *thread)
+{
+    /* add thread to ready list */
+    CurrentThread->state = THREAD_READY;
+    /* add to list head so that can be run quickly */
+    ListAdd(&thread->list, &ThreadReadyList);    
+}
+
+/**
+ * wakeup a thread, must called interrupt disabled
+ */
+PUBLIC OS_Error ThreadWakeup(Thread *thread)
+{
+    if (thread == NULL)
+    {
+        return OS_EINVAL;
+    }
+    /* if thread in sleep, then wakeup it */
+    if (thread->state == THREAD_SLEEP)
+    {
+        ThreadUnblockInterruptDisabled(thread);
+    }
+    return OS_EOK;
+}
+
+PRIVATE void ThreadSleepTimeout(Timer *timer, void *arg)
+{
+    Thread *thread = (Thread *)arg; /* the thread wait for timeout  */
+    
+    if (ThreadWakeup(thread) != OS_EOK)
+    {
+        LOG_E("Wakeup thread:%s/%d failed!\n", thread->name, thread->tid);
+    }
+    else
+    {
+        LOG_I("Wakeup thread:%s/%d success!\n", thread->name, thread->tid);
+    }
+    
+    thread->resource.sleepTimer = NULL; /* cleanup sleep timer */
+
+}
+
+/* if thread sleep less equal than 2s, use delay instead */
+#define THREAD_SLEEP_TIMEOUT_THRESHOLD 2
+
+PUBLIC OS_Error ThreadSleep(Uint microseconds)
+{
+    if (microseconds == 0)
+    {
+        return OS_EINVAL;
+    }
+    if (microseconds <= THREAD_SLEEP_TIMEOUT_THRESHOLD)
+    {
+        return ClockTickDelayMillisecond(microseconds);
+    }
+
+    Thread *self = ThreadSelf();
+    Timer sleepTimer;
+    OS_Error err;
+    err = TimerInit(&sleepTimer, microseconds, ThreadSleepTimeout, (void *)self, TIMER_ONESHOT);
+    if (err != OS_EOK)
+    {
+        return err;
+    }
+
+    Uint irqLevel = HAL_InterruptSaveLevel();
+    /* lock thread */
+    self->resource.sleepTimer = &sleepTimer;
+
+    TimerStart(&sleepTimer);
+
+    /* set thread as sleep state */
+    ThreadBlockInterruptDisabled(THREAD_SLEEP, irqLevel);
+
+    /* if sleep timer always here, it means that the thread was interrupted! */
+    if (self->resource.sleepTimer != NULL)
+    {
+        /* thread was interrupted! */
+        TimerStop(self->resource.sleepTimer);
+        self->resource.sleepTimer = NULL;
+        return OS_EINTR;
+    }
+    return OS_EOK;
 }
 
 /**

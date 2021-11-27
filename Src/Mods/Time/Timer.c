@@ -27,11 +27,11 @@ PRIVATE VOLATILE ClockTick NextTimeoutTicks = 0;
 
 PRIVATE Timer IdleTimer;
 
-PUBLIC OS_Error TimerInit(Timer *timer, Uint milliSecond, 
+PUBLIC OS_Error TimerInit(Timer *timer, Uint milliseconds, 
                           void (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags)
 {
-    if (timer == NULL || !milliSecond || handler == NULL || flags == 0)
+    if (timer == NULL || !milliseconds || handler == NULL || flags == 0)
     {
         return OS_EINVAL;
     }
@@ -44,7 +44,7 @@ PUBLIC OS_Error TimerInit(Timer *timer, Uint milliSecond,
     timer->flags = flags;
     timer->state = TIMER_INITED;
 
-    timer->timeTicks = MILLISECOND_TO_TICKS(milliSecond);
+    timer->timeTicks = MILLISECOND_TO_TICKS(milliseconds);
     
     /* calc timeout here */
     timer->timeout = timer->timeTicks + TimerTicks;
@@ -55,7 +55,7 @@ PUBLIC OS_Error TimerInit(Timer *timer, Uint milliSecond,
     return OS_EOK;
 }
 
-PUBLIC Timer *TimerCreate(Uint milliSecond, 
+PUBLIC Timer *TimerCreate(Uint milliseconds, 
                           void (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags)
 {
@@ -64,7 +64,7 @@ PUBLIC Timer *TimerCreate(Uint milliSecond,
     {
         return NULL;
     }
-    if (TimerInit(timer, milliSecond, handler, arg, flags) != OS_EOK)
+    if (TimerInit(timer, milliseconds, handler, arg, flags) != OS_EOK)
     {
         MemFree(timer);
         return NULL;

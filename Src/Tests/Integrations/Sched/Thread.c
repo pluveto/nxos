@@ -106,7 +106,7 @@ PRIVATE void TestMutex1(void *arg)
         MutexLock(&mutexLock, TRUE);
         LOG_I(ThreadSelf()->name, " get lock");
         MutexUnlock(&mutexLock);
-        ClockTickDelayMilliSecond(10);
+        ClockTickDelayMillisecond(10);
     }
 }
 

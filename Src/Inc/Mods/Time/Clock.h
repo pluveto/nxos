@@ -37,24 +37,24 @@ PUBLIC void ClockTickGo(void);
 
 PUBLIC OS_Error ClockTickDelay(ClockTick ticks);
 
-INLINE TimeVal ClockTickToMilliSecond(ClockTick tick)
+INLINE TimeVal ClockTickToMillisecond(ClockTick tick)
 {
     return TICKS_TO_MILLISECOND(tick);
 }
 
-INLINE ClockTick MilliSecondToClockTick(TimeVal milliSecond)
+INLINE ClockTick MillisecondToClockTick(TimeVal milliseconds)
 {
-    return MILLISECOND_TO_TICKS(milliSecond);
+    return MILLISECOND_TO_TICKS(milliseconds);
 }
 
-INLINE ClockTick ClockTickGetMilliSecond(void)
+INLINE TimeVal ClockTickGetMillisecond(void)
 {
-    return ClockTickToMilliSecond(ClockTickGet());
+    return ClockTickToMillisecond(ClockTickGet());
 }
 
-INLINE ClockTick ClockTickDelayMilliSecond(TimeVal milliSecond)
+INLINE OS_Error ClockTickDelayMillisecond(TimeVal milliseconds)
 {
-    return ClockTickDelay(MilliSecondToClockTick(milliSecond));
+    return ClockTickDelay(MillisecondToClockTick(milliseconds));
 }
 
 #endif  /* __MODS_TIME_CLOCK__ */
