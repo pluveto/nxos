@@ -16,7 +16,7 @@
 INLINE void BootModInit(struct multiboot_tag *tag);
 INLINE void BootMemModInit(struct multiboot_tag *tag);
 
-int BootSetting(unsigned long magic, unsigned long addr)
+PUBLIC int BootSetting(unsigned long magic, unsigned long addr)
 {
     // whether a multiboot
     if (magic != MULTIBOOT2_BOOTLOADER_MAGIC || addr & 7)
@@ -45,7 +45,7 @@ int BootSetting(unsigned long magic, unsigned long addr)
 
 #define CmdlineIs(cmd) (!StrCmp(((struct multiboot_tag_module *)tag)->cmdline, cmd))
 
-static void BootModInit(struct multiboot_tag *tag) {
+INLINE void BootModInit(struct multiboot_tag *tag) {
     struct BootModInfo *modInfo = (struct BootModInfo *)BOOT_INFO_ADDR;
     int index = modInfo->modNum;
 
@@ -74,7 +74,7 @@ static void BootModInit(struct multiboot_tag *tag) {
 
 #undef CmdlineIs
 
-static void BootMemModInit(struct multiboot_tag *tag)
+INLINE void BootMemModInit(struct multiboot_tag *tag)
 {
     unsigned long memUpper = ((struct multiboot_tag_basic_meminfo *)tag)->mem_upper;
     unsigned long memLower = ((struct multiboot_tag_basic_meminfo *)tag)->mem_lower;

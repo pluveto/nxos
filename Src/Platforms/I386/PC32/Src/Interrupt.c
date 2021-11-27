@@ -23,7 +23,7 @@
 /* irq table for external interrupt */
 PRIVATE IRQ_Info irqInfoTable[MAX_INTR_NR];
 
-PRIVATE char *exceptionName[] = {
+PRIVATE char *ExceptionName[] = {
     "#DE Divide Error",
     "#DB Debug Exception",
     "NMI Interrupt",
@@ -82,7 +82,7 @@ PUBLIC void CPU_InitInterrupt(void)
     {
         irqInfoTable[i].handler = DefaultExceptionHandler;
         irqInfoTable[i].arg = NULL;
-        StrCopy(irqInfoTable[i].name, exceptionName[i]);
+        StrCopy(irqInfoTable[i].name, ExceptionName[i]);
     }
     /* external */
     for (i = EXTERNAL_BASE; i < EXTERNAL_BASE + MAX_EXTERNAL_NR; i++)

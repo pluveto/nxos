@@ -27,12 +27,12 @@ _start:
     jmp MultibootEntry
 
 .align 8
-multibootHeader:
+MultibootHeader:
     .long MULTIBOOT2_HEADER_MAGIC                  # magic number (multiboot 2)
     .long MULTIBOOT_ARCHITECTURE_I386              # architecture 0 (protected mode i386)
-    .long multibootHeaderEnd - multibootHeader  # header length
+    .long MultibootHeaderEnd - MultibootHeader  # header length
     # checksum
-    .long -(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT_ARCHITECTURE_I386 + (multibootHeaderEnd - multibootHeader))
+    .long -(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT_ARCHITECTURE_I386 + (MultibootHeaderEnd - MultibootHeader))
     # insert optional multiboot tags here
 
     # required end tag
@@ -40,7 +40,7 @@ multibootHeader:
     .short MULTIBOOT_HEADER_TAG_END # type
     .short 0                        # flags
     .long  8                        # Size
-multibootHeaderEnd:
+MultibootHeaderEnd:
 MultibootEntry:
     # initialize the bootStack pointer
     movl $(bootStack + BOOT_STACK_SIZE), %esp
