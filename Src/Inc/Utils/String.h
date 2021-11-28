@@ -18,6 +18,7 @@
 PUBLIC char *StrCopy(const char *dst, const char *src);
 PUBLIC char StrCmp(const char *a, const char *b);
 PUBLIC int StrLen(const char *str);
+PUBLIC char *StrCopyN(const char *dst, const char *src, Size len);
 
 int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args);
 

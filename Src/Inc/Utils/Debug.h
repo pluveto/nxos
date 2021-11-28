@@ -36,7 +36,7 @@ void AssertionFailure(char *exp, char *file, char *baseFile, int line);
  * OS Panic
  */
 #define PANIC(str) \
-        HAL_InterruptDisable(); \
+        IRQ_Disable(); \
         LOG_E("!PANIC!"); \
         SPIN(str)
 

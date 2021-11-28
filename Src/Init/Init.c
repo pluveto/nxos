@@ -37,20 +37,15 @@ PUBLIC void ExitCallInvoke(void)
     CallInvoke(__ExitCallStart, __ExitCallEnd);
 }
 
-#ifdef CONFIG_PLATFORM_THREAD
-WEAK_SYM void PlatformMain(void)
+INTERFACE WEAK_SYM void PlatformMain(void)
 {
     LOG_I("Deafult platform main running...\n");
 }
-#endif
 
 PRIVATE void CallsEntry(void *arg)
 {
     InitCallInvoke();
-
-#ifdef CONFIG_PLATFORM_THREAD
     PlatformMain();
-#endif
 }
 
 PUBLIC void CallsInit(void)

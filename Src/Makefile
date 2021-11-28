@@ -81,6 +81,7 @@ SRCDIRS		+=	Utils/
 SRCDIRS		+=	MM/
 SRCDIRS		+=	Tests/
 SRCDIRS		+=	Sched/
+SRCDIRS		+=	IO/
 
 #
 # XBuild variables

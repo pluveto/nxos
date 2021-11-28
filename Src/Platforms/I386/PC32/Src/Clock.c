@@ -14,6 +14,10 @@
 #include <XBook/HAL.h>
 #include <Interrupt.h>
 #include <Mods/Time/Clock.h>
+#include <IO/IRQ.h>
+
+#define LOG_NAME "Clock"
+#include <Utils/Log.h>
 
 /* PIT （Programmable Interval Timer）8253/8254 */
 
@@ -145,10 +149,17 @@ PUBLIC OS_Error HAL_InitClock(void)
     IO_Out8(PIT_COUNTER0, (U8) (COUNTER0_VALUE & 0xff));
     IO_Out8(PIT_COUNTER0, (U8) (COUNTER0_VALUE >> 8) & 0xff);
 
-    if (HAL_IRQInstall(IRQ_CLOCK, ClockHandler, NULL, "Clock") != OS_EOK)
+    OS_Error err = IRQ_Bind(IRQ_CLOCK, ClockHandler, NULL, "Clock", IRQ_FLAG_DISABLED);
+    if (err != OS_EOK)
     {
+        LOG_E("IRQ bind failed! %d", err);
         return OS_ERROR;
     }
-    HAL_IRQEnable(IRQ_CLOCK);
+    err = IRQ_Unmask(IRQ_CLOCK);
+    if (err != OS_EOK)
+    {
+        LOG_E("IRQ unmask failed! %d", err);
+        return OS_ERROR;
+    }
     return OS_EOK;
 }

@@ -13,12 +13,12 @@
 #include <XBook/HAL.h>
 #include <Regs.h>
 
-void HAL_InterruptDisable(void)
+void IRQ_Disable(void)
 {
     S_StatusWrite(S_StatusRead() & ~SSTATUS_SIE);
 }
 
-void HAL_InterruptEnable(void)
+void IRQ_Enable(void)
 {
     S_StatusWrite(S_StatusRead() | SSTATUS_SIE);
 }

@@ -36,7 +36,7 @@ PUBLIC void ClockTickGo(void)
     SystemClockTicks++;
     if ((SystemClockTicks % TICKS_PER_SECOND) == 0)
     {
-        // LOG_I("1s");
+        //LOG_I("1s");
     }
     TimerGo();
 

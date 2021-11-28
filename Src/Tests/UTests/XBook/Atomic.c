@@ -16,115 +16,115 @@
 
 TEST(AtomicSetAndGet)
 {
-    HAL_Atomic val;
-    HAL_AtomicSet(&val, 0);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0);
+    Atomic val;
+    AtomicSet(&val, 0);
+    EXPECT_EQ(AtomicGet(&val), 0);
     
-    HAL_AtomicSet(&val, 1);
-    EXPECT_EQ(HAL_AtomicGet(&val), 1);
+    AtomicSet(&val, 1);
+    EXPECT_EQ(AtomicGet(&val), 1);
 }
 
 TEST(AtomicAdd)
 {
-    HAL_Atomic val;
-    HAL_AtomicSet(&val, 0);
-    HAL_AtomicAdd(&val, 1);
-    EXPECT_EQ(HAL_AtomicGet(&val), 1);
-    HAL_AtomicAdd(&val, 3);
-    EXPECT_EQ(HAL_AtomicGet(&val), 4);
-    HAL_AtomicAdd(&val, 100);
-    EXPECT_EQ(HAL_AtomicGet(&val), 104);
+    Atomic val;
+    AtomicSet(&val, 0);
+    AtomicAdd(&val, 1);
+    EXPECT_EQ(AtomicGet(&val), 1);
+    AtomicAdd(&val, 3);
+    EXPECT_EQ(AtomicGet(&val), 4);
+    AtomicAdd(&val, 100);
+    EXPECT_EQ(AtomicGet(&val), 104);
 }
 
 TEST(AtomicSub)
 {
-    HAL_Atomic val;
-    HAL_AtomicSet(&val, 0);
-    HAL_AtomicSub(&val, 1);
-    EXPECT_EQ(HAL_AtomicGet(&val), -1);
-    HAL_AtomicSub(&val, 3);
-    EXPECT_EQ(HAL_AtomicGet(&val), -4);
-    HAL_AtomicSub(&val, 100);
-    EXPECT_EQ(HAL_AtomicGet(&val), -104);
+    Atomic val;
+    AtomicSet(&val, 0);
+    AtomicSub(&val, 1);
+    EXPECT_EQ(AtomicGet(&val), -1);
+    AtomicSub(&val, 3);
+    EXPECT_EQ(AtomicGet(&val), -4);
+    AtomicSub(&val, 100);
+    EXPECT_EQ(AtomicGet(&val), -104);
 }
 
 TEST(AtomicInc)
 {
-    HAL_Atomic val;
-    HAL_AtomicSet(&val, 0);
-    HAL_AtomicInc(&val);
-    EXPECT_EQ(HAL_AtomicGet(&val), 1);
-    HAL_AtomicInc(&val);
-    EXPECT_EQ(HAL_AtomicGet(&val), 2);
-    HAL_AtomicInc(&val);
-    EXPECT_EQ(HAL_AtomicGet(&val), 3);
+    Atomic val;
+    AtomicSet(&val, 0);
+    AtomicInc(&val);
+    EXPECT_EQ(AtomicGet(&val), 1);
+    AtomicInc(&val);
+    EXPECT_EQ(AtomicGet(&val), 2);
+    AtomicInc(&val);
+    EXPECT_EQ(AtomicGet(&val), 3);
 }
 
 TEST(AtomicDec)
 {
-    HAL_Atomic val;
-    HAL_AtomicSet(&val, 0);
-    HAL_AtomicDec(&val);
-    EXPECT_EQ(HAL_AtomicGet(&val), -1);
-    HAL_AtomicDec(&val);
-    EXPECT_EQ(HAL_AtomicGet(&val), -2);
-    HAL_AtomicDec(&val);
-    EXPECT_EQ(HAL_AtomicGet(&val), -3);
+    Atomic val;
+    AtomicSet(&val, 0);
+    AtomicDec(&val);
+    EXPECT_EQ(AtomicGet(&val), -1);
+    AtomicDec(&val);
+    EXPECT_EQ(AtomicGet(&val), -2);
+    AtomicDec(&val);
+    EXPECT_EQ(AtomicGet(&val), -3);
 }
 
 TEST(AtomicSetMask)
 {
-    HAL_Atomic val;
-    HAL_AtomicSet(&val, 0);
-    HAL_AtomicSetMask(&val, 0x01);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0x01);
-    HAL_AtomicSetMask(&val, 0x02);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0x03);
-    HAL_AtomicSetMask(&val, 0x10);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0x13);
+    Atomic val;
+    AtomicSet(&val, 0);
+    AtomicSetMask(&val, 0x01);
+    EXPECT_EQ(AtomicGet(&val), 0x01);
+    AtomicSetMask(&val, 0x02);
+    EXPECT_EQ(AtomicGet(&val), 0x03);
+    AtomicSetMask(&val, 0x10);
+    EXPECT_EQ(AtomicGet(&val), 0x13);
 }
 
 TEST(AtomicClearMask)
 {
-    HAL_Atomic val;
-    HAL_AtomicSet(&val, 0xffffff);
-    HAL_AtomicClearMask(&val, 0x01);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0xfffffe);
-    HAL_AtomicClearMask(&val, 0x02);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0xfffffc);
-    HAL_AtomicClearMask(&val, 0x10);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0xffffec);
+    Atomic val;
+    AtomicSet(&val, 0xffffff);
+    AtomicClearMask(&val, 0x01);
+    EXPECT_EQ(AtomicGet(&val), 0xfffffe);
+    AtomicClearMask(&val, 0x02);
+    EXPECT_EQ(AtomicGet(&val), 0xfffffc);
+    AtomicClearMask(&val, 0x10);
+    EXPECT_EQ(AtomicGet(&val), 0xffffec);
 }
 
 TEST(AtomicSwap)
 {
-    HAL_Atomic val;
-    HAL_AtomicSet(&val, 0);
-    EXPECT_EQ(HAL_AtomicSwap(&val, 1), 0);
-    EXPECT_EQ(HAL_AtomicGet(&val), 1);
+    Atomic val;
+    AtomicSet(&val, 0);
+    EXPECT_EQ(AtomicSwap(&val, 1), 0);
+    EXPECT_EQ(AtomicGet(&val), 1);
 
-    EXPECT_EQ(HAL_AtomicSwap(&val, 0x5a5a5a5a), 1);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0x5a5a5a5a);
+    EXPECT_EQ(AtomicSwap(&val, 0x5a5a5a5a), 1);
+    EXPECT_EQ(AtomicGet(&val), 0x5a5a5a5a);
 }
 
 TEST(AtomicCAS)
 {
-    HAL_Atomic val;
-    HAL_AtomicSet(&val, 0);
-    EXPECT_EQ(HAL_AtomicCAS(&val, 0, 1), 0);
-    EXPECT_EQ(HAL_AtomicGet(&val), 1);
+    Atomic val;
+    AtomicSet(&val, 0);
+    EXPECT_EQ(AtomicCAS(&val, 0, 1), 0);
+    EXPECT_EQ(AtomicGet(&val), 1);
 
-    EXPECT_EQ(HAL_AtomicCAS(&val, 1, 0x5a5a5a5a), 1);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0x5a5a5a5a);
+    EXPECT_EQ(AtomicCAS(&val, 1, 0x5a5a5a5a), 1);
+    EXPECT_EQ(AtomicGet(&val), 0x5a5a5a5a);
 
-    EXPECT_EQ(HAL_AtomicCAS(&val, 1, 0xfafafa), 0x5a5a5a5a);
-    EXPECT_NE(HAL_AtomicGet(&val), 0xfafafa);
+    EXPECT_EQ(AtomicCAS(&val, 1, 0xfafafa), 0x5a5a5a5a);
+    EXPECT_NE(AtomicGet(&val), 0xfafafa);
 
-    EXPECT_EQ(HAL_AtomicCAS(&val, 0x5a5a5a5a, 0xfafafa), 0x5a5a5a5a);
-    EXPECT_EQ(HAL_AtomicGet(&val), 0xfafafa);
+    EXPECT_EQ(AtomicCAS(&val, 0x5a5a5a5a, 0xfafafa), 0x5a5a5a5a);
+    EXPECT_EQ(AtomicGet(&val), 0xfafafa);
     
-    EXPECT_NE(HAL_AtomicCAS(&val, 0, 1), 0);
-    EXPECT_NE(HAL_AtomicGet(&val), 0);
+    EXPECT_NE(AtomicCAS(&val, 0, 1), 0);
+    EXPECT_NE(AtomicGet(&val), 0);
 }
 
 TEST_TABLE(Atomic)

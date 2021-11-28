@@ -13,55 +13,55 @@
 
 #define LOCK_PREFIX "lock "
 
-INTERFACE void HAL_AtomicSet(HAL_Atomic *atomic, int value)
+PRIVATE void HAL_AtomicSet(Atomic *atomic, int value)
 {
     atomic->value = value;
 }
 
-INTERFACE int HAL_AtomicGet(HAL_Atomic *atomic)
+PRIVATE int HAL_AtomicGet(Atomic *atomic)
 {
     return atomic->value;
 }
 
-INTERFACE void HAL_AtomicAdd(HAL_Atomic *atomic, int value)
+PRIVATE void HAL_AtomicAdd(Atomic *atomic, int value)
 {
     CASM(LOCK_PREFIX "addl %1,%0"   
          : "+m" (atomic->value)   
          : "ir" (value));
 }
 
-INTERFACE void HAL_AtomicSub(HAL_Atomic *atomic, int value)
+PRIVATE void HAL_AtomicSub(Atomic *atomic, int value)
 {
     CASM(LOCK_PREFIX "subl %1,%0"   
          : "+m" (atomic->value)   
          : "ir" (value));
 }
 
-INTERFACE void HAL_AtomicInc(HAL_Atomic *atomic)
+PRIVATE void HAL_AtomicInc(Atomic *atomic)
 {
     CASM(LOCK_PREFIX "incl %0"   
          : "+m" (atomic->value));
 }
 
-INTERFACE void HAL_AtomicDec(HAL_Atomic *atomic)
+PRIVATE void HAL_AtomicDec(Atomic *atomic)
 {
     CASM(LOCK_PREFIX "decl %0"   
          : "+m" (atomic->value));   
 }
 
-INTERFACE void HAL_AtomicSetMask(HAL_Atomic *atomic, int mask)
+PRIVATE void HAL_AtomicSetMask(Atomic *atomic, int mask)
 {
     CASM(LOCK_PREFIX "orl %0,%1"
         : : "r" (mask), "m" (*(&atomic->value)) : "memory");
 }
 
-INTERFACE void HAL_AtomicClearMask(HAL_Atomic *atomic, int mask)
+PRIVATE void HAL_AtomicClearMask(Atomic *atomic, int mask)
 {    
     CASM(LOCK_PREFIX "andl %0,%1"
          : : "r" (~(mask)), "m" (*(&atomic->value)) : "memory");
 }
 
-INTERFACE int HAL_AtomicSwap(HAL_Atomic *atomic, int newValue)
+PRIVATE int HAL_AtomicSwap(Atomic *atomic, int newValue)
 {
     CASM("xchgl %k0,%1"   
          : "=r" (newValue)
@@ -70,7 +70,7 @@ INTERFACE int HAL_AtomicSwap(HAL_Atomic *atomic, int newValue)
     return newValue;
 }
 
-INTERFACE int HAL_AtomicCAS(HAL_Atomic *atomic, int old, int newValue)
+PRIVATE int HAL_AtomicCAS(Atomic *atomic, int old, int newValue)
 {
     int prev;
     CASM(LOCK_PREFIX "cmpxchgl %k1,%2"   
@@ -79,3 +79,17 @@ INTERFACE int HAL_AtomicCAS(HAL_Atomic *atomic, int old, int newValue)
          : "memory");
     return prev;
 }
+
+INTERFACE struct AtomicOps AtomicOpsInterface = 
+{
+    .set        = HAL_AtomicSet,
+    .get        = HAL_AtomicGet,
+    .add        = HAL_AtomicAdd,
+    .sub        = HAL_AtomicSub,
+    .inc        = HAL_AtomicInc,
+    .dec        = HAL_AtomicDec,
+    .setMask    = HAL_AtomicSetMask,
+    .clearMask  = HAL_AtomicClearMask,
+    .swap       = HAL_AtomicSwap,
+    .cas        = HAL_AtomicCAS,
+};

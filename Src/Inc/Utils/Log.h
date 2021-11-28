@@ -41,6 +41,7 @@
 #ifdef LOG_ENABLE
 #include <Mods/Console/Console.h>
 #include <Mods/Time/Clock.h>
+#include <IO/IRQ.h>
 
 #ifdef LOG_LEVEL
 #ifndef LOG_MOD_LEVEL
@@ -85,12 +86,12 @@
 #define LOG_LINE(logName, color, ...) \
     do \
     { \
-        Uint _level = HAL_InterruptSaveLevel(); \
+        Uint _level = IRQ_SaveLevel(); \
         LOG_TIMELINE \
         __LOG_BEGIN(logName, color); \
         Printf(__VA_ARGS__); \
         __LOG_END; \
-        HAL_InterruptRestoreLevel(_level); \
+        IRQ_RestoreLevel(_level); \
     } \
     while (0)
 #define __LOG_RAW(...) LOG_TIMELINE \

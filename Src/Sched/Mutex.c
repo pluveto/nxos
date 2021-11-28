@@ -13,6 +13,7 @@
 #include <XBook/HAL.h>
 #include <Sched/Sched.h>
 #include <Sched/Thread.h>
+#include <IO/IRQ.h>
 
 #define MUTEX_MAGIC 0x10000002
 
@@ -43,18 +44,18 @@ PUBLIC OS_Error MutexLock(Mutex *mutex, Bool forever)
     do
     {
         /* disable interrupt for locking per cpu */
-        Uint level = HAL_InterruptSaveLevel();
+        Uint level = IRQ_SaveLevel();
 
         /* spin lock for mutex */
         if (SpinLock(&mutex->lock, FALSE) == OS_EOK)
         {
-            HAL_InterruptRestoreLevel(level);
+            IRQ_RestoreLevel(level);
             break;
         }
         else
         {
             /* restore interrupt for unlocking per cpu */
-            HAL_InterruptRestoreLevel(level);
+            IRQ_RestoreLevel(level);
 
             /* checkout timeout */
             if (forever == FALSE)

@@ -11,6 +11,7 @@
 
 #include <Sched/Spin.h>
 #include <XBook/HAL.h>
+#include <IO/IRQ.h>
 
 PUBLIC OS_Error SpinInit(Spin *lock)
 {
@@ -23,7 +24,7 @@ PUBLIC OS_Error SpinInit(Spin *lock)
         return OS_EFAULT;
     }
 
-    HAL_AtomicSet(&lock->value, 0);
+    AtomicSet(&lock->value, 0);
     lock->magic = SPIN_MAGIC;
     return OS_EOK;
 }
@@ -37,7 +38,7 @@ PUBLIC OS_Error SpinLock(Spin *lock, Bool forever)
 
     do
     {
-        if (HAL_AtomicCAS(&lock->value, 0, SPIN_LOCK_VALUE) == 0)
+        if (AtomicCAS(&lock->value, 0, SPIN_LOCK_VALUE) == 0)
         {
             break;
         }
@@ -56,7 +57,7 @@ PUBLIC OS_Error SpinUnlock(Spin *lock)
     {
         return OS_EFAULT;
     }
-    HAL_AtomicSet(&lock->value, 0);
+    AtomicSet(&lock->value, 0);
     return OS_EOK;
 }
 
@@ -66,7 +67,7 @@ PUBLIC OS_Error SpinLockIRQ(Spin *lock, Uint *level)
     {
         return OS_EINVAL;
     }
-    *level = HAL_InterruptSaveLevel();
+    *level = IRQ_SaveLevel();
     return SpinLock(lock, TRUE);
 }
 
@@ -80,6 +81,6 @@ PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, Uint level)
     {
         return OS_EFAULT;
     }
-    HAL_InterruptRestoreLevel(level);
+    IRQ_RestoreLevel(level);
     return OS_EOK;
 }

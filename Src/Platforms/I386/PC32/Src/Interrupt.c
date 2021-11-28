@@ -15,13 +15,11 @@
 #include <Utils/Memory.h>
 #include <XBook/HAL.h>
 #include <PIC.h>
+#include <IO/IRQ.h>
 
 #define LOG_LEVEL LOG_DBG
 #define LOG_NAME "Interrupt"
 #include <Utils/Log.h>
-
-/* irq table for external interrupt */
-PRIVATE IRQ_Info irqInfoTable[MAX_INTR_NR];
 
 PRIVATE char *ExceptionName[] = {
     "#DE Divide Error",
@@ -58,39 +56,8 @@ PRIVATE char *ExceptionName[] = {
     "Reserved",
 };
 
-PRIVATE OS_Error DefaultExceptionHandler(U32 irq, void *arg)
-{
-    char *name = irqInfoTable[irq].name;
-    LOG_E("Exception: vector/0x%x Name: %s handled!", irq, name);
-
-    while (1);
-    return OS_EOK;
-}
-
-PRIVATE OS_Error DefaultExternalHandler(U32 irq, void *arg)
-{
-    char *name = irqInfoTable[irq].name;
-    LOG_I("External: vector/0x%x Name: %s handled!", irq, name);
-    return OS_EOK;
-}
-
 PUBLIC void CPU_InitInterrupt(void)
 {
-    int i;
-    /* exceptions */
-    for (i = 0; i < EXTERNAL_BASE; i++)
-    {
-        irqInfoTable[i].handler = DefaultExceptionHandler;
-        irqInfoTable[i].arg = NULL;
-        StrCopy(irqInfoTable[i].name, ExceptionName[i]);
-    }
-    /* external */
-    for (i = EXTERNAL_BASE; i < EXTERNAL_BASE + MAX_EXTERNAL_NR; i++)
-    {
-        irqInfoTable[i].handler = DefaultExternalHandler;
-        irqInfoTable[i].arg = NULL;
-        StrCopy(irqInfoTable[i].name, "external");
-    }
     PIC_Init();
 }
 
@@ -98,43 +65,20 @@ PUBLIC void InterruptDispatch(void *stackFrame)
 {
     HAL_TrapFrame *frame = (HAL_TrapFrame *) stackFrame;
     U32 vector = frame->vectorNumber;
-    void *arg;
-    IRQ_Handler handler;
 
-    if (vector < EXCEPTION_BASE || vector >= MAX_INTR_NR)
-    {
-        LOG_E("unknown intr vector %x", vector);
-        return;
-    }
     /* call handler with different vector */
     if (vector >= EXCEPTION_BASE && vector < EXCEPTION_BASE + MAX_EXCEPTION_NR)
     {
         /* exception */
-        handler = irqInfoTable[vector].handler;
-        arg = frame;    /* arg is frame */
-        if (handler != NULL)
-        {
-            if (handler(vector, arg) != OS_EOK)
-            {
-                DefaultExceptionHandler(vector, arg);
-            }
-        }
+        LOG_E("unhandled exception vector %x/%s", vector, ExceptionName[vector]);
+        while (1);
     }
-    else if (vector >= EXTERNAL_BASE && vector < EXTERNAL_BASE + MAX_EXTERNAL_NR)
+    else if (vector >= EXTERNAL_BASE && vector < EXTERNAL_BASE + NR_IRQS)
     {
-        /* external */
-        handler = irqInfoTable[vector].handler;
-        arg = irqInfoTable[vector].arg;
-        if (handler != NULL)
-        {
-            handler(vector, arg);
-            if (HAL_IRQAck(vector) != OS_EOK)
-            {
-                LOG_E("IRQ %d ack failed!", vector);
-            }
-        }
+        IRQ_Handle(vector - EXTERNAL_BASE);
+        return;
     }
-    else if (vector >= SYSCALL_BASE && vector < SYSCALL_BASE + MAX_SYSCALL_NR)
+    else if (vector == SYSCALL_BASE)
     {
         /* syscall */
     }
@@ -145,78 +89,67 @@ PUBLIC void InterruptDispatch(void *stackFrame)
     }
 }
 
-INTERFACE OS_Error HAL_IRQInstall(IRQ_Number irqno, IRQ_Handler handler, void *arg, char *name)
+
+PRIVATE OS_Error HAL_IrqUnmask(IRQ_Number irqno)
 {
-    if (irqno < EXCEPTION_BASE || irqno >= MAX_INTR_NR)
+    if (irqno < 0 || irqno >= NR_IRQS)
     {
         return OS_EINVAL;
     }
-    irqInfoTable[irqno].handler = handler;
-    irqInfoTable[irqno].arg = arg;
-    Zero(irqInfoTable[irqno].name, IRQ_NAME_LEN);
-    StrCopy(irqInfoTable[irqno].name, name);
+
+    PIC_Enable(irqno);
     return OS_EOK;
 }
 
-INTERFACE OS_Error HAL_IRQUnInstall(IRQ_Number irqno)
+PRIVATE OS_Error HAL_IrqMask(IRQ_Number irqno)
 {
-    if (irqno < EXCEPTION_BASE || irqno >= MAX_INTR_NR)
+    if (irqno < 0 || irqno >= NR_IRQS)
     {
         return OS_EINVAL;
     }
-    irqInfoTable[irqno].handler = NULL;
-    irqInfoTable[irqno].arg = NULL;
+    PIC_Disable(irqno);
     return OS_EOK;
 }
 
-INTERFACE OS_Error HAL_IRQEnable(IRQ_Number irqno)
+PRIVATE OS_Error HAL_IrqAck(IRQ_Number irqno)
 {
-    if (irqno < EXTERNAL_BASE || irqno >= EXTERNAL_BASE + MAX_EXTERNAL_NR)
+    if (irqno < 0 || irqno >= NR_IRQS)
     {
         return OS_EINVAL;
     }
-    PIC_Enable(irqno - EXTERNAL_BASE);
+    PIC_Ack(irqno);
     return OS_EOK;
 }
 
-INTERFACE OS_Error HAL_IRQDisable(IRQ_Number irqno)
-{
-    if (irqno < EXTERNAL_BASE || irqno >= EXTERNAL_BASE + MAX_EXTERNAL_NR)
-    {
-        return OS_EINVAL;
-    }
-    PIC_Disable(irqno - EXTERNAL_BASE);
-    return OS_EOK;
-}
-
-INTERFACE OS_Error HAL_IRQAck(IRQ_Number irqno)
-{
-    if (irqno < EXTERNAL_BASE || irqno >= EXTERNAL_BASE + MAX_EXTERNAL_NR)
-    {
-        return OS_EINVAL;
-    }
-    PIC_Ack(irqno - EXTERNAL_BASE);
-    return OS_EOK;
-}
-
-INTERFACE void HAL_InterruptEnable(void)
+PRIVATE void HAL_IrqEnable(void)
 {
     CASM("sti");
 }
 
-INTERFACE void HAL_InterruptDisable(void)
+PRIVATE void HAL_IrqDisable(void)
 {
     CASM("cli");
 }
 
-INTERFACE Uint HAL_InterruptSaveLevel(void)
+PRIVATE Uint HAL_IrqSaveLevel(void)
 {
     Uint level = 0;
     CASM("pushfl; popl %0; cli":"=g" (level): :"memory");
     return level;
 }
 
-INTERFACE void HAL_InterruptRestoreLevel(Uint level)
+PRIVATE void HAL_IrqRestoreLevel(Uint level)
 {
     CASM("pushl %0; popfl": :"g" (level):"memory", "cc");
 }
+
+INTERFACE IRQ_Controller IRQ_ControllerInterface = 
+{
+    .unmask = HAL_IrqUnmask,
+    .mask = HAL_IrqMask,
+    .ack = HAL_IrqAck,
+    .enable = HAL_IrqEnable,
+    .disable = HAL_IrqDisable,
+    .saveLevel = HAL_IrqSaveLevel,
+    .restoreLevel = HAL_IrqRestoreLevel,
+};

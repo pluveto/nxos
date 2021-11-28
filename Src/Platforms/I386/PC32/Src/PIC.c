@@ -12,6 +12,7 @@
 #include <IO.h>
 #include <PIC.h>
 #include <Interrupt.h>
+#include <IO/IRQ.h>
 
 PUBLIC void PIC_Init(void)
 {
@@ -40,7 +41,7 @@ PUBLIC void PIC_Enable(U32 irq)
         IO_Out8(PIC_MASTER_CTLMASK, IO_In8(PIC_MASTER_CTLMASK) & ~(1 << irq));
     } else {
         /* clear irq 2 first, then clear slave */
-        IO_Out8(PIC_MASTER_CTLMASK, IO_In8(PIC_MASTER_CTLMASK) & ~(1 << (IRQ_CONNECT - EXTERNAL_BASE)));    
+        IO_Out8(PIC_MASTER_CTLMASK, IO_In8(PIC_MASTER_CTLMASK) & ~(1 << (IRQ_CONNECT)));    
         IO_Out8(PIC_SLAVE_CTLMASK, IO_In8(PIC_SLAVE_CTLMASK) & ~ (1 << (irq - 8)));
     }
 }

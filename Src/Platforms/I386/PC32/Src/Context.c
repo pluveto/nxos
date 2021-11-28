@@ -19,7 +19,7 @@
  */
 PRIVATE void ThreadEntry(HAL_ThreadHandler handler, void *arg, void (*texit)())
 {
-    HAL_InterruptEnable();
+    IRQ_Enable();
     handler(arg);
     if (texit)
         texit();

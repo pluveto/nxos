@@ -132,19 +132,19 @@ PUBLIC OS_Error TimerStart(Timer *timer)
         return OS_EINVAL;
     }
     
-    Uint level = HAL_InterruptSaveLevel();
+    Uint level = IRQ_SaveLevel();
 
     /* timeout is invalid */
     if (IDLE_TIMER_TIMEOUT_TICKS - timer->timeTicks < TimerTicks)
     {
-        HAL_InterruptRestoreLevel(level);
+        IRQ_RestoreLevel(level);
         return OS_EINVAL;
     }
 
     /* make sure not on the list */
     if (ListFind(&timer->list, &TimerListHead))
     {
-        HAL_InterruptRestoreLevel(level);
+        IRQ_RestoreLevel(level);
         return OS_EAGAIN;
     }
     
@@ -180,7 +180,7 @@ PUBLIC OS_Error TimerStart(Timer *timer)
         }
     }
 
-    HAL_InterruptRestoreLevel(level);
+    IRQ_RestoreLevel(level);
     return OS_EOK;
 }
 
@@ -194,14 +194,14 @@ PUBLIC OS_Error TimerStop(Timer *timer)
         return OS_EINVAL;
     }
 
-    Uint level = HAL_InterruptSaveLevel();
+    Uint level = IRQ_SaveLevel();
     
     TimerState state = timer->state;
 
     /* stop must when state is waiting or processing */
     if (state != TIMER_PROCESSING && state != TIMER_WAITING)
     {    
-        HAL_InterruptRestoreLevel(level);
+        IRQ_RestoreLevel(level);
         return OS_EAGAIN;
     }
 
@@ -213,7 +213,7 @@ PUBLIC OS_Error TimerStop(Timer *timer)
         TimerRemove(timer, TRUE, FALSE);
     }
 
-    HAL_InterruptRestoreLevel(level);
+    IRQ_RestoreLevel(level);
     return OS_EOK;
 }
 
@@ -259,7 +259,7 @@ PUBLIC void TimerGo(void)
         return;
     }
 
-    Uint level = HAL_InterruptSaveLevel();
+    Uint level = IRQ_SaveLevel();
     
     ListForEachEntrySafe(timer, next, &TimerListHead, list)
     {
@@ -280,7 +280,7 @@ PUBLIC void TimerGo(void)
         }
     }
     NextTimeoutTicks = timer->timeout;
-    HAL_InterruptRestoreLevel(level);
+    IRQ_RestoreLevel(level);
 }
 
 /**

@@ -16,15 +16,17 @@
 
 enum OS_Error
 {
-    OS_EOK = 0,
-    OS_ERROR,
-    OS_EPERM,
-    OS_EINVAL,
-    OS_ETIMEOUT,
-    OS_EFAULT,
-    OS_ENORES,
-    OS_EAGAIN,
-    OS_EINTR,
+    OS_EOK = 0, /* ok */
+    OS_ERROR,   /* error */
+    OS_EPERM,   /* no perimisson */
+    OS_EINVAL,  /* invalid arg */
+    OS_ETIMEOUT,/* timeout */
+    OS_EFAULT,  /* execute fault */
+    OS_ENORES,  /* no resource */
+    OS_EAGAIN,  /* try again later */
+    OS_EINTR,   /* interrupt */
+    OS_ENOMEM,  /* no memory */
+    OS_ENOFUNC, /* no function */
     OS_ERROR_NR
 };
 typedef enum OS_Error OS_Error;

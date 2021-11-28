@@ -20,7 +20,7 @@
 
 struct Spin
 {
-    HAL_Atomic value;
+    Atomic value;
     U32 magic;  /* magic for spin init */
 };
 typedef struct Spin Spin;

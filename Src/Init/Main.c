@@ -19,6 +19,7 @@
 #include <Sched/Sched.h>
 #include <MM/HeapCache.h>
 #include <MM/PageHeap.h>
+#include <IO/IRQ.h>
 #include <Mods/Time/Timer.h>
 
 PUBLIC int OS_Main(void)
@@ -29,6 +30,9 @@ PUBLIC int OS_Main(void)
         PANIC("Platfrom init failed!" Endln);
     }
     LOG_I("Hello, NXOS!");
+
+    /* init irq */
+    IRQ_Init();
 
     /* init page heap */
     PageHeapInit();
@@ -45,6 +49,12 @@ PUBLIC int OS_Main(void)
     /* init auto calls */
     CallsInit();
     
+    /* platform stage2 call */
+    if (PlatformStage2() != OS_EOK)
+    {
+        PANIC("Platform stage2 failed!");
+    }
+
     /* start sched */
     SchedToFirstThread();
     PANIC("should never be here!");

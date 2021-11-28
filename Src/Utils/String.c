@@ -26,6 +26,20 @@ PUBLIC char *StrCopy(const char *dst, const char *src)
     return (char *)dst;
 }
 
+PUBLIC char *StrCopyN(const char *dst, const char *src, Size len)
+{
+    if (dst == NULL || src == NULL || !len)
+    {
+        LOG_D("NULL arg: %s", __func__);
+        return NULL;
+    }
+    char *dstPtr = (char *) dst;
+    while ((*dstPtr++ = *src++) && len-- > 0)
+    {
+    }
+    return (char *)dst;
+}
+
 PUBLIC char StrCmp(const char *a, const char *b)
 {
     if (a == NULL || b == NULL)
