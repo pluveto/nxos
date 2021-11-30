@@ -12,11 +12,12 @@
 #ifndef __DIRECT_UART_HEADER__
 #define __DIRECT_UART_HEADER__
 
-#include <XBook/Defines.h>
+#include <XBook.h>
 
 /* direct means not use driver framework */
 
 PUBLIC void HAL_DirectUartInit(void);
 PUBLIC void HAL_DirectUartPutc(char ch);
+PUBLIC void HAL_DirectUartStage2(void);
 
 #endif /* __DIRECT_UART_HEADER__ */

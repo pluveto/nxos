@@ -53,5 +53,7 @@ INTERFACE OS_Error PlatformStage2(void)
         LOG_E("Init clock failed!");
         return OS_ERROR;
     }
+    HAL_DirectUartStage2();
+    
     return OS_EOK;
 }
