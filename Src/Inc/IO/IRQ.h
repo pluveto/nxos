@@ -28,7 +28,7 @@
 #define NR_IRQS CONFIG_NR_IRQS
 #endif
 
-#define IRQ_FLAG_DISABLED   0x01    /* handle irq with interrupt disabled */
+#define IRQ_FLAG_REENTER    0x01    /* handle irq allow reenter */
 #define IRQ_FLAG_SHARED     0x02    /* irq was shared by more device */
 
 typedef U32 IRQ_Number;

@@ -57,4 +57,6 @@ INLINE OS_Error ClockTickDelayMillisecond(TimeVal milliseconds)
     return ClockTickDelay(MillisecondToClockTick(milliseconds));
 }
 
+PUBLIC OS_Error ClockInit(void);
+
 #endif  /* __MODS_TIME_CLOCK__ */

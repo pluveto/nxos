@@ -46,6 +46,11 @@ PUBLIC int OS_Main(void)
     /* init thread */
     ThreadsInit();
     
+    if (ClockInit() != OS_EOK)
+    {
+        PANIC("Clock init failed!" Endln);
+    }
+    
     /* init auto calls */
     CallsInit();
     

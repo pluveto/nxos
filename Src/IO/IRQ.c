@@ -10,6 +10,7 @@
  */
 
 #include <IO/IRQ.h>
+#include <IO/DelayIRQ.h>
 #include <Utils/Memory.h>
 #include <Utils/String.h>
 #include <XBook/HAL.h>
@@ -29,6 +30,7 @@ PUBLIC void IRQ_Init(void)
         AtomicSet(&irq->reference, 0);
         ListInit(&irq->actionList);
     }
+    IRQ_DelayQueueInit();
 }
 
 PRIVATE IRQ_Node *IRQ_NodeGet(IRQ_Number irq)

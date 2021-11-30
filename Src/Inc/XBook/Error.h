@@ -27,6 +27,7 @@ enum OS_Error
     OS_EINTR,   /* interrupt */
     OS_ENOMEM,  /* no memory */
     OS_ENOFUNC, /* no function */
+    OS_ENOSRCH, /* no search/found */
     OS_ERROR_NR
 };
 typedef enum OS_Error OS_Error;

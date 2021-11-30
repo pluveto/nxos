@@ -15,6 +15,7 @@
 #include <Interrupt.h>
 #include <Mods/Time/Clock.h>
 #include <IO/IRQ.h>
+#include <IO/DelayIRQ.h>
 
 #define LOG_NAME "Clock"
 #include <Utils/Log.h>
@@ -138,7 +139,6 @@ enum ctrl_mode_bits
 PRIVATE OS_Error ClockHandler(U32 irq, void *arg)
 {
     ClockTickGo();
-    
     return OS_EOK;
 }
 
@@ -149,7 +149,7 @@ PUBLIC OS_Error HAL_InitClock(void)
     IO_Out8(PIT_COUNTER0, (U8) (COUNTER0_VALUE & 0xff));
     IO_Out8(PIT_COUNTER0, (U8) (COUNTER0_VALUE >> 8) & 0xff);
 
-    OS_Error err = IRQ_Bind(IRQ_CLOCK, ClockHandler, NULL, "Clock", IRQ_FLAG_DISABLED);
+    OS_Error err = IRQ_Bind(IRQ_CLOCK, ClockHandler, NULL, "Clock", 0);
     if (err != OS_EOK)
     {
         LOG_E("IRQ bind failed! %d", err);

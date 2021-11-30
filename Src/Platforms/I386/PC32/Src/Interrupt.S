@@ -13,6 +13,7 @@
 
 .extern InterruptDispatch
 .extern ReSchedCheck
+.extern IRQ_DelayQueueCheck
 
 /* cpu no error code, need push by hand */
 .macro CPU_TrapEntryNoErrCode p1
@@ -151,8 +152,12 @@ SyscallExit:
 .global InterruptExit
 InterruptExit:
 
+    /* do exit check */
+    call IRQ_DelayQueueCheck
+    
+    /* check sched (Open interrupt) */
     sti
-    call ReSchedCheck   /* check sched */
+    call ReSchedCheck
     cli
 
     /* do interrupt stack restore  */
