@@ -34,7 +34,7 @@ struct AtomicOps
     int (*cas)(Atomic *atomic, int old, int newValue);
 };
 
-INTERFACE struct AtomicOps AtomicOpsInterface;
+INTERFACE IMPORT struct AtomicOps AtomicOpsInterface;
 
 #define AtomicSet(atomic, value)    AtomicOpsInterface.set(atomic, value)
 #define AtomicGet(atomic)           AtomicOpsInterface.get(atomic)

@@ -37,7 +37,7 @@ QEMU_ARGS 	:=  -m 128m \
 
 # cpus
 ifndef CPUS
-CPUS := 2
+CPUS := 1
 endif # CPUS
 
 QEMU_ARGS	+= 	-machine virt

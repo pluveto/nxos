@@ -5,12 +5,20 @@ Next XBook Operating System (NXOS)
 | ARCH    | MACH       |
 | ------- | ---------- |
 | I386    | PC32       |
-| Amd64   | PC64       |
+| Amd64   | PC64       | 
 | Riscv64 | Qemu, K210 |
 | Arm64   | Qemu       |
 | Arm32   | Qemu       |
 
-
+平台快捷方式
+```sh
+PLATFORM=I386-PC32
+PLATFORM=Amd64-PC64
+PLATFORM=Riscv64-Qemu
+PLATFORM=Riscv64-K210
+PLATFORM=Arm64-Qemu
+PLATFORM=Arm32-Qemu
+```
 
 子文档：
 

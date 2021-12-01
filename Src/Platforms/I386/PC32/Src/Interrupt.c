@@ -89,7 +89,6 @@ PUBLIC void InterruptDispatch(void *stackFrame)
     }
 }
 
-
 PRIVATE OS_Error HAL_IrqUnmask(IRQ_Number irqno)
 {
     if (irqno < 0 || irqno >= NR_IRQS)

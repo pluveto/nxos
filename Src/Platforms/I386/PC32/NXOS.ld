@@ -13,10 +13,12 @@ OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
 OUTPUT_ARCH(i386)
 ENTRY(Start)
 
+BASE_ADDRESS = 0x00100000; /* GRUB2 need kernel here */
+
 SECTIONS {
     /* Load the kernel at this address: "." means the current address */
     
-    . = 0x00100000; /* GRUB2 need kernel here */
+    . = BASE_ADDRESS;
 
     /* code segment */
     . = ALIGN(4);

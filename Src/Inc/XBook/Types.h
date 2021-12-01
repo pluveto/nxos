@@ -38,7 +38,7 @@ typedef unsigned long       Addr;
 typedef unsigned long       Size;
 typedef signed long         SSize;
 
-typedef int PtrDiff;
+typedef long PtrDiff;
 
 enum Bool
 {

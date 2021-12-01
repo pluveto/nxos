@@ -15,8 +15,18 @@
 #define LOG_NAME "INIT"
 #include <Utils/Debug.h>
 
+PUBLIC void ClearBSS(void);
+
 INTERFACE OS_Error PlatformInit(void)
 {
+    ClearBSS();
     LOG_I("Hello, QEMU Riscv64!");
-    return 0;
+
+    return OS_ERROR;
+}
+
+INTERFACE OS_Error PlatformStage2(void)
+{
+    
+    return OS_EOK;
 }

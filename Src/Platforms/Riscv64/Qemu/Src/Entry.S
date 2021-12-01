@@ -9,7 +9,7 @@
  * 2021-10-1      JasonHu           Init
  */
 
-    .section .text.entry
+    .section .text.start
     .extern OS_Main
     .global bootStack
     .global _Start

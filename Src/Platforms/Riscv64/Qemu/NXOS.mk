@@ -12,7 +12,7 @@
 #
 # Override default variables.
 #
-CFLAGS		+= -fno-omit-frame-pointer -MD -ffreestanding -fno-common -mno-relax
+CFLAGS		+= -fno-stack-protector -mno-relax
 ASFLAGS		+= -ffunction-sections -fdata-sections -ffreestanding 
 MCFLAGS		+= -march=rv64imafdc -mabi=lp64d -mcmodel=medany
 LDFLAGS 	+= -no-pie -nostartfile -n 

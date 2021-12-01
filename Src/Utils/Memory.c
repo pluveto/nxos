@@ -22,6 +22,20 @@ PUBLIC void *Set(void *dst, U8 value, Size sz)
 	return dst;
 }
 
+/**
+ * memset for compiler
+ */
+PUBLIC void *memset(void *dst, U8 value, Size sz)
+{
+    U8 *dstPtr = (U8 *)dst;
+	while (sz > 0)
+    {
+		*dstPtr++ = value;
+		--sz;
+	}
+	return dst;
+}
+
 PUBLIC void Copy(void *dst, void *src, Size sz)
 {
     U8 *dstPtr = (U8 *)dst;

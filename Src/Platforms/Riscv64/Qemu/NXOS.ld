@@ -7,6 +7,7 @@
  * Change Logs:
  * Date           Author            Notes
  * 2021-10-1      JasonHu           Init
+ * 2021-12-1      JasonHu           Update symbol
  */
 
 OUTPUT_FORMAT("elf64-littleriscv", "elf64-littleriscv", "elf64-littleriscv")
@@ -20,49 +21,69 @@ SECTIONS
     /* Load the OS at this address: "." means the current address */
     . = BASE_ADDRESS;
 
-    OS_Start = .;
-
-    . = ALIGN(4K);
-
-    textStart = .;
-    .text : {
-        *(.text.entry)
-        *(.text .text.*)
+    /* code segment */
+    . = ALIGN(4);
+    __OS_TextStart = .;
+    .text : 
+    {
+        *(.text.start)
+        *(.text)
         *(.init.text)
 		*(.exit.text)
-        . = ALIGN(0x1000);
-        _trampoline = .;
-        *(trampsec)
-        . = ALIGN(0x1000);
-        /* ASSERT(. - _trampoline == 0x1000, "error: trampoline larger than one page"); */
-        PROVIDE(etext = .);
-    }
+        
+        . = ALIGN(4);
+        PROVIDE(__InitCallStart = .);
+        KEEP(*(.initCall0.text))
+        KEEP(*(.initCall1.text))
+        KEEP(*(.initCall2.text))
+        KEEP(*(.initCall9.text))
+        PROVIDE(__InitCallEnd = .);
 
-    . = ALIGN(4K);
-    rodataStart = .;
-    .rodata : {
-        srodata = .;
-        *(.rodata .rodata.*)
-        erodata = .;
+        . = ALIGN(4);
+        PROVIDE(__ExitCallStart = .);
+        KEEP(*(.exitcall0.text))
+        KEEP(*(.exitcall1.text))
+        KEEP(*(.exitcall2.text))
+        PROVIDE(__ExitCallEnd = .);
+    
+        /* section information for utest */
+        . = ALIGN(4);
+        PROVIDE(__UTestCaseTableStart = .);
+        KEEP(*(UTestCaseTable))
+        PROVIDE(__UTestCaseTableEnd = .);
+        
+        /* section information for integration */
+        . = ALIGN(4);
+        PROVIDE(__IntegrationTableStart = .);
+        KEEP(*(IntegrationTable))
+        PROVIDE(__IntegrationTableEnd = .);
     }
+    __OS_TextEnd = .;
 
-    . = ALIGN(4K);
-    dataStart = .;
-    .data : {
-        sdata = .;
-        *(.data .data.*)
-        edata = .;
+
+    /* data segment */
+    . = ALIGN(4);
+    __OS_DataStart = .;
+    .data :
+    {
+        *(.data)
+        *(.data.*)
+        *(.rodata)
+        *(.rodata.*)
     }
-
-    . = ALIGN(4K);
-    bssStart = .;
-    .bss : {
-	    *(.bss.stack)
-        sbss_clear = .;
-        *(.sbss .bss .bss.*)
-        ebss_clear = .;
+    __OS_DataEnd = .;
+    
+    /* bss segement */
+    
+    . = ALIGN(4);
+    __OS_BssStart = .;
+    .bss       :
+    {
+        *(.bss)
+        *(.bss.*)
+        *(COMMON)
     }
+    . = ALIGN(4);
+    __OS_BssEnd = .;
 
-    . = ALIGN(4K);
-    PROVIDE(OS_End = .);
 }

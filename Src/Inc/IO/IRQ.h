@@ -66,7 +66,7 @@ struct IRQ_Node
 };
 typedef struct IRQ_Node IRQ_Node;
 
-INTERFACE IRQ_Controller IRQ_ControllerInterface;
+INTERFACE IMPORT IRQ_Controller IRQ_ControllerInterface;
 
 PUBLIC OS_Error IRQ_Bind(IRQ_Number irqno,
                          IRQ_Handler handler,

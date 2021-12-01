@@ -22,16 +22,16 @@
 #define SSTATUS_FS (1L << 13)  // Float support
 #define SSTATUS_XS (1L << 14)  // Accelerator support
 
-INLINE U64 S_StatusRead()
+INLINE U64 SstatusRead()
 {
     U64 x;
-    asm volatile("csrr %0, sstatus" : "=r" (x) );
+    CASM("csrr %0, sstatus" : "=r" (x) );
     return x;
 }
 
-INLINE void S_StatusWrite(U64 x)
+INLINE void SstatusWrite(U64 x)
 {
-    asm volatile("csrw sstatus, %0" : : "r" (x));
+    CASM("csrw sstatus, %0" : : "r" (x));
 }
 
 #endif  /* __PLATFROM_REGS__ */
