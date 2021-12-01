@@ -10,6 +10,11 @@
 ##
 
 #
+# Get platform config
+#
+sinclude Platform.mk
+
+#
 # Tools name
 #
 MAKE = make
@@ -53,8 +58,6 @@ else
 # you can set default platfrom here
 ARCH			:= I386
 MACH			:= PC32
-#ARCH			:= Riscv64
-#MACH			:= Qemu
 endif
 
 #

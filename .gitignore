@@ -5,3 +5,4 @@ Tools/
 Scripts/Kconfiglib/__pycache__/*.pyc
 Src/Platforms/Kconfig
 Src/Inc/Configure.h
+Platform.mk

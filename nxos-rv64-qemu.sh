@@ -7,5 +7,5 @@ export PATH=$NXOS_EXEC_PATH:$PATH
 echo "[ROOT DIR ]" $NXOS_ROOT_DIR
 echo "[SRC DIR  ]" $NXOS_SRC_DIR
 echo "[EXEC PATH]" $NXOS_EXEC_PATH
-cp Configs/Platform-I386-PC32.mk Platform.mk
-echo "[PLAFORM  ]" I386-PC32
+cp Configs/Platform-Riscv64-Qemu.mk Platform.mk
+echo "[PLAFORM  ]" Riscv64-Qemu
