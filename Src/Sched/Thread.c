@@ -160,10 +160,10 @@ PUBLIC OS_Error ThreadTerminate(Thread *thread)
         return OS_EPERM;
     }
 
-    Uint level = IRQ_SaveLevel();
+    Uint level = INTR_SaveLevel();
     thread->isTerminated = 1;
     ThreadWakeup(thread);
-    IRQ_RestoreLevel(level);
+    INTR_RestoreLevel(level);
     return OS_EOK;
 }
 
@@ -293,7 +293,7 @@ PUBLIC OS_Error ThreadSleep(Uint microseconds)
         return err;
     }
 
-    Uint irqLevel = IRQ_SaveLevel();
+    Uint irqLevel = INTR_SaveLevel();
     /* lock thread */
     self->resource.sleepTimer = &sleepTimer;
 
@@ -337,7 +337,7 @@ PRIVATE void DaemonThread(void *arg)
     while (1)
     {
         /* TODO: lock thread instead interrupt disable */
-        IRQ_Disable();
+        INTR_Disable();
         ListForEachEntrySafe (thread, safe, &ThreadExitList, globalList)
         {
             LOG_D("daemon release thread: %s/%d", thread->name, thread->tid);
@@ -346,7 +346,7 @@ PRIVATE void DaemonThread(void *arg)
 
             ThreadReleaseSelf(thread);
         }
-        IRQ_Enable();
+        INTR_Enable();
 
         /* do delay or timeout */
         ThreadYield();

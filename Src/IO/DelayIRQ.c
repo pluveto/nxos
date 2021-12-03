@@ -49,10 +49,10 @@ PUBLIC OS_Error IRQ_DelayQueueEnter(IRQ_DelayQueue queue, IRQ_DelayWork *work)
         return OS_EAGAIN;
     }
 
-    Uint level = IRQ_SaveLevel();
+    Uint level = INTR_SaveLevel();
     work->queue = queue;
     ListAddTail(&work->list, &DelayIrqListTable[queue]);
-    IRQ_RestoreLevel(level);
+    INTR_RestoreLevel(level);
     return OS_EOK;
 }
 
@@ -68,10 +68,10 @@ PUBLIC OS_Error IRQ_DelayQueueLeave(IRQ_DelayQueue queue, IRQ_DelayWork *work)
         return OS_ENOSRCH;
     }
 
-    Uint level = IRQ_SaveLevel();
+    Uint level = INTR_SaveLevel();
     work->queue = 0;
     ListDel(&work->list);
-    IRQ_RestoreLevel(level);
+    INTR_RestoreLevel(level);
     return OS_EOK;
 }
 
@@ -141,14 +141,14 @@ INLINE void IRQ_DelayWorkCheck(IRQ_DelayWork *work)
 
         if (!(work->flags & IRQ_WORK_NOREENTER))
         {
-            IRQ_Enable();   
+            INTR_Enable();   
         }
 
         work->handler(work->arg);
 
         if (!(work->flags & IRQ_WORK_NOREENTER))
         {
-            IRQ_Disable();                      
+            INTR_Disable();                      
         }
     }
 }
@@ -169,7 +169,7 @@ INTERFACE void IRQ_DelayQueueCheck(void)
         {
             return;
         }
-        IRQ_Enable();
+        INTR_Enable();
 
         int i;
         for (i = 0; i < IRQ_QUEUE_NR; i++)
@@ -184,6 +184,6 @@ INTERFACE void IRQ_DelayQueueCheck(void)
                 IRQ_DelayWorkCheck(work);
             }
         }
-        IRQ_Disable();
+        INTR_Disable();
     }
 }

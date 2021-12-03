@@ -88,7 +88,7 @@ PUBLIC OS_Error IRQ_Unbind(IRQ_Number irqno, void *data)
     IRQ_Action *action = NULL;
     IRQ_Action *actionFind = NULL;
 
-    Uint level = IRQ_SaveLevel();
+    Uint level = INTR_SaveLevel();
     if (irqNode->flags & IRQ_FLAG_SHARED)
     {
         ListForEachEntry(action, &irqNode->actionList, list)
@@ -107,7 +107,7 @@ PUBLIC OS_Error IRQ_Unbind(IRQ_Number irqno, void *data)
     }
     if (actionFind == NULL)
     {
-        IRQ_RestoreLevel(level);
+        INTR_RestoreLevel(level);
         return OS_ENORES;
     }
     /* remove action */
@@ -121,7 +121,7 @@ PUBLIC OS_Error IRQ_Unbind(IRQ_Number irqno, void *data)
         irqNode->controller = NULL;
         irqNode->flags = 0;
     }
-    IRQ_RestoreLevel(level);
+    INTR_RestoreLevel(level);
     return OS_EOK;
 }
 

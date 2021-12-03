@@ -81,10 +81,10 @@ PUBLIC OS_Error IRQ_Mask(IRQ_Number irqno);
 
 PUBLIC OS_Error IRQ_Handle(IRQ_Number irqno);
 
-#define IRQ_Enable()            IRQ_ControllerInterface.enable()
-#define IRQ_Disable()           IRQ_ControllerInterface.disable()
-#define IRQ_SaveLevel()         IRQ_ControllerInterface.saveLevel()
-#define IRQ_RestoreLevel(level) IRQ_ControllerInterface.restoreLevel(level)
+#define INTR_Enable()            IRQ_ControllerInterface.enable()
+#define INTR_Disable()           IRQ_ControllerInterface.disable()
+#define INTR_SaveLevel()         IRQ_ControllerInterface.saveLevel()
+#define INTR_RestoreLevel(level) IRQ_ControllerInterface.restoreLevel(level)
 
 PUBLIC void IRQ_Init(void);
 

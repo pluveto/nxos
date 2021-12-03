@@ -11,21 +11,21 @@
 
     .section .text.start
     .extern OS_Main
-    .global bootStack
+    .global BootStack
     .global _Start
 _Start:
     add t0, a0, 1
     slli t0, t0, 14
-    la sp, bootStack
+    la sp, BootStack
     add sp, sp, t0
 	call OS_Main
 loop:
     j loop
 
-    .section .bss.stack
+    .section .data.stack
     .align 12
-    .globl bootStack
-bootStack:
+    .globl BootStack
+BootStack:
     .space 4096 * 4 * 2
-    .globl bootStack_top
-bootStack_top:
+    .globl BootStackTop
+BootStackTop:

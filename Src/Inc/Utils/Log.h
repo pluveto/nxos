@@ -86,12 +86,12 @@
 #define LOG_LINE(logName, color, ...) \
     do \
     { \
-        Uint _level = IRQ_SaveLevel(); \
+        Uint _level = INTR_SaveLevel(); \
         LOG_TIMELINE \
         __LOG_BEGIN(logName, color); \
         Printf(__VA_ARGS__); \
         __LOG_END; \
-        IRQ_RestoreLevel(_level); \
+        INTR_RestoreLevel(_level); \
     } \
     while (0)
 #define __LOG_RAW(...) LOG_TIMELINE \

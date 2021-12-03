@@ -17,9 +17,9 @@ QEMU_WINDOW ?= n
 #
 # Tools for PC32
 # 
-TOOL_DIR 	:= Tools/
-RUSTSBI_DIR	:= $(TOOL_DIR)SBI
-RUSTSBI		:= $(RUSTSBI_DIR)/rustsbi-qemu
+TOOL_DIR 	:= Tools
+RUSTSBI_DIR	:= $(TOOL_DIR)/SBI
+SBI			:= $(TOOL_DIR)/SBI/opensbi-qemu
 
 RM			:= rm
 
@@ -42,7 +42,7 @@ endif # CPUS
 
 QEMU_ARGS	+= 	-machine virt
 QEMU_ARGS	+= 	-kernel $(NXOS_NAME).elf
-QEMU_ARGS	+= 	-bios $(RUSTSBI)
+QEMU_ARGS	+= 	-bios $(SBI)
 QEMU_ARGS	+= 	-smp $(CPUS)
 
 ifeq ($(QEMU_WINDOW),y)

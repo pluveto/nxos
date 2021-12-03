@@ -64,12 +64,12 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
     {
         HAL_ContextSwitchNext((Addr)&next->stack);
     }
-    IRQ_RestoreLevel(irqLevel);
+    INTR_RestoreLevel(irqLevel);
 }
 
 PUBLIC void SchedYield(void)
 {
-    Uint level = IRQ_SaveLevel();
+    Uint level = INTR_SaveLevel();
     /* put thread to tail of ready list */
     CurrentThread->state = THREAD_READY;
     ListAddTail(&CurrentThread->list, &ThreadReadyList);
@@ -78,7 +78,7 @@ PUBLIC void SchedYield(void)
 
 PUBLIC void SchedExit(void)
 {
-    Uint level = IRQ_SaveLevel();
+    Uint level = INTR_SaveLevel();
 
     /* set exit state, del from global list and add to exit list */
     CurrentThread->state = THREAD_EXIT;
@@ -98,7 +98,7 @@ PUBLIC void ReSchedCheck(void)
     }
     if (thread->needSched)
     {
-        Uint level = IRQ_SaveLevel();
+        Uint level = INTR_SaveLevel();
         thread->needSched = 0;
 
         /* put thread to tail of thread and reset ticks from timeslice */

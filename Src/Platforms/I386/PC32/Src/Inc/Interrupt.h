@@ -66,7 +66,7 @@ struct HAL_TrapFrame
      */
     U32 esp;
     U32 ss;
-} __attribute__((packed));
+} PACKED;
 typedef struct HAL_TrapFrame HAL_TrapFrame;
 
 PUBLIC void CPU_InitInterrupt(void);

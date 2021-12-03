@@ -10,6 +10,8 @@
  */
 
 #include <XBook.h>
+#include <Trap.h>
+#include <Clock.h>
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "INIT"
@@ -21,7 +23,12 @@ INTERFACE OS_Error PlatformInit(void)
 {
     ClearBSS();
     LOG_I("Hello, QEMU Riscv64!");
+    CPU_InitTrap();
+    HAL_InitClock();
 
+    INTR_Enable();
+    while (1);
+    CASM ("ebreak");
     return OS_ERROR;
 }
 

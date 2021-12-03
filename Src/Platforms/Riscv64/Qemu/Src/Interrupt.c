@@ -44,25 +44,25 @@ PRIVATE OS_Error HAL_IrqAck(IRQ_Number irqno)
 
 PRIVATE void HAL_IrqEnable(void)
 {
-    SstatusWrite(SstatusRead() | SSTATUS_SIE);
+    WriteCSR(sstatus, ReadCSR(sstatus) | SSTATUS_SIE);
 }
 
 PRIVATE void HAL_IrqDisable(void)
 {
-    SstatusWrite(SstatusRead() & ~SSTATUS_SIE);
+    WriteCSR(sstatus, ReadCSR(sstatus) & ~SSTATUS_SIE);
 }
 
 PRIVATE Uint HAL_IrqSaveLevel(void)
 {
     Uint level = 0;
-    level = SstatusRead();
-    SstatusWrite(level & ~SSTATUS_SIE);
+    level = ReadCSR(sstatus);
+    WriteCSR(sstatus, level & ~SSTATUS_SIE);
     return level & SSTATUS_SIE;
 }
 
 PRIVATE void HAL_IrqRestoreLevel(Uint level)
 {
-    SstatusWrite(SstatusRead() | (level & SSTATUS_SIE));
+    WriteCSR(sstatus, ReadCSR(sstatus) | (level & SSTATUS_SIE));
 }
 
 INTERFACE IRQ_Controller IRQ_ControllerInterface = 

@@ -67,7 +67,7 @@ PUBLIC OS_Error SpinLockIRQ(Spin *lock, Uint *level)
     {
         return OS_EINVAL;
     }
-    *level = IRQ_SaveLevel();
+    *level = INTR_SaveLevel();
     return SpinLock(lock, TRUE);
 }
 
@@ -81,6 +81,6 @@ PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, Uint level)
     {
         return OS_EFAULT;
     }
-    IRQ_RestoreLevel(level);
+    INTR_RestoreLevel(level);
     return OS_EOK;
 }

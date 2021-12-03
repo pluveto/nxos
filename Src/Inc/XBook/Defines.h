@@ -107,5 +107,6 @@
 #define UNUSED              __attribute__((unused))
 #define USED                __attribute__((used))
 #define ALIGN(n)            __attribute__((aligned(n)))
+#define PACKED              __attribute__((packed))
 
 #endif  /* __XBOOK_DEFINES__ */

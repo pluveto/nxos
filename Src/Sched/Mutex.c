@@ -44,18 +44,18 @@ PUBLIC OS_Error MutexLock(Mutex *mutex, Bool forever)
     do
     {
         /* disable interrupt for locking per cpu */
-        Uint level = IRQ_SaveLevel();
+        Uint level = INTR_SaveLevel();
 
         /* spin lock for mutex */
         if (SpinLock(&mutex->lock, FALSE) == OS_EOK)
         {
-            IRQ_RestoreLevel(level);
+            INTR_RestoreLevel(level);
             break;
         }
         else
         {
             /* restore interrupt for unlocking per cpu */
-            IRQ_RestoreLevel(level);
+            INTR_RestoreLevel(level);
 
             /* checkout timeout */
             if (forever == FALSE)

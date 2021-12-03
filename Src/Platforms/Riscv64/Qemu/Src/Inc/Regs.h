@@ -22,16 +22,62 @@
 #define SSTATUS_FS (1L << 13)  // Float support
 #define SSTATUS_XS (1L << 14)  // Accelerator support
 
-INLINE U64 SstatusRead()
-{
-    U64 x;
-    CASM("csrr %0, sstatus" : "=r" (x) );
-    return x;
-}
+#define RISCV_XLEN    64
 
-INLINE void SstatusWrite(U64 x)
-{
-    CASM("csrw sstatus, %0" : : "r" (x));
-}
+#define SCAUSE_INTERRUPT    (1UL << (RISCV_XLEN - 1))
+#define SCAUSE_S_SOFTWARE_INTR  1
+#define SCAUSE_S_TIMER_INTR     5
+#define SCAUSE_S_EXTERNAL_INTR  9
+
+#define IRQ_S_SOFT   1
+#define IRQ_H_SOFT   2
+#define IRQ_M_SOFT   3
+#define IRQ_S_TIMER  5
+#define IRQ_H_TIMER  6
+#define IRQ_M_TIMER  7
+#define IRQ_S_EXT    9
+#define IRQ_H_EXT    10
+#define IRQ_M_EXT    11
+#define IRQ_COP      12
+#define IRQ_HOST     13
+
+#define SIE_SSIE    (1 << IRQ_S_SOFT)
+#define SIE_STIE    (1 << IRQ_S_TIMER)
+#define SIE_SEIE    (1 << IRQ_S_EXT)
+
+#ifndef __ASSEMBLY__
+/* csr registers read/write */
+#define ReadCSR(reg) ({ unsigned long __tmp; \
+    CASM ("csrr %0, " #reg : "=r"(__tmp)); \
+    __tmp; })
+
+#define WriteCSR(reg, val) ({ \
+    if (__builtin_constant_p(val) && (unsigned long)(val) < 32) \
+        CASM ("csrw " #reg ", %0" :: "i"(val)); \
+    else \
+        CASM ("csrw " #reg ", %0" :: "r"(val)); })
+
+#define SwapCSR(reg, val) ({ unsigned long __tmp; \
+    if (__builtin_constant_p(val) && (unsigned long)(val) < 32) \
+        CASM ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "i"(val)); \
+    else \
+        CASM ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "r"(val)); \
+    __tmp; })
+
+#define SetCSR(reg, bit) ({ unsigned long __tmp; \
+    if (__builtin_constant_p(bit) && (unsigned long)(bit) < 32) \
+        CASM ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "i"(bit)); \
+    else \
+        CASM ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
+    __tmp; })
+
+#define ClearCSR(reg, bit) ({ unsigned long __tmp; \
+    if (__builtin_constant_p(bit) && (unsigned long)(bit) < 32) \
+        CASM ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "i"(bit)); \
+    else \
+        CASM ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
+    __tmp; })
+
+#endif /* !__ASSEMBLY__ */
 
 #endif  /* __PLATFROM_REGS__ */
