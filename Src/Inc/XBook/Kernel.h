@@ -20,4 +20,10 @@
 #define KVADDR_OFFSET CONFIG_KVADDR_OFFSET
 #endif
 
+#ifndef CONFIG_NR_CPUS
+#error "Please config NR_CPUS"
+#else
+#define NR_CPUS CONFIG_NR_CPUS
+#endif
+
 #endif  /* __XBOOK_KERNEL__ */

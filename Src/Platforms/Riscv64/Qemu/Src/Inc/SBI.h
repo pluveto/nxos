@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: RustSBI call 
+ * Contains: Supervisor Binary Interface(SBI)
  * 
  * Change Logs:
  * Date           Author            Notes
@@ -92,17 +92,6 @@ INLINE void SBI_RemoteSfenceVmaAsid(const Uint *hart_mask,
     Uint asid)
 {
 	SBI_CALL_4(SBI_REMOTE_SFENCE_VMA_ASID, hart_mask, start, Size, asid);
-}
-
-INLINE void SBI_SetExternInterrupt(Uint func_pointer)
-{
-	asm volatile("mv a6, %0" : : "r" (0x210));
-	SBI_CALL_1(0x0A000004, func_pointer);
-}
-
-INLINE void SBI_SetMIE(void)
-{
-	SBI_CALL_0(0x0A000005);
 }
 
 #endif  /* __PLATFORM_RISCV_SBI__ */

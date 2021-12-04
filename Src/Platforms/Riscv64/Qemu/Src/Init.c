@@ -13,6 +13,8 @@
 #include <Trap.h>
 #include <Clock.h>
 #include <Page.h>
+#include <Platform.h>
+#include <PLIC.h>
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "INIT"
@@ -24,8 +26,14 @@ INTERFACE OS_Error PlatformInit(void)
 {
     ClearBSS();
     LOG_I("Hello, QEMU Riscv64!");
+    if (NR_CPUS <= 0 || NR_CPUS > PLATFORM_MAX_NR_CPUS)
+    {
+        PANIC("config CPU number error!");    
+    }
+
     CPU_InitTrap();
     HAL_InitClock();
+    PLIC_Init();
     
     PageInit();
     
@@ -35,10 +43,12 @@ INTERFACE OS_Error PlatformInit(void)
 INTERFACE OS_Error PlatformStage2(void)
 {
     LOG_I("stage2!");
-    
+    HAL_DirectUartStage2();
+
     INTR_Enable();
-    
+
+    PlatformMain();
+
     while (1);
-    CASM ("ebreak");
     return OS_EOK;
 }

@@ -18,3 +18,10 @@ if DEBUG
 
 endif
 endmenu
+
+#
+# CPU numbers
+#
+config NR_CPUS
+    int "platform CPU numbers"
+    default 1

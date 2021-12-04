@@ -13,6 +13,7 @@
 #include <XBook/HAL.h>
 #include <Regs.h>
 #include <IO/IRQ.h>
+#include <PLIC.h>
 
 PRIVATE OS_Error HAL_IrqUnmask(IRQ_Number irqno)
 {
@@ -21,7 +22,7 @@ PRIVATE OS_Error HAL_IrqUnmask(IRQ_Number irqno)
         return OS_EINVAL;
     }
 
-    return OS_EOK;
+    return PLIC_EnableIRQ(0, irqno);
 }
 
 PRIVATE OS_Error HAL_IrqMask(IRQ_Number irqno)
@@ -30,7 +31,8 @@ PRIVATE OS_Error HAL_IrqMask(IRQ_Number irqno)
     {
         return OS_EINVAL;
     }
-    return OS_EOK;
+
+    return PLIC_DisableIRQ(0, irqno);
 }
 
 PRIVATE OS_Error HAL_IrqAck(IRQ_Number irqno)
@@ -39,7 +41,8 @@ PRIVATE OS_Error HAL_IrqAck(IRQ_Number irqno)
     {
         return OS_EINVAL;
     }
-    return OS_EOK;
+    
+    return PLIC_Complete(0, irqno);
 }
 
 PRIVATE void HAL_IrqEnable(void)
