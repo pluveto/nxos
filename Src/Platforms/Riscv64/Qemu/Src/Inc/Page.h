@@ -25,4 +25,6 @@ enum PageZone
 };
 typedef enum PageZone PageZone;
 
+PUBLIC void PageInit(void);
+
 #endif  /* __PLATFORM_PAGE__ */

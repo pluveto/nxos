@@ -32,7 +32,7 @@ PRIVATE VOLATILE U32 kernelTable[PAGE_SIZE / sizeof(U32)] CALIGN(PAGE_SIZE);
  */
 PUBLIC void PageInit(void)
 {    
-    U32 memSize = *(U32 *)GRUB2_READ_MEMORY_BYTES_ADDR;
+    Size memSize = *(Size *)GRUB2_READ_MEMORY_BYTES_ADDR;
     
     LOG_I("Memory Size: %x Bytes %d MB", memSize, memSize / SZ_MB);
 
@@ -47,16 +47,16 @@ PUBLIC void PageInit(void)
     }
     
     /* calc normal base & size */
-    U32 normalSize = memSize - MEM_DMA_SIZE - MEM_KERNEL_SZ;
+    Size normalSize = memSize - MEM_DMA_SIZE - MEM_KERNEL_SZ;
     normalSize /= 2;
-    if (normalSize + MEM_NORMAL_BASE > MEM_KERNEL_TOP)
+    if (normalSize > MEM_KERNEL_SPACE_SZ)
     {
-        normalSize = MEM_KERNEL_TOP - MEM_NORMAL_BASE;
+        normalSize = MEM_KERNEL_SPACE_SZ;
     }
     
     /* calc user base & size */
     Addr userBase = MEM_NORMAL_BASE + normalSize;
-    Size userSize = memSize - userBase;
+    Size userSize = memSize - normalSize;
 
     LOG_I("DMA memory base: %x Size:%d MB", MEM_DMA_BASE, MEM_DMA_SIZE / SZ_MB);
     LOG_I("Normal memory base: %x Size:%d MB", MEM_NORMAL_BASE, normalSize / SZ_MB);

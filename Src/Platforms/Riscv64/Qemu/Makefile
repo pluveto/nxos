@@ -20,7 +20,6 @@ QEMU_WINDOW ?= n
 TOOL_DIR 	:= Tools
 RUSTSBI_DIR	:= $(TOOL_DIR)/SBI
 SBI			:= $(TOOL_DIR)/SBI/opensbi-qemu
-
 RM			:= rm
 
 #
@@ -28,6 +27,8 @@ RM			:= rm
 # 
 MAKE		:= make
 QEMU 		:= qemu-system-riscv64
+DEBUGER		:= $(CROSS_COMPILE)gdb
+DUMP		:= $(CROSS_COMPILE)objdump
 
 #
 # Qemu args configure
@@ -49,6 +50,10 @@ ifeq ($(QEMU_WINDOW),y)
 	QEMU_ARGS += -serial stdio
 else
 	QEMU_ARGS += -nographic
+endif
+
+ifeq ($(G),y)
+	QEMU_ARGS += -S -gdb tcp::10001,ipv4
 endif
 
 #
@@ -75,3 +80,18 @@ prepare:
 	-$(RM) -rf $(TOOL_DIR)
 	git clone https://gitee.com/BookOS/nxos-platform-qemu-riscv64-tools $(TOOL_DIR)
 	echo "parpare done."
+
+# 
+# gdb debug
+# 
+gdb:
+	@echo gdb load file from $(ARCH)/$(MACH)/$(NXOS_NAME).elf
+	$(DEBUGER) $(NXOS_NAME).elf -x connect.gdb
+	
+#
+# dump kernel
+#
+dump:
+	@echo dump kernel $(ARCH)/$(MACH)/$(NXOS_NAME).elf
+	$(DUMP) -D -S $(NXOS_NAME).elf > $(NXOS_NAME).dump.S
+	

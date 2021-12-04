@@ -144,6 +144,12 @@ gdb:
 	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) gdb
 
 #
+# dump kernel
+#
+dump:
+	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) dump
+
+#
 # menuconfig
 #
 menuconfig:

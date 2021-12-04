@@ -14,4 +14,56 @@
 
 #include <XBook.h>
 
+#define DRAM_SIZE_DEFAULT (128 * SZ_MB)
+
+#define MEM_SBI_BASE    0x80000000
+#define MEM_SBI_SZ      (2 * SZ_MB)
+
+#define MEM_KERNEL_BASE (MEM_SBI_BASE + MEM_SBI_SZ)
+#define MEM_KERNEL_SZ   (30 * SZ_MB)
+
+#define MEM_NORMAL_BASE (MEM_KERNEL_BASE + MEM_KERNEL_SZ)
+
+#define MEM_MIN_SIZE    (128 * SZ_MB)
+
+#define MEM_KERNEL_SPACE_SZ  (128 * SZ_MB)
+
+#define MEM_KERNEL_TOP  (MEM_SBI_BASE + MEM_KERNEL_SPACE_SZ)
+
+/**
+ * Physical memory layout:
+ *
+ * +------------------------+ <- MAX PHY SIZE (TOP to 4GB)
+ * | L3 PAGES               |
+ * +------------------------+ <- KERNEL PAGES (TOP to 2GB + 128MB)
+ * | L3(K) & L0/1/2  PAGES  |
+ * +------------------------+ <- 0x82000000 (2GB + 32MB)
+ * | KERNEL                 |
+ * +------------------------+ <- 0x80200000 (2GB + 2MB)
+ * | OPENSBI                |
+ * +------------------------+ <- 0x80000000 (2GB)
+ * | MMIO/UNMAPPED          |
+ * +------------------------+ <- 0x00000000
+ */
+
+/**
+ * Virtual memory layout:
+ * 
+ * @: delay map
+ * 
+ * +------------------------+ <- 0xFFFFFFFF (4GB)
+ * | @USER                  |
+ * +------------------------+ <- 0x88000000 (2GB + 128MB)
+ * | @KMAP                  |
+ * +------------------------+ <- 0x84000000 (2GB + 64MB)
+ * | KHEAP                  |
+ * +------------------------+ <- 0x82000000 (2GB + 32MB)
+ * | KCODE & KDATA & KBSS   |
+ * +------------------------+ <- 0x80200000 (2GB + 2MB)
+ * | OPENSBI                |
+ * +------------------------+ <- 0x80000000 (2GB)
+ * | MMIO/UNMAPPED          |
+ * +------------------------+ <- 0x00000000
+ */
+
 #endif /* __PLATFORM_HEADER__ */

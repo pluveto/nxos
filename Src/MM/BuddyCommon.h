@@ -34,7 +34,7 @@ INLINE int BuddyFLS(U32 word)
 }
 
 /* Possibly 64-bit version of BuddyFLS. */
-#if defined(CONFIG_64BIT)
+#if defined(CONFIG_CPU_64BITS)
 PRIVATE int BuddyFlsSizet(Size size)
 {
     int high = (int)(size >> 32);

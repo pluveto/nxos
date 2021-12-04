@@ -28,6 +28,7 @@ RM			:= rm
 MAKE		:= make
 QEMU 		:= qemu-system-i386
 DEBUGER		:= $(CROSS_COMPILE)gdb
+DUMP		:= $(CROSS_COMPILE)objdump
 
 #
 # Qemu args configure
@@ -81,3 +82,11 @@ prepare:
 gdb:
 	@echo gdb load file from $(ARCH)/$(MACH)/$(NXOS_NAME).elf
 	$(DEBUGER) $(NXOS_NAME).elf -x connect.gdb
+	
+#
+# dump kernel
+#
+dump:
+	@echo gdb load file from $(ARCH)/$(MACH)/$(NXOS_NAME).elf
+	$(DUMP) -D -S $(NXOS_NAME).elf > $(NXOS_NAME).dump.S
+	

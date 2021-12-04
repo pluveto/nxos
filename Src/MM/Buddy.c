@@ -95,7 +95,7 @@ PRIVATE BuddySystem* BuddyCreateFromMemory(void *mem)
 PUBLIC BuddySystem* BuddyCreate(void *mem, Size size)
 {
     ASSERT(mem && size);
-    LOG_I("mem: %x size: %x", mem, size);
+    LOG_I("mem: 0x%p size: 0x%p", mem, size);
     if (!(mem && size))
     {
         return NULL;

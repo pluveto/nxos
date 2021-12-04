@@ -14,10 +14,10 @@
 
 #include <Configure.h>
 
-#ifndef CONFIG_VADDR_START
-#error "Please config VSTART_ADDR"
+#ifndef CONFIG_KVADDR_OFFSET
+#error "Please config KVADDR_OFFSET"
 #else
-#define VADDR_START CONFIG_VADDR_START
+#define KVADDR_OFFSET CONFIG_KVADDR_OFFSET
 #endif
 
 #endif  /* __XBOOK_KERNEL__ */

@@ -1,5 +1,5 @@
-config VADDR_START
-    hex "os virtual base addr"
+config KVADDR_OFFSET
+    hex "kernel virtual address offset to physic address"
     default 0x00000000
 
 config PAGE_SHIFT

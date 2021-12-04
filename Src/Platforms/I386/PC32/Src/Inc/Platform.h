@@ -23,7 +23,10 @@
 #define MEM_NORMAL_BASE (MEM_DMA_BASE + MEM_DMA_SIZE)
 
 #define MEM_MIN_SIZE (510 * SZ_MB)
-#define MEM_KERNEL_TOP (512 * SZ_MB)
+
+#define MEM_KERNEL_SPACE_SZ (512 * SZ_MB)
+
+#define MEM_KERNEL_TOP (MEM_KERNEL_BASE + MEM_KERNEL_SPACE_SZ)
 
 /**
  * Physical memory layout:

@@ -29,7 +29,7 @@ struct Page
 {
     List list;
     U32 flags;
-    U32 order;
+    I32 order;
     Size sizeClass;         /* size class on this span */
     Size maxObjectsOnSpan;  /* max memory objects on this span */
 };

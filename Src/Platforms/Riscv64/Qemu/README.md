@@ -15,3 +15,8 @@
 - [ ] 添加SMP支持
   - [ ] 添加SMP启动
   - [ ] 添加SMP调度
+
+# 内存布局
+
+see https://nankai.gitbook.io/ucore-os-on-risc-v64/lab2/wu-li-nei-cun-tan-ce
+

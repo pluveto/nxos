@@ -41,7 +41,7 @@ PUBLIC void *PageZoneGetBuddySystem(PageZone zone);
 #define PageAlloc(size) PageAllocInZone(PZ_NORMAL, size)
 #define PageFree(ptr) PageFreeInZone(PZ_NORMAL, ptr)
 
-#define P2V(addr) ((addr) + VADDR_START)
-#define V2P(addr) ((addr) - VADDR_START)
+#define P2V(addr) ((addr) + KVADDR_OFFSET)
+#define V2P(addr) ((addr) - KVADDR_OFFSET)
 
 #endif /* __MM_PAGE__ */
