@@ -12,20 +12,27 @@
 #ifndef __CONTEXT_HEADER__
 #define __CONTEXT_HEADER__
 
-#include <Riscv.h>
+#include <Interrupt.h>
 
+/**
+ * NOTE: 
+ * sscratch was used to save sp for temp register when trap or context switch,
+ * sp maybe user sp or kernel sp,
+ * only save need sscratch, restore no need it.
+ */
 #ifdef __ASSEMBLY__
+/* t0, t1, t2 broken in this func */
 .macro SAVE_CONTEXT
-    csrw sscratch, sp
-    addi sp, sp, -36 * REGBYTES
+    /* reserved context stack */
+    addi sp, sp, -CONTEXT_REG_NR * REGBYTES
 
-    STORE x0, 0*REGBYTES(sp)
-    STORE x1, 1*REGBYTES(sp)
-    STORE x3, 3*REGBYTES(sp)
-    STORE x4, 4*REGBYTES(sp)
-    STORE x5, 5*REGBYTES(sp)
-    STORE x6, 6*REGBYTES(sp)
-    STORE x7, 7*REGBYTES(sp)
+    STORE x0, 0 * REGBYTES(sp)
+    STORE x1, 1 * REGBYTES(sp)
+    STORE x3, 3 * REGBYTES(sp)
+    STORE x4, 4 * REGBYTES(sp)
+    STORE x5, 5 * REGBYTES(sp)
+    STORE x6, 6 * REGBYTES(sp)
+    STORE x7, 7 * REGBYTES(sp)
     STORE x8, 8*REGBYTES(sp)
     STORE x9, 9*REGBYTES(sp)
     STORE x10, 10*REGBYTES(sp)
@@ -51,22 +58,19 @@
     STORE x30, 30*REGBYTES(sp)
     STORE x31, 31*REGBYTES(sp)
     
-    csrrw s0, sscratch, x0
-    csrr s1, sstatus
-    csrr s2, sepc
-    csrr s3, stval
-    csrr s4, scause
+    csrrw t0, sscratch, x0
+    csrr t1, sstatus
+    csrr t2, sepc
 
-    STORE s0, 2*REGBYTES(sp)
-    STORE s1, 32*REGBYTES(sp)
-    STORE s2, 33*REGBYTES(sp)
-    STORE s3, 34*REGBYTES(sp)
-    STORE s4, 35*REGBYTES(sp)
+    STORE t0, CTX_SP_OFF * REGBYTES(sp)
+    STORE t1, CTX_STATUS_OFF * REGBYTES(sp)
+    STORE t2, CTX_PC_OFF * REGBYTES(sp)
 .endm
 
+/* s1, s2 broken in this func */
 .macro RESTORE_CONTEXT
-    LOAD s1, 32*REGBYTES(sp)
-    LOAD s2, 33*REGBYTES(sp)
+    LOAD s1, CTX_STATUS_OFF * REGBYTES(sp)
+    LOAD s2, CTX_PC_OFF * REGBYTES(sp)
 
     csrw sstatus, s1
     csrw sepc, s2
@@ -102,7 +106,8 @@
     LOAD x30, 30*REGBYTES(sp)
     LOAD x31, 31*REGBYTES(sp)
 
-    LOAD x2, 2*REGBYTES(sp)
+    /* restore sp from context sp */
+    LOAD sp, CTX_SP_OFF * REGBYTES(sp)
 .endm
 
 #endif

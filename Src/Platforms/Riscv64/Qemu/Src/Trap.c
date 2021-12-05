@@ -59,10 +59,6 @@ PRIVATE const char *ExceptionName[] =
 
 PUBLIC void CPU_InitTrap(void)
 {
-    /**
-     * if sscratch == 0 : interrupt from kernel mode
-     * else             : interrupt from user mode
-     */
     WriteCSR(sscratch, 0);
     
     /* set trap entry */
@@ -75,12 +71,15 @@ PUBLIC void CPU_InitTrap(void)
 PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
 {
     // LOG_D("trap dispatcher");
+    U64 cause = ReadCSR(scause);
+    U64 stval = ReadCSR(stval);
+
     const char *msg = NULL;
-    Uint id = frame->cause & ((1UL << (RISCV_XLEN - 2)) - 1);
+    Uint id = cause & ((1UL << (RISCV_XLEN - 2)) - 1);
 
     /* supervisor external interrupt */
-    if ((SCAUSE_INTERRUPT & frame->cause) && 
-        SCAUSE_S_EXTERNAL_INTR == (frame->cause & 0xff))
+    if ((SCAUSE_INTERRUPT & cause) && 
+        SCAUSE_S_EXTERNAL_INTR == (cause & 0xff))
     {
         IRQ_Number irqno = PLIC_Claim(0);
         if (irqno != 0)
@@ -89,14 +88,14 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
         }
         return;
     }
-    else if ((SCAUSE_INTERRUPT | SCAUSE_S_TIMER_INTR) == frame->cause)
+    else if ((SCAUSE_INTERRUPT | SCAUSE_S_TIMER_INTR) == cause)
     {
         // LOG_D("supervisor timer");
         /* supervisor timer */
         HAL_ClockHandler();
         return;
     }
-    else if (SCAUSE_INTERRUPT & frame->cause)
+    else if (SCAUSE_INTERRUPT & cause)
     {
         if(id < sizeof(InterruptName) / sizeof(const char *))
         {
@@ -121,6 +120,6 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
         LOG_E("Unhandled Exception %ld:%s", id, msg);
     }
 
-    LOG_E("scause:0x%p, stval:0x%p, sepc:0x%p", frame->cause, frame->tval, frame->epc);
+    LOG_E("scause:0x%p, stval:0x%p, sepc:0x%p", cause, stval, frame->epc);
     while(1);
 }

@@ -13,7 +13,15 @@
 #define __INTERRUPT_HEADER__
 
 #include <XBook.h>
+#include <Riscv.h>
 
+#define CONTEXT_REG_NR  34
+
+#define CTX_SP_OFF      2
+#define CTX_STATUS_OFF  32
+#define CTX_PC_OFF      33
+
+#ifndef __ASSEMBLY__
 struct HAL_TrapFrame
 {
     Uint zero;  // Hard-wired zero
@@ -48,11 +56,10 @@ struct HAL_TrapFrame
     Uint t4;    // Temporary
     Uint t5;    // Temporary
     Uint t6;    // Temporary
-    Uint status; //sstatus
-    Uint epc; //sepc
-    Uint tval; //trap value
-    Uint cause; //scause
+    Uint status;//sstatus
+    Uint epc;   //sepc
 } PACKED;
 typedef struct HAL_TrapFrame HAL_TrapFrame;
+#endif
 
 #endif  /* __INTERRUPT_HEADER__ */
