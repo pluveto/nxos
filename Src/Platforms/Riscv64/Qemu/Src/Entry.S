@@ -18,6 +18,7 @@ _Start:
     slli t0, t0, 14
     la sp, BootStack
     add sp, sp, t0
+    csrw sscratch, sp /* first set sscrach as cpu stack here */
 	call OS_Main
 loop:
     j loop

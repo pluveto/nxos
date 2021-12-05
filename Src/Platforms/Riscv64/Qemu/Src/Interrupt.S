@@ -22,7 +22,7 @@ TrapEntry:
 
     /* save sp to sscratch reg, sscratch saved old sp from user/kernel */
     csrrw sp, sscratch, sp
-
+    
     /* TODO: switch to cpu stack */
 
     /* save context */

@@ -59,8 +59,6 @@ PRIVATE const char *ExceptionName[] =
 
 PUBLIC void CPU_InitTrap(void)
 {
-    WriteCSR(sscratch, 0);
-    
     /* set trap entry */
     WriteCSR(stvec, TrapEntry);
 

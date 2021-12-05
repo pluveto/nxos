@@ -30,15 +30,15 @@ HAL_ContextSwitchNext:
  */
 .globl HAL_ContextSwitchPrevNext
 HAL_ContextSwitchPrevNext:
+    /* t0, t1, t2 will broken in SAVE_CONTEXT, so use t3 to save sp here */
+    mv t3, sp
+
     /**
      * set as supervisor mode and enable interupt 
      * make sure kernel mode thread do context switch
      */
     li t1, SSTATUS_SPP | SSTATUS_SPIE 
     csrs sstatus, t1
-
-    /* save kernel sp to sscratch */
-    csrrw sp, sscratch, sp
 
     /**
      * set `sepc` as `ra`, `ra` saved return address of HAL_ContextSwitchPrevNext
@@ -48,6 +48,9 @@ HAL_ContextSwitchPrevNext:
     
     /* save context to stack */
     SAVE_CONTEXT
+
+    /* save old sp to stack, instead the sp in sscratch */
+    STORE t3, CTX_PC_OFF * REGBYTES(sp)
 
     /* save sp to from thread, *from = `sp` */
     STORE sp, (a0)

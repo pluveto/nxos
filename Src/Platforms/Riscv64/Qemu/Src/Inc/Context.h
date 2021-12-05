@@ -58,7 +58,7 @@
     STORE x30, 30*REGBYTES(sp)
     STORE x31, 31*REGBYTES(sp)
     
-    csrrw t0, sscratch, x0
+    csrr t0, sscratch
     csrr t1, sstatus
     csrr t2, sepc
 
