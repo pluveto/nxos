@@ -11,56 +11,55 @@
 
 #include <XBook/Atomic.h>
 
-PRIVATE void HAL_AtomicSet(Atomic *atomic, int value)
+PRIVATE void HAL_AtomicSet(Atomic *atomic, long value)
 {
     atomic->value = value;
 }
 
-PRIVATE int HAL_AtomicGet(Atomic *atomic)
+PRIVATE long HAL_AtomicGet(Atomic *atomic)
 {
     return atomic->value;
 }
 
-PRIVATE void HAL_AtomicAdd(Atomic *atomic, int value)
+PRIVATE void HAL_AtomicAdd(Atomic *atomic, long value)
 {
-    
+    /* gcc build-in functions */
+    __sync_fetch_and_add(&atomic->value, value);
 }
 
-PRIVATE void HAL_AtomicSub(Atomic *atomic, int value)
+PRIVATE void HAL_AtomicSub(Atomic *atomic, long value)
 {
-    
+    __sync_fetch_and_sub(&atomic->value, value);
 }
 
 PRIVATE void HAL_AtomicInc(Atomic *atomic)
 {
-    
+    __sync_fetch_and_add(&atomic->value, 1);
 }
 
 PRIVATE void HAL_AtomicDec(Atomic *atomic)
 {
-      
+    __sync_fetch_and_sub(&atomic->value, 1);
 }
 
-PRIVATE void HAL_AtomicSetMask(Atomic *atomic, int mask)
+PRIVATE void HAL_AtomicSetMask(Atomic *atomic, long mask)
 {
-    
+    __sync_fetch_and_or(&atomic->value, mask);
 }
 
-PRIVATE void HAL_AtomicClearMask(Atomic *atomic, int mask)
+PRIVATE void HAL_AtomicClearMask(Atomic *atomic, long mask)
 {    
-    
+    __sync_fetch_and_and(&atomic->value, ~mask);
 }
 
-PRIVATE int HAL_AtomicSwap(Atomic *atomic, int newValue)
+PRIVATE long HAL_AtomicSwap(Atomic *atomic, long newValue)
 {
-    
-    return newValue;
+    return __sync_lock_test_and_set(&((atomic)->value), newValue);
 }
 
-PRIVATE int HAL_AtomicCAS(Atomic *atomic, int old, int newValue)
+PRIVATE long HAL_AtomicCAS(Atomic *atomic, long old, long newValue)
 {
-    int prev = 0;
-    return prev;
+    return __sync_val_compare_and_swap(&atomic->value, old, newValue);
 }
 
 INTERFACE struct AtomicOps AtomicOpsInterface = 

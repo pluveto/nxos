@@ -28,7 +28,7 @@ PRIVATE UTestSum UtestCaseSum = {FALSE, 0, 0};
 IMPORT const Addr __UTestCaseTableStart;
 IMPORT const Addr __UTestCaseTableEnd;
 
-PRIVATE void UTestInvoke(void)
+PUBLIC void UTestInvoke(void)
 {
     UtestCaseSum.hasError = FALSE;
     UtestCaseSum.passedNum = 0;

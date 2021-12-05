@@ -13,24 +13,24 @@
 
 #define LOCK_PREFIX "lock "
 
-PRIVATE void HAL_AtomicSet(Atomic *atomic, int value)
+PRIVATE void HAL_AtomicSet(Atomic *atomic, long value)
 {
     atomic->value = value;
 }
 
-PRIVATE int HAL_AtomicGet(Atomic *atomic)
+PRIVATE long HAL_AtomicGet(Atomic *atomic)
 {
     return atomic->value;
 }
 
-PRIVATE void HAL_AtomicAdd(Atomic *atomic, int value)
+PRIVATE void HAL_AtomicAdd(Atomic *atomic, long value)
 {
     CASM(LOCK_PREFIX "addl %1,%0"   
          : "+m" (atomic->value)   
          : "ir" (value));
 }
 
-PRIVATE void HAL_AtomicSub(Atomic *atomic, int value)
+PRIVATE void HAL_AtomicSub(Atomic *atomic, long value)
 {
     CASM(LOCK_PREFIX "subl %1,%0"   
          : "+m" (atomic->value)   
@@ -49,19 +49,19 @@ PRIVATE void HAL_AtomicDec(Atomic *atomic)
          : "+m" (atomic->value));   
 }
 
-PRIVATE void HAL_AtomicSetMask(Atomic *atomic, int mask)
+PRIVATE void HAL_AtomicSetMask(Atomic *atomic, long mask)
 {
     CASM(LOCK_PREFIX "orl %0,%1"
         : : "r" (mask), "m" (*(&atomic->value)) : "memory");
 }
 
-PRIVATE void HAL_AtomicClearMask(Atomic *atomic, int mask)
+PRIVATE void HAL_AtomicClearMask(Atomic *atomic, long mask)
 {    
     CASM(LOCK_PREFIX "andl %0,%1"
          : : "r" (~(mask)), "m" (*(&atomic->value)) : "memory");
 }
 
-PRIVATE int HAL_AtomicSwap(Atomic *atomic, int newValue)
+PRIVATE long HAL_AtomicSwap(Atomic *atomic, long newValue)
 {
     CASM("xchgl %k0,%1"   
          : "=r" (newValue)
@@ -70,9 +70,9 @@ PRIVATE int HAL_AtomicSwap(Atomic *atomic, int newValue)
     return newValue;
 }
 
-PRIVATE int HAL_AtomicCAS(Atomic *atomic, int old, int newValue)
+PRIVATE long HAL_AtomicCAS(Atomic *atomic, long old, long newValue)
 {
-    int prev;
+    long prev;
     CASM(LOCK_PREFIX "cmpxchgl %k1,%2"   
          : "=a"(prev)
          : "r"(newValue), "m"(*(&atomic->value)), "0"(old)   

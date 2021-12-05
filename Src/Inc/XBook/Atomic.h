@@ -16,22 +16,22 @@
 
 struct Atomic
 {
-    VOLATILE int value;
+    VOLATILE long value;
 };
 typedef struct Atomic Atomic;
 
 struct AtomicOps
 {
-    void (*set)(Atomic *atomic, int value);
-    int (*get)(Atomic *atomic);
-    void (*add)(Atomic *atomic, int value);
-    void (*sub)(Atomic *atomic, int value);
+    void (*set)(Atomic *atomic, long value);
+    long (*get)(Atomic *atomic);
+    void (*add)(Atomic *atomic, long value);
+    void (*sub)(Atomic *atomic, long value);
     void (*inc)(Atomic *atomic);
     void (*dec)(Atomic *atomic);
-    void (*setMask)(Atomic *atomic, int mask);
-    void (*clearMask)(Atomic *atomic, int mask);
-    int (*swap)(Atomic *atomic, int newValue);
-    int (*cas)(Atomic *atomic, int old, int newValue);
+    void (*setMask)(Atomic *atomic, long mask);
+    void (*clearMask)(Atomic *atomic, long mask);
+    long (*swap)(Atomic *atomic, long newValue);
+    long (*cas)(Atomic *atomic, long old, long newValue);
 };
 
 INTERFACE IMPORT struct AtomicOps AtomicOpsInterface;

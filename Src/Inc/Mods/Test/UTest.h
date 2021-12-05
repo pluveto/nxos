@@ -107,6 +107,8 @@ typedef struct UTestSum UTestSum;
     }
 
 PUBLIC void UTestInit(void);
+/* invoke utest */
+PUBLIC void UTestInvoke(void);
 
 #endif /* CONFIG_ENABLE_TEST_UTEST */
 
