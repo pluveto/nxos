@@ -48,7 +48,9 @@ PUBLIC void ClockTickGo(void)
     }
     
     IRQ_DelayWorkHandle(&TimerWork);
+#ifdef CONFIG_ENABLE_SCHED
     IRQ_DelayWorkHandle(&SchedWork);
+#endif
 }
 
 PUBLIC OS_Error ClockTickDelay(ClockTick ticks)

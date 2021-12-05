@@ -17,18 +17,10 @@
 
 INTERFACE void PlatformMain(void)
 {
-    LOG_I("PC32 platform main running...\n");
-    while (1)
-    {
-        int data = HAL_DirectUartTryGetc();
-        if (data != -1)
-        {
-            HAL_DirectUartGetc(data);
-        }
-    }
+    LOG_I("QEMU platform main running...\n");
 }
 
-PUBLIC void HAL_DirectUartGetc(char data)
+PUBLIC void HAL_DirectUartGetcHandler(char data)
 {
     switch (data)
     {

@@ -211,12 +211,12 @@ PUBLIC void HAL_DirectUartInit(void)
 /**
  * default handler
 */
-WEAK_SYM PUBLIC void HAL_DirectUartGetc(char data)
+WEAK_SYM PUBLIC void HAL_DirectUartGetcHandler(char data)
 {
     Printf("Deafult uart handler:%x/%c\n", data, data);
 }
 
-PRIVATE void UartWorkHandler(void *arg)
+PUBLIC int HAL_DirectUartGetc(void)
 {
     struct DirectUart *uart = &DirectUart;
     
@@ -229,12 +229,17 @@ PRIVATE void UartWorkHandler(void *arg)
     {
         data = IO_In8(uart->data);
     }
+    return data;
+}
 
+PRIVATE void UartWorkHandler(void *arg)
+{
+    int data = HAL_DirectUartGetc();
     if (data != -1)
     {
-        if (HAL_DirectUartGetc != NULL)
+        if (HAL_DirectUartGetcHandler != NULL)
         {
-            HAL_DirectUartGetc(data);
+            HAL_DirectUartGetcHandler(data);
         }
     }
 }

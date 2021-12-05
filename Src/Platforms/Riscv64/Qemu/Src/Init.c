@@ -15,6 +15,7 @@
 #include <Page.h>
 #include <Platform.h>
 #include <PLIC.h>
+#include <Drivers/DirectUart.h>
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "INIT"
@@ -25,6 +26,8 @@ PUBLIC void ClearBSS(void);
 INTERFACE OS_Error PlatformInit(void)
 {
     ClearBSS();
+    HAL_DirectUartInit();
+
     LOG_I("Hello, QEMU Riscv64!");
     if (NR_CPUS <= 0 || NR_CPUS > PLATFORM_MAX_NR_CPUS)
     {
@@ -46,8 +49,6 @@ INTERFACE OS_Error PlatformStage2(void)
     HAL_DirectUartStage2();
 
     INTR_Enable();
-
-    PlatformMain();
 
     while (1);
     return OS_EOK;

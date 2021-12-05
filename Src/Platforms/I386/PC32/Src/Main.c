@@ -20,7 +20,7 @@ INTERFACE void PlatformMain(void)
     LOG_I("PC32 platform main running...\n");
 }
 
-PUBLIC void HAL_DirectUartGetc(char data)
+PUBLIC void HAL_DirectUartGetcHandler(char data)
 {
     switch (data)
     {

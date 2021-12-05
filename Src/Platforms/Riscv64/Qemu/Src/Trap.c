@@ -13,6 +13,7 @@
 #include <Trap.h>
 #include <Interrupt.h>
 #include <Clock.h>
+#include <PLIC.h>
 
 #define LOG_NAME "Trap"
 #include <Utils/Log.h>
@@ -81,7 +82,11 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
     if ((SCAUSE_INTERRUPT & frame->cause) && 
         SCAUSE_S_EXTERNAL_INTR == (frame->cause & 0xff))
     {
-        LOG_D("external interrupt");
+        IRQ_Number irqno = PLIC_Claim(0);
+        if (irqno != 0)
+        {
+            IRQ_Handle(irqno);
+        }
         return;
     }
     else if ((SCAUSE_INTERRUPT | SCAUSE_S_TIMER_INTR) == frame->cause)

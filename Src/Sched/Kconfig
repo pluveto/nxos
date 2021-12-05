@@ -9,3 +9,7 @@ config THREAD_NAME_LEN
 config THREAD_STACK_SIZE
     int "default thread stack size (bytes)"
     default 4096
+
+config ENABLE_SCHED
+    bool "Enable thread scheduler"
+    default n

@@ -12,10 +12,13 @@
 #include <IO/DelayIRQ.h>
 #include <MM/Alloc.h>
 
-#define IRQ_WORK_PENDING  0x80000000    /* work is pending */
+/* protect flags */
+#define IRQ_WORK_PENDING        0x80000000    /* work is pending */
+#define IRQ_WORK_ON_QUEUED      0x40000000    /* work is on queue */
+
 
 PRIVATE List DelayIrqListTable[IRQ_QUEUE_NR];
-PRIVATE U32 DelayIrqEvent;
+PRIVATE VOLATILE U32 DelayIrqEvent;
 
 PUBLIC void IRQ_DelayQueueInit(void)
 {
@@ -25,6 +28,11 @@ PUBLIC void IRQ_DelayQueueInit(void)
         ListInit(&DelayIrqListTable[i]);
     }
     DelayIrqEvent = 0;
+}
+
+PRIVATE U32 IRQ_DelayEventGet(void)
+{
+    return DelayIrqEvent;
 }
 
 PRIVATE void IRQ_DelayEventSet(U32 event)
@@ -51,6 +59,7 @@ PUBLIC OS_Error IRQ_DelayQueueEnter(IRQ_DelayQueue queue, IRQ_DelayWork *work)
 
     Uint level = INTR_SaveLevel();
     work->queue = queue;
+    work->flags |= IRQ_WORK_ON_QUEUED;
     ListAddTail(&work->list, &DelayIrqListTable[queue]);
     INTR_RestoreLevel(level);
     return OS_EOK;
@@ -70,6 +79,8 @@ PUBLIC OS_Error IRQ_DelayQueueLeave(IRQ_DelayQueue queue, IRQ_DelayWork *work)
 
     Uint level = INTR_SaveLevel();
     work->queue = 0;
+    work->flags &= ~IRQ_WORK_ON_QUEUED;
+
     ListDel(&work->list);
     INTR_RestoreLevel(level);
     return OS_EOK;
@@ -123,6 +134,10 @@ PUBLIC OS_Error IRQ_DelayWorkHandle(IRQ_DelayWork *work)
     {
         return OS_EINVAL;
     }
+    if (!(work->flags & IRQ_WORK_ON_QUEUED))
+    {
+        return OS_EFAULT;
+    }
     if (work->queue < 0 || work->queue >= IRQ_QUEUE_NR)
     {
         return OS_EFAULT;
@@ -162,9 +177,8 @@ INTERFACE void IRQ_DelayQueueCheck(void)
     
     while (checkTimes-- > 0)
     {
-        U32 irqEvent = DelayIrqEvent;
+        U32 irqEvent = IRQ_DelayEventGet();
         IRQ_DelayEventClear();
-
         if (irqEvent == 0)
         {
             return;
@@ -184,6 +198,7 @@ INTERFACE void IRQ_DelayQueueCheck(void)
                 IRQ_DelayWorkCheck(work);
             }
         }
+
         INTR_Disable();
     }
 }

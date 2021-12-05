@@ -14,6 +14,7 @@
 
 .text
 
+.extern IRQ_DelayQueueCheck
 .extern TrapDispatch
 .globl TrapEntry
 .align 4 # TrapEntry must aligin with 4 byte
@@ -28,6 +29,10 @@ TrapEntry:
 
 .globl TrapReturn
 TrapReturn:
+    
+    /* do exit check */
+    call IRQ_DelayQueueCheck
+
     RESTORE_CONTEXT
     # return from supervisor call
     sret
