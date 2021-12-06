@@ -92,7 +92,7 @@ PRIVATE void SchedIrqHandler(void *arg)
 PUBLIC OS_Error ClockInit(void)
 {
     OS_Error err;
-    err = IRQ_DelayWorkInit(&TimerWork, TimerIrqHandler, NULL, 0);
+    err = IRQ_DelayWorkInit(&TimerWork, TimerIrqHandler, NULL, IRQ_WORK_NOREENTER);
     if (err != OS_EOK)
     {
         goto End;

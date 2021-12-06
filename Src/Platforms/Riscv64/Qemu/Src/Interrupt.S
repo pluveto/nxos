@@ -16,16 +16,18 @@
 
 .extern IRQ_DelayQueueCheck
 .extern TrapDispatch
+.extern BootStackTop
 .globl TrapEntry
-.align 4 # TrapEntry must aligin with 4 byte
+.align 2 # TrapEntry must aligin with 4 byte
 TrapEntry:
 
     /* save sp to sscratch reg, sscratch saved old sp from user/kernel */
     csrrw sp, sscratch, sp
     
-    /* TODO: switch to cpu stack */
+    /* switch to cpu stack */
+    la sp, BootStackTop
 
-    /* save context */
+    /* save context to cpu stack */
     SAVE_CONTEXT
     
     /* call handler */
@@ -40,6 +42,7 @@ TrapReturn:
     /* do exit check */
     call IRQ_DelayQueueCheck
 
+    /* restore context will restore sp */
     RESTORE_CONTEXT
     /* return from supervisor call */
     sret

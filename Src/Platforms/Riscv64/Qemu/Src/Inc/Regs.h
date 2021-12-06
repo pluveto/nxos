@@ -21,6 +21,7 @@
 #define SSTATUS_UIE (1L << 0)  // User Interrupt Enable
 #define SSTATUS_FS (1L << 13)  // Float support
 #define SSTATUS_XS (1L << 14)  // Accelerator support
+#define SSTATUS_SUM (1L << 18)  // Supervisor Access User memroy
 
 #define RISCV_XLEN    64
 

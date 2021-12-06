@@ -12,7 +12,16 @@
 #ifndef __CONTEXT_HEADER__
 #define __CONTEXT_HEADER__
 
-#include <Interrupt.h>
+#include <XBook.h>
+#include <Riscv.h>
+
+#define CONTEXT_REG_NR  33
+
+#define CTX_PC_OFF      0
+#define CTX_SP_OFF      2
+#define CTX_STATUS_OFF  32
+
+#ifdef __ASSEMBLY__
 
 /**
  * NOTE: 
@@ -20,13 +29,11 @@
  * sp maybe user sp or kernel sp,
  * only save need sscratch, restore no need it.
  */
-#ifdef __ASSEMBLY__
-/* t0, t1, t2 broken in this func */
+/* t2 broken in this func */
 .macro SAVE_CONTEXT
     /* reserved context stack */
     addi sp, sp, -CONTEXT_REG_NR * REGBYTES
 
-    STORE x0, 0 * REGBYTES(sp)
     STORE x1, 1 * REGBYTES(sp)
     STORE x3, 3 * REGBYTES(sp)
     STORE x4, 4 * REGBYTES(sp)
@@ -58,22 +65,23 @@
     STORE x30, 30*REGBYTES(sp)
     STORE x31, 31*REGBYTES(sp)
     
-    csrr t0, sscratch
-    csrr t1, sstatus
+    csrr t2, sscratch
+    STORE t2, CTX_SP_OFF * REGBYTES(sp)
+    
+    csrr t2, sstatus
+    STORE t2, CTX_STATUS_OFF * REGBYTES(sp)
+    
     csrr t2, sepc
-
-    STORE t0, CTX_SP_OFF * REGBYTES(sp)
-    STORE t1, CTX_STATUS_OFF * REGBYTES(sp)
     STORE t2, CTX_PC_OFF * REGBYTES(sp)
 .endm
 
-/* s1, s2 broken in this func */
+/* s2 broken in this func */
 .macro RESTORE_CONTEXT
-    LOAD s1, CTX_STATUS_OFF * REGBYTES(sp)
     LOAD s2, CTX_PC_OFF * REGBYTES(sp)
-
-    csrw sstatus, s1
     csrw sepc, s2
+
+    LOAD s2, CTX_STATUS_OFF * REGBYTES(sp)
+    csrw sstatus, s2
     
     LOAD x1, 1*REGBYTES(sp)
     LOAD x3, 3*REGBYTES(sp)
@@ -109,7 +117,45 @@
     /* restore sp from context sp */
     LOAD sp, CTX_SP_OFF * REGBYTES(sp)
 .endm
+#else
 
-#endif
+struct HAL_Context
+{
+    Uint epc;   //sepc
+    Uint ra;    // Return address
+    Uint sp;    // Stack pointer
+    Uint gp;    // Global pointer
+    Uint tp;    // Thread pointer
+    Uint t0;    // Temporary
+    Uint t1;    // Temporary
+    Uint t2;    // Temporary
+    Uint s0;    // Saved register/frame pointer
+    Uint s1;    // Saved register
+    Uint a0;    // Function argument/return value
+    Uint a1;    // Function argument/return value
+    Uint a2;    // Function argument
+    Uint a3;    // Function argument
+    Uint a4;    // Function argument
+    Uint a5;    // Function argument
+    Uint a6;    // Function argument
+    Uint a7;    // Function argument
+    Uint s2;    // Saved register
+    Uint s3;    // Saved register
+    Uint s4;    // Saved register
+    Uint s5;    // Saved register
+    Uint s6;    // Saved register
+    Uint s7;    // Saved register
+    Uint s8;    // Saved register
+    Uint s9;    // Saved register
+    Uint s10;   // Saved register
+    Uint s11;   // Saved register
+    Uint t3;    // Temporary
+    Uint t4;    // Temporary
+    Uint t5;    // Temporary
+    Uint t6;    // Temporary
+    Uint sstatus;// sstatus
+} PACKED;
+typedef struct HAL_Context HAL_Context;
+#endif /* __ASSEMBLY__ */
 
 #endif  /* __CONTEXT_HEADER__ */

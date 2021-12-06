@@ -30,8 +30,7 @@ HAL_ContextSwitchNext:
  */
 .globl HAL_ContextSwitchPrevNext
 HAL_ContextSwitchPrevNext:
-    /* t0, t1, t2 will broken in SAVE_CONTEXT, so use t3 to save sp here */
-    mv t3, sp
+    mv t0, sp
 
     /**
      * set as supervisor mode and enable interupt 
@@ -50,7 +49,7 @@ HAL_ContextSwitchPrevNext:
     SAVE_CONTEXT
 
     /* save old sp to stack, instead the sp in sscratch */
-    STORE t3, CTX_PC_OFF * REGBYTES(sp)
+    STORE t0, CTX_SP_OFF * REGBYTES(sp)
 
     /* save sp to from thread, *from = `sp` */
     STORE sp, (a0)

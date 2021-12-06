@@ -61,9 +61,11 @@ PRIVATE void thread_entry3(void *arg)
 PUBLIC void Demo_HAL_Context(void)
 {
     LOG_I("start demo: HAL_Context");
-    threadSP1 = HAL_ContextInit(thread_entry1, (void *) 0x12345678, threadStack1, NULL);
-    threadSP2 = HAL_ContextInit(thread_entry2, (void *) 0x12345678, threadStack2, NULL);
-    threadSP3 = HAL_ContextInit(thread_entry3, (void *) 0x12345678, threadStack3, NULL);
+    threadSP1 = HAL_ContextInit(thread_entry1, (void *) 0x12345678, threadStack1 + STACK_SZ, NULL);
+    threadSP2 = HAL_ContextInit(thread_entry2, (void *) 0x12345678, threadStack2 + STACK_SZ, NULL);
+    threadSP3 = HAL_ContextInit(thread_entry3, (void *) 0x12345678, threadStack3 + STACK_SZ, NULL);
+    
+    LOG_I("demo: HAL_Context: switch");
     HAL_ContextSwitchNext((Uint)&threadSP1);
     LOG_I("end demo: HAL_Context");
 }

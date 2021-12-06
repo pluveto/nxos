@@ -13,7 +13,10 @@
 #define __RISCV_TRAP__
 
 #include <XBook.h>
+#include <Interrupt.h>
 
 PUBLIC void CPU_InitTrap(void);
+
+PUBLIC void TrapFrameDump(HAL_TrapFrame *frame);
 
 #endif  /* __RISCV_TRAP__ */

@@ -27,6 +27,6 @@ loop:
     .align 12
     .globl BootStack
 BootStack:
-    .space 4096 * 4 * 2
+    .space 4096 * 4
     .globl BootStackTop
 BootStackTop:

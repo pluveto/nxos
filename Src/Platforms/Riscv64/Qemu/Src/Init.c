@@ -48,8 +48,7 @@ INTERFACE OS_Error PlatformStage2(void)
     LOG_I("stage2!");
     HAL_DirectUartStage2();
 
-    INTR_Enable();
-
-    while (1);
+    // INTR_Enable();
+    // while (1);
     return OS_EOK;
 }

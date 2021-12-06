@@ -12,54 +12,10 @@
 #ifndef __INTERRUPT_HEADER__
 #define __INTERRUPT_HEADER__
 
-#include <XBook.h>
-#include <Riscv.h>
-
-#define CONTEXT_REG_NR  34
-
-#define CTX_SP_OFF      2
-#define CTX_STATUS_OFF  32
-#define CTX_PC_OFF      33
+#include <Context.h>
 
 #ifndef __ASSEMBLY__
-struct HAL_TrapFrame
-{
-    Uint zero;  // Hard-wired zero
-    Uint ra;    // Return address
-    Uint sp;    // Stack pointer
-    Uint gp;    // Global pointer
-    Uint tp;    // Thread pointer
-    Uint t0;    // Temporary
-    Uint t1;    // Temporary
-    Uint t2;    // Temporary
-    Uint s0;    // Saved register/frame pointer
-    Uint s1;    // Saved register
-    Uint a0;    // Function argument/return value
-    Uint a1;    // Function argument/return value
-    Uint a2;    // Function argument
-    Uint a3;    // Function argument
-    Uint a4;    // Function argument
-    Uint a5;    // Function argument
-    Uint a6;    // Function argument
-    Uint a7;    // Function argument
-    Uint s2;    // Saved register
-    Uint s3;    // Saved register
-    Uint s4;    // Saved register
-    Uint s5;    // Saved register
-    Uint s6;    // Saved register
-    Uint s7;    // Saved register
-    Uint s8;    // Saved register
-    Uint s9;    // Saved register
-    Uint s10;   // Saved register
-    Uint s11;   // Saved register
-    Uint t3;    // Temporary
-    Uint t4;    // Temporary
-    Uint t5;    // Temporary
-    Uint t6;    // Temporary
-    Uint status;//sstatus
-    Uint epc;   //sepc
-} PACKED;
-typedef struct HAL_TrapFrame HAL_TrapFrame;
+#define HAL_TrapFrame HAL_Context
 #endif
 
 #endif  /* __INTERRUPT_HEADER__ */

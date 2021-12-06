@@ -65,7 +65,7 @@ PRIVATE OS_Error ThreadInit(Thread *thread,
     thread->needSched = 0;
     thread->stackBase = stack;
     thread->stackSize = stackSize;
-    thread->stack = thread->stackBase + stackSize;
+    thread->stack = thread->stackBase + stackSize - sizeof(Uint);
     thread->stack = HAL_ContextInit(handler, arg, thread->stack, (void *)ThreadExit);
     
     thread->resource.sleepTimer = NULL;
