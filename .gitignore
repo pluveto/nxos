@@ -1,5 +1,4 @@
 .vscode/settings.json
-Tools/
 .config
 .config.old
 Scripts/Kconfiglib/__pycache__/*.pyc
