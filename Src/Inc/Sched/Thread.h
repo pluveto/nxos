@@ -75,8 +75,6 @@ struct Thread
 };
 typedef struct Thread Thread;
 
-IMPORT Thread *CurrentThread;
-
 PUBLIC Thread *ThreadCreate(const char *name, ThreadHandler handler, void *arg);
 PUBLIC OS_Error ThreadDestroy(Thread *thread);
 

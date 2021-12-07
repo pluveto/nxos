@@ -17,6 +17,7 @@
 
 IMPORT List ThreadReadyList;
 IMPORT List ThreadExitList;
+IMPORT Thread *CurrentThread;
 
 PUBLIC void SchedToFirstThread(void)
 {
@@ -25,6 +26,7 @@ PUBLIC void SchedToFirstThread(void)
     ListDel(&thread->list);
     thread->state = THREAD_RUNNING;
     CurrentThread = thread;
+    LOG_D("Sched to first thread:%s/%d", thread->name, thread->tid);
     HAL_ContextSwitchNext((Addr)&thread->stack);
     /* should never be here */
     PANIC("Sched to first thread failed!");
@@ -56,8 +58,7 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
     if (prev != NULL)
     {
         ASSERT(prev && next);
-        // LOG_D("Sched prev: %d next: %d", prev->tid, next->tid);
-        //LOG_D("Sched prev: %s next: %s", prev->name, next->name);
+        //LOG_D("Sched prev: %s/%d next: %s/%d", prev->name, prev->tid, next->name, next->tid);
         HAL_ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
     }
     else
@@ -89,6 +90,8 @@ PUBLIC void SchedExit(void)
 
 PUBLIC void ReSchedCheck(void)
 {
+    INTR_Enable();
+
     Thread *thread = CurrentThread;
     if (thread->isTerminated)
     {
@@ -108,4 +111,5 @@ PUBLIC void ReSchedCheck(void)
 
         SchedWithInterruptDisabled(level);
     }
+    INTR_Disable();
 }

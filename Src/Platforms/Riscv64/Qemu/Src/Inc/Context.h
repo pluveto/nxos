@@ -29,7 +29,7 @@
  * sp maybe user sp or kernel sp,
  * only save need sscratch, restore no need it.
  */
-/* t2 broken in this func */
+/* x1 broken in this func */
 .macro SAVE_CONTEXT
     /* reserved context stack */
     addi sp, sp, -CONTEXT_REG_NR * REGBYTES
@@ -65,23 +65,25 @@
     STORE x30, 30*REGBYTES(sp)
     STORE x31, 31*REGBYTES(sp)
     
-    csrr t2, sscratch
-    STORE t2, CTX_SP_OFF * REGBYTES(sp)
+    csrr x1, sstatus
+    STORE x1, CTX_STATUS_OFF * REGBYTES(sp)
     
-    csrr t2, sstatus
-    STORE t2, CTX_STATUS_OFF * REGBYTES(sp)
-    
-    csrr t2, sepc
-    STORE t2, CTX_PC_OFF * REGBYTES(sp)
+    csrr x1, sepc
+    STORE x1, CTX_PC_OFF * REGBYTES(sp)
+
+    csrr x1, sscratch
+    STORE x1, CTX_SP_OFF * REGBYTES(sp)
+
 .endm
 
-/* s2 broken in this func */
+/* x1 broken in this func */
 .macro RESTORE_CONTEXT
-    LOAD s2, CTX_PC_OFF * REGBYTES(sp)
-    csrw sepc, s2
 
-    LOAD s2, CTX_STATUS_OFF * REGBYTES(sp)
-    csrw sstatus, s2
+    LOAD x1, CTX_PC_OFF * REGBYTES(sp)
+    csrw sepc, x1
+
+    LOAD x1, CTX_STATUS_OFF * REGBYTES(sp)
+    csrw sstatus, x1
     
     LOAD x1, 1*REGBYTES(sp)
     LOAD x3, 3*REGBYTES(sp)

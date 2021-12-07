@@ -40,19 +40,21 @@ PUBLIC char *StrCopyN(const char *dst, const char *src, Size len)
     return (char *)dst;
 }
 
-PUBLIC char StrCmp(const char *a, const char *b)
+PUBLIC int StrCmp(const char *a, const char *b)
 {
     if (a == NULL || b == NULL)
     {
         LOG_D("NULL arg: %s", __func__);
         return 0;
     }
-    while (*a != 0 && *a == *b)
+
+    while (*a && *a == *b)
     {
         a++;
         b++;
     }
-    return *a < *b ? -1 : *a > *b;
+
+    return (*a - *b);
 }
 
 PUBLIC int StrLen(const char *str)

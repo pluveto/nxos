@@ -14,33 +14,33 @@
 
 #include <XBook.h>
 
-#define SSTATUS_SPP (1L << 8)  // Previous mode, 1=Supervisor, 0=User
-#define SSTATUS_SPIE (1L << 5) // Supervisor Previous Interrupt Enable
-#define SSTATUS_UPIE (1L << 4) // User Previous Interrupt Enable
-#define SSTATUS_SIE (1L << 1)  // Supervisor Interrupt Enable
-#define SSTATUS_UIE (1L << 0)  // User Interrupt Enable
-#define SSTATUS_FS (1L << 13)  // Float support
-#define SSTATUS_XS (1L << 14)  // Accelerator support
-#define SSTATUS_SUM (1L << 18)  // Supervisor Access User memroy
+#define SSTATUS_SPP     (1L << 8)  // Previous mode, 1=Supervisor, 0=User
+#define SSTATUS_SPIE    (1L << 5) // Supervisor Previous Interrupt Enable
+#define SSTATUS_UPIE    (1L << 4) // User Previous Interrupt Enable
+#define SSTATUS_SIE     (1L << 1)  // Supervisor Interrupt Enable
+#define SSTATUS_UIE     (1L << 0)  // User Interrupt Enable
+#define SSTATUS_FS      (1L << 13)  // Float support
+#define SSTATUS_XS      (1L << 14)  // Accelerator support
+#define SSTATUS_SUM     (1L << 18)  // Supervisor Access User memroy
 
 #define RISCV_XLEN    64
 
-#define SCAUSE_INTERRUPT    (1UL << (RISCV_XLEN - 1))
+#define SCAUSE_INTERRUPT        (1UL << (RISCV_XLEN - 1))
 #define SCAUSE_S_SOFTWARE_INTR  1
 #define SCAUSE_S_TIMER_INTR     5
 #define SCAUSE_S_EXTERNAL_INTR  9
 
-#define IRQ_S_SOFT   1
-#define IRQ_H_SOFT   2
-#define IRQ_M_SOFT   3
-#define IRQ_S_TIMER  5
-#define IRQ_H_TIMER  6
-#define IRQ_M_TIMER  7
-#define IRQ_S_EXT    9
-#define IRQ_H_EXT    10
-#define IRQ_M_EXT    11
-#define IRQ_COP      12
-#define IRQ_HOST     13
+#define IRQ_S_SOFT  1
+#define IRQ_H_SOFT  2
+#define IRQ_M_SOFT  3
+#define IRQ_S_TIMER 5
+#define IRQ_H_TIMER 6
+#define IRQ_M_TIMER 7
+#define IRQ_S_EXT   9
+#define IRQ_H_EXT   10
+#define IRQ_M_EXT   11
+#define IRQ_COP     12
+#define IRQ_HOST    13
 
 #define SIE_SSIE    (1 << IRQ_S_SOFT)
 #define SIE_STIE    (1 << IRQ_S_TIMER)

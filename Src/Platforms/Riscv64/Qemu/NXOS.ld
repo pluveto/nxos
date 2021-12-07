@@ -22,7 +22,7 @@ SECTIONS
     . = BASE_ADDRESS;
 
     /* code segment */
-    . = ALIGN(4);
+    . = ALIGN(8);
     __OS_TextStart = .;
     .text : 
     {
@@ -31,7 +31,7 @@ SECTIONS
         *(.init.text)
 		*(.exit.text)
         
-        . = ALIGN(4);
+        . = ALIGN(8);
         PROVIDE(__InitCallStart = .);
         KEEP(*(.initCall0.text))
         KEEP(*(.initCall1.text))
@@ -39,7 +39,7 @@ SECTIONS
         KEEP(*(.initCall9.text))
         PROVIDE(__InitCallEnd = .);
 
-        . = ALIGN(4);
+        . = ALIGN(8);
         PROVIDE(__ExitCallStart = .);
         KEEP(*(.exitcall0.text))
         KEEP(*(.exitcall1.text))
@@ -47,13 +47,13 @@ SECTIONS
         PROVIDE(__ExitCallEnd = .);
     
         /* section information for utest */
-        . = ALIGN(4);
+        . = ALIGN(8);
         PROVIDE(__UTestCaseTableStart = .);
         KEEP(*(UTestCaseTable))
         PROVIDE(__UTestCaseTableEnd = .);
         
         /* section information for integration */
-        . = ALIGN(4);
+        . = ALIGN(8);
         PROVIDE(__IntegrationTableStart = .);
         KEEP(*(IntegrationTable))
         PROVIDE(__IntegrationTableEnd = .);
@@ -62,7 +62,7 @@ SECTIONS
 
 
     /* data segment */
-    . = ALIGN(4);
+    . = ALIGN(8);
     __OS_DataStart = .;
     .data :
     {
@@ -75,7 +75,7 @@ SECTIONS
     
     /* bss segement */
     
-    . = ALIGN(4);
+    . = ALIGN(8);
     __OS_BssStart = .;
     .bss       :
     {
@@ -83,7 +83,7 @@ SECTIONS
         *(.bss.*)
         *(COMMON)
     }
-    . = ALIGN(4);
+    . = ALIGN(8);
     __OS_BssEnd = .;
 
 }

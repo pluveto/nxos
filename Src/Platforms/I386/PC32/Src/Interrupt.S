@@ -155,10 +155,8 @@ InterruptExit:
     /* do exit check */
     call IRQ_DelayQueueCheck
     
-    /* check sched (Open interrupt) */
-    sti
+    /* check sched (Interrupt disabled) */
     call ReSchedCheck
-    cli
 
     /* do interrupt stack restore  */
     addl $4, %esp               /* skip intr no */

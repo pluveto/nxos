@@ -14,9 +14,13 @@
 #include <Interrupt.h>
 #include <Clock.h>
 #include <PLIC.h>
+#include <Regs.h>
 
 #define LOG_NAME "Trap"
 #include <Utils/Log.h>
+
+#include <Sched/Thread.h>
+#include <Utils/Memory.h>
 
 IMPORT void TrapEntry();
 
@@ -198,4 +202,28 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
     LOG_E("scause:0x%p, stval:0x%p, sepc:0x%p", cause, stval, frame->epc);
     TrapFrameDump(frame);
     while(1);
+}
+
+/**
+ * switch CPU stack to thread stack, thread stack maybe stack top or stack middle.
+ */
+PUBLIC U8 *TrapSwitchStack(HAL_TrapFrame *frame)
+{
+    Uint sstatus = ReadCSR(sstatus);
+    U8 *sp;
+    if ((sstatus & SSTATUS_SPP)) /* trap from supervisor */
+    {
+        //LOG_D("from supervisor:%p, sstatus:%p", frame, sstatus);
+        sp = (U8 *)ReadCSR(sscratch); /* read from sscratch, it saved old sp in kernel */
+    }
+    else    /* trap from user */
+    {
+        LOG_W("from user:%p, sstatus:%p", frame, sstatus);
+        Thread *thread = ThreadSelf();
+        sp = (U8 *)(thread->stackBase + thread->stackSize);
+    }
+    sp -= sizeof(HAL_TrapFrame);
+    /* copy TrapFrame to new stack */
+    Copy((void *)sp, frame, sizeof(HAL_TrapFrame));
+    return sp; 
 }
