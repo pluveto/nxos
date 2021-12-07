@@ -1,7 +1,3 @@
-config PLATFROM_NAME
-    string "Platform name"
-    default "i386-pc32"
-
 config PLATFROM_I386_PC32
     bool
     default y

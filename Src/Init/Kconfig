@@ -19,6 +19,10 @@ if DEBUG
 endif
 endmenu
 
+config PLATFROM_NAME
+    string "Platform name"
+    default "Unknown"
+
 #
 # CPU numbers
 #

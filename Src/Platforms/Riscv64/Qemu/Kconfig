@@ -1,7 +1,3 @@
-config PLATFROM_NAME
-    string "Platform name"
-    default "riscv64-qemu"
-
 config PLATFROM_RISCV64_QEMU
     bool
     default y
