@@ -169,6 +169,7 @@ defconfig:
 	@-rm -f .config.old
 	@-cp Src/Platforms/$(ARCH)/$(MACH)/defconfig ./.config
 	@-cp Src/Platforms/$(ARCH)/$(MACH)/Kconfig ./Src/Platforms/Kconfig
+	@-cp $(CONFIG_OUT_FILE_PLATFORM) $(CONFIG_OUT_FILE)
 	@echo update Kconfig from platform $(ARCH)-$(MACH) .
 
 saveconfig:
