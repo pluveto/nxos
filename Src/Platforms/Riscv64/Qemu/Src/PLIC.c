@@ -32,7 +32,7 @@ PRIVATE OS_Error PLIC_SetPriority(IRQ_Number irqno, U32 priority)
 
 PUBLIC OS_Error PLIC_EnableIRQ(U32 hart, IRQ_Number irqno)
 {
-    if (hart >= NR_CPUS || irqno <= 0 || irqno >= NR_IRQS)
+    if (hart >= NR_MULTI_CORES || irqno <= 0 || irqno >= NR_IRQS)
     {
         return OS_EINVAL;
     }
@@ -51,7 +51,7 @@ PUBLIC OS_Error PLIC_EnableIRQ(U32 hart, IRQ_Number irqno)
 
 PUBLIC OS_Error PLIC_DisableIRQ(U32 hart, IRQ_Number irqno)
 {
-    if (hart >= NR_CPUS || irqno <= 0 || irqno >= NR_IRQS)
+    if (hart >= NR_MULTI_CORES || irqno <= 0 || irqno >= NR_IRQS)
     {
         return OS_EINVAL;
     }
@@ -73,7 +73,7 @@ PUBLIC OS_Error PLIC_DisableIRQ(U32 hart, IRQ_Number irqno)
  */
 PUBLIC IRQ_Number PLIC_Claim(U32 hart)
 {
-    if (hart >= NR_CPUS)
+    if (hart >= NR_MULTI_CORES)
     {
         return 0;
     }
@@ -87,7 +87,7 @@ PUBLIC IRQ_Number PLIC_Claim(U32 hart)
  */
 PUBLIC OS_Error PLIC_Complete(U32 hart, int irqno)
 {
-    if (hart >= NR_CPUS || irqno <= 0 || irqno >= NR_IRQS)
+    if (hart >= NR_MULTI_CORES || irqno <= 0 || irqno >= NR_IRQS)
     {
         return OS_EINVAL;
     }
@@ -97,19 +97,22 @@ PUBLIC OS_Error PLIC_Complete(U32 hart, int irqno)
     return OS_EOK;
 }
 
-PUBLIC void PLIC_Init(void)
+PUBLIC void PLIC_Init(Bool bootCore)
 {
-    int hart;
-    for (hart = 0; hart < NR_CPUS; hart++)
+    if (bootCore == TRUE)
     {
-        /* priority must be > threshold to trigger an interrupt */
-        Write32(PLIC_STHRESHOLD(hart), 0);
-        
-        /* set all interrupt priority */
-        int irqno;
-        for (irqno = 1; irqno < NR_IRQS; irqno++)
+        int hart;
+        for (hart = 0; hart < NR_MULTI_CORES; hart++)
         {
-            PLIC_SetPriority(irqno, 0);
+            /* priority must be > threshold to trigger an interrupt */
+            Write32(PLIC_STHRESHOLD(hart), 0);
+            
+            /* set all interrupt priority */
+            int irqno;
+            for (irqno = 1; irqno < NR_IRQS; irqno++)
+            {
+                PLIC_SetPriority(irqno, 0);
+            }
         }
     }
     /* Enable supervisor external interrupts. */

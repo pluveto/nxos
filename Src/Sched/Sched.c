@@ -14,6 +14,7 @@
 #include <Sched/Sched.h>
 #include <Sched/Thread.h>
 #include <XBook/HAL.h>
+#include <Sched/MultiCore.h>
 
 IMPORT List ThreadReadyList;
 IMPORT List ThreadExitList;
@@ -59,6 +60,7 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
     {
         ASSERT(prev && next);
         //LOG_D("Sched prev: %s/%d next: %s/%d", prev->name, prev->tid, next->name, next->tid);
+        //LOG_D("CPU#%d Sched", MultiCoreGetId());
         HAL_ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
     }
     else

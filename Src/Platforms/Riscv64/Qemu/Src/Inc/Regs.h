@@ -102,6 +102,13 @@
         (*(VOLATILE U64 *)(addr)) = (value); \
     }
 
+#define ReadReg(reg) ({ U64 __tmp; \
+    CASM ("mv %0, " #reg : "=r"(__tmp)); \
+    __tmp; })
+
+#define WriteReg(reg, val) ({ \
+        CASM ("mv " #reg ", %0" :: "r"(val)); })
+
 #endif /* !__ASSEMBLY__ */
 
 #endif  /* __PLATFROM_REGS__ */

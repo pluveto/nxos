@@ -41,7 +41,6 @@
 #ifdef LOG_ENABLE
 #include <Mods/Console/Console.h>
 #include <Mods/Time/Clock.h>
-#include <IO/IRQ.h>
 
 #ifdef LOG_LEVEL
 #ifndef LOG_MOD_LEVEL
@@ -83,19 +82,30 @@
 #define LOG_TIMELINE
 #endif
 
+PUBLIC OS_Error LogLineLock(Uint *level);
+PUBLIC OS_Error LogLineUnlock(Uint level);
+
 #define LOG_LINE(logName, color, ...) \
     do \
     { \
-        Uint _level = INTR_SaveLevel(); \
+        Uint _level; \
+        LogLineLock(&_level); \
         LOG_TIMELINE \
         __LOG_BEGIN(logName, color); \
         Printf(__VA_ARGS__); \
         __LOG_END; \
-        INTR_RestoreLevel(_level); \
+        LogLineUnlock(_level); \
     } \
     while (0)
 #define __LOG_RAW(...) LOG_TIMELINE \
-        Printf(__VA_ARGS__)
+    do \
+    { \
+        Uint _level; \
+        LogLineLock(&_level); \
+        Printf(__VA_ARGS__); \
+        LogLineUnlock(_level); \
+    } \
+    while (0)
 
 #else
 #define LOG_LINE(logName, color, fmt, ...)

@@ -31,7 +31,7 @@
 #define MEM_KERNEL_TOP  (MEM_SBI_BASE + MEM_KERNEL_SPACE_SZ)
 
 /* max cpus for qemu */
-#define PLATFORM_MAX_NR_CPUS 8
+#define PLATFORM_MAX_NR_MULTI_CORES 8
 
 /**
  * Physical memory layout:

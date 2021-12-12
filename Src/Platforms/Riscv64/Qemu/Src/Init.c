@@ -15,7 +15,10 @@
 #include <Page.h>
 #include <Platform.h>
 #include <PLIC.h>
+#include <SBI.h>
+#include <Regs.h>
 #include <Drivers/DirectUart.h>
+#include <Sched/MultiCore.h>
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "INIT"
@@ -23,20 +26,22 @@
 
 PUBLIC void ClearBSS(void);
 
-INTERFACE OS_Error PlatformInit(void)
+INTERFACE OS_Error PlatformInit(Uint coreId)
 {
     ClearBSS();
+
+    /* NOTE: after inited trap, you can use core id func */
+    CPU_InitTrap(coreId);
+
     HAL_DirectUartInit();
 
-    LOG_I("Hello, QEMU Riscv64!");
-    if (NR_CPUS <= 0 || NR_CPUS > PLATFORM_MAX_NR_CPUS)
-    {
-        PANIC("config CPU number error!");    
-    }
+    sbi_init();
+    sbi_print_version();
 
-    CPU_InitTrap();
+    LOG_I("Hello, QEMU Riscv64!");
+    
     HAL_InitClock();
-    PLIC_Init();
+    PLIC_Init(TRUE);
     
     PageInit();
     
@@ -47,7 +52,6 @@ INTERFACE OS_Error PlatformStage2(void)
 {
     LOG_I("stage2!");
     HAL_DirectUartStage2();
-
     // INTR_Enable();
     // while (1);
     return OS_EOK;

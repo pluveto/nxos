@@ -26,7 +26,7 @@
 
 PUBLIC void ClearBSS(void);
 
-INTERFACE OS_Error PlatformInit(void)
+INTERFACE OS_Error PlatformInit(Uint coreId)
 {
     ClearBSS();
     

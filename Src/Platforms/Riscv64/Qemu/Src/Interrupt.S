@@ -20,17 +20,43 @@
 .extern TrapSwitchStack
 .extern ReSchedCheck
 
-.extern BootStackTop
+.extern CPU_StackTop0
+.extern CPU_StackTop1
+.extern CPU_StackTop2
+.extern CPU_StackTop3
 
-.globl TrapEntry
+.globl TrapEntry0
+.globl TrapEntry1
+.globl TrapEntry2
+.globl TrapEntry3
+
 .align 2 # TrapEntry must aligin with 4 byte
-TrapEntry:
+TrapEntry0:
     /* save sp to sscratch reg, sscratch saved old sp from user/kernel */
-    csrrw sp, sscratch, sp
-    
+    csrrw sp, sscratch, sp    
     /* switch to cpu stack as temp stack */
-    la sp, BootStackTop
+    la sp, CPU_StackTop0
+    j TrapEntry
 
+.align 2
+TrapEntry1:
+    csrrw sp, sscratch, sp    
+    la sp, CPU_StackTop1
+    j TrapEntry
+
+.align 2
+TrapEntry2:
+    csrrw sp, sscratch, sp    
+    la sp, CPU_StackTop2
+    j TrapEntry
+
+.align 2
+TrapEntry3:
+    csrrw sp, sscratch, sp    
+    la sp, CPU_StackTop3
+    j TrapEntry
+
+TrapEntry:
     /* save context to cpu stack */
     SAVE_CONTEXT
 

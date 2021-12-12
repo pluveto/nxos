@@ -11,22 +11,58 @@
 
     .section .text.start
     .extern OS_Main
-    .global BootStack
+
+    .globl CPU_StackTop0
+    .globl CPU_StackTop1
+    .globl CPU_StackTop2
+    .globl CPU_StackTop3
     .global _Start
 _Start:
-    add t0, a0, 1
-    slli t0, t0, 14
-    la sp, BootStack
-    add sp, sp, t0
+    li t0, 0
+    beq a0, t0, _SetSP0
+    li t0, 1
+    beq a0, t0, _SetSP1
+    li t0, 2
+    beq a0, t0, _SetSP2
+    li t0, 3
+    beq a0, t0, _SetSP3
+    j _EnterMain
+    
+_SetSP0:
+    la sp, CPU_StackTop0
+    j _EnterMain
+
+_SetSP1:
+    la sp, CPU_StackTop1
+    j _EnterMain
+
+_SetSP2:
+    la sp, CPU_StackTop2
+    j _EnterMain
+
+_SetSP3:
+    la sp, CPU_StackTop3
+    j _EnterMain
+
+_EnterMain:
     csrw sscratch, sp /* first set sscrach as cpu stack here */
-	call OS_Main
+    call OS_Main
+
 loop:
     j loop
 
     .section .data.stack
     .align 12
-    .globl BootStack
-BootStack:
-    .space 4096 * 4
-    .globl BootStackTop
-BootStackTop:
+
+CPU_Stack0:
+    .space 8192
+CPU_StackTop0:
+CPU_Stack1:
+    .space 8192
+CPU_StackTop1:
+CoreStack2:
+    .space 8192
+CPU_StackTop2:
+CoreStack3:
+    .space 8192
+CPU_StackTop3:

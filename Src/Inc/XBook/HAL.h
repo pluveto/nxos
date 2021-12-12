@@ -15,7 +15,7 @@
 #include <XBook.h>
 
 /* Platform */
-INTERFACE OS_Error PlatformInit(void);
+INTERFACE OS_Error PlatformInit(Uint coreId);
 
 /**
  * stage2 means you can do:

@@ -20,6 +20,9 @@ struct Atomic
 };
 typedef struct Atomic Atomic;
 
+#define ATOMIC_INIT_VALUE(val) {val}
+#define STATIC_ATOMIC_INIT(name) Atomic name = ATOMIC_INIT_VALUE(0);
+
 struct AtomicOps
 {
     void (*set)(Atomic *atomic, long value);

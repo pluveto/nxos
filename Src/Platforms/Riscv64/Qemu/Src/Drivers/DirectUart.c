@@ -46,7 +46,7 @@
 PUBLIC void HAL_DirectUartPutc(char ch)
 {
 #ifdef CONFIG_UART0_FROM_SBI
-    SBI_ConsolePutChar(ch);
+    sbi_console_putchar(ch);
 #else
     if ((Read8(UART0_PHY_ADDR + LSR) & LSR_TX_IDLE) == 0)
     {
@@ -60,7 +60,7 @@ PUBLIC void HAL_DirectUartPutc(char ch)
 PUBLIC int HAL_DirectUartGetc(void)
 {
 #ifdef CONFIG_UART0_FROM_SBI
-    return SBI_ConsoleGetChar();
+    return sbi_console_getchar();
 #else
     if (Read8(UART0_PHY_ADDR + LSR) & 0x01)
     {

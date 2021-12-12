@@ -26,6 +26,6 @@ config PLATFROM_NAME
 #
 # CPU numbers
 #
-config NR_CPUS
-    int "platform CPU numbers"
+config NR_MULTI_CORES
+    int "platform CPU core numbers"
     default 1

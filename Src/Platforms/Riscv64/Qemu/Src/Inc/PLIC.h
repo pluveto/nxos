@@ -33,6 +33,6 @@ PUBLIC OS_Error PLIC_EnableIRQ(U32 hart, IRQ_Number irqno);
 PUBLIC OS_Error PLIC_DisableIRQ(U32 hart, IRQ_Number irqno);
 PUBLIC IRQ_Number PLIC_Claim(U32 hart);
 PUBLIC OS_Error PLIC_Complete(U32 hart, int irqno);
-PUBLIC void PLIC_Init(void);
+PUBLIC void PLIC_Init(Bool bootCore);
 
 #endif  /* __RISCV_PLIC__ */

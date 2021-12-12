@@ -10,58 +10,75 @@
  */
 
 #include <XBook/HAL.h>
-#define LOG_NAME "Main"
-#define LOG_LEVEL LOG_INFO
+#define LOG_NAME "OS Main"
 #include <Utils/Debug.h>
 
 #include <Mods/Test/UTest.h>
 #include <Sched/Thread.h>
 #include <Sched/Sched.h>
+#include <Sched/MultiCore.h>
 #include <MM/HeapCache.h>
 #include <MM/PageHeap.h>
 #include <IO/IRQ.h>
 #include <Mods/Time/Timer.h>
 
-PUBLIC int OS_Main(void)
+/* used to record how many core entered main */
+PRIVATE STATIC_ATOMIC_INIT(MainEnterReference);
+
+PUBLIC int OS_Main(Uint coreId)
 {
-    /* platfrom init */
-    if (PlatformInit() != OS_EOK)
+    if (!AtomicGet(&MainEnterReference))
     {
-        PANIC("Platfrom init failed!" Endln);
+        AtomicInc(&MainEnterReference);
+        
+        /* init multi core before enter platform */
+        MultiCoreInit(coreId);
+        
+        /* platfrom init */
+        if (PlatformInit(coreId) != OS_EOK)
+        {
+            PANIC("Platfrom init failed!" Endln);
+        }
+        LOG_I("Hello, NXOS!");
+
+        /* init irq */
+        IRQ_Init();
+
+        /* init page heap */
+        PageHeapInit();
+        
+        /* init heap cache for MemAlloc & MemFree */
+        HeapCacheInit();
+        
+        /* init timer */
+        TimersInit();
+
+        /* init thread */
+        ThreadsInit();
+        
+        if (ClockInit() != OS_EOK)
+        {
+            PANIC("Clock init failed!" Endln);
+        }
+        
+        /* init auto calls */
+        CallsInit();
+        
+        /* platform stage2 call */
+        if (PlatformStage2() != OS_EOK)
+        {
+            PANIC("Platform stage2 failed!");
+        }
+        
+        MultiCoreMain(coreId);
     }
-    LOG_I("Hello, NXOS!");
-
-    /* init irq */
-    IRQ_Init();
-
-    /* init page heap */
-    PageHeapInit();
-    
-    /* init heap cache for MemAlloc & MemFree */
-    HeapCacheInit();
-    
-    /* init timer */
-    TimersInit();
-
-    /* init thread */
-    ThreadsInit();
-    
-    if (ClockInit() != OS_EOK)
+    else
     {
-        PANIC("Clock init failed!" Endln);
+        MultiCoreStage2(coreId);
     }
-    
-    /* init auto calls */
-    CallsInit();
-    
-    /* platform stage2 call */
-    if (PlatformStage2() != OS_EOK)
-    {
-        PANIC("Platform stage2 failed!");
-    }
-
     /* start sched */
     SchedToFirstThread();
+    /* should never be here */
     PANIC("should never be here!");
     return 0;
 }

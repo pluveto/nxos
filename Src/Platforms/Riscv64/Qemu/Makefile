@@ -37,14 +37,14 @@ QEMU_ARGS 	:=  -m 128m \
 				-name "NXOS - Plartform QEMU - Arch Riscv64"
 
 # cpus
-ifndef CPUS
-CPUS := 1
-endif # CPUS
+ifndef CORES
+CORES := 4
+endif # CORES
 
 QEMU_ARGS	+= 	-machine virt
 QEMU_ARGS	+= 	-kernel $(NXOS_NAME).elf
 QEMU_ARGS	+= 	-bios $(SBI)
-QEMU_ARGS	+= 	-smp $(CPUS)
+QEMU_ARGS	+= 	-smp $(CORES)
 
 ifeq ($(QEMU_WINDOW),y)
 	QEMU_ARGS += -serial stdio

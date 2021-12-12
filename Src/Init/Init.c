@@ -11,6 +11,7 @@
 
 #include <XBook/InitCall.h>
 #include <Sched/Thread.h>
+#define LOG_NAME "InitCall"
 #include <Utils/Debug.h>
 
 IMPORT InitCallHandler __InitCallStart[];

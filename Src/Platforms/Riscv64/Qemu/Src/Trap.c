@@ -18,11 +18,11 @@
 
 #define LOG_NAME "Trap"
 #include <Utils/Log.h>
+#include <Utils/Debug.h>
 
 #include <Sched/Thread.h>
+#include <Sched/MultiCore.h>
 #include <Utils/Memory.h>
-
-IMPORT void TrapEntry();
 
 /* trap name for riscv */
 PRIVATE const char *InterruptName[] =
@@ -138,10 +138,33 @@ PUBLIC void TrapFrameDump(HAL_TrapFrame *frame)
     LOG_RAW("------------ Trap frame Dump Done ------------\n");
 }
 
-PUBLIC void CPU_InitTrap(void)
+IMPORT Addr TrapEntry0;
+IMPORT Addr TrapEntry1;
+IMPORT Addr TrapEntry2;
+IMPORT Addr TrapEntry3;
+
+PUBLIC void CPU_InitTrap(Uint coreId)
 {
+    Addr *trapEntry = 0;
+    switch (coreId)
+    {
+    case 0:
+        trapEntry = &TrapEntry0;
+        break;
+    case 1:
+        trapEntry = &TrapEntry1;
+        break;
+    case 2:
+        trapEntry = &TrapEntry2;
+        break;
+    case 3:
+        trapEntry = &TrapEntry3;
+        break;
+    default:
+        return;
+    }
     /* set trap entry */
-    WriteCSR(stvec, TrapEntry);
+    WriteCSR(stvec, trapEntry);
 
     /* Enable soft interrupt */
     SetCSR(sie, SIE_SSIE);
@@ -160,7 +183,7 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
     if ((SCAUSE_INTERRUPT & cause) && 
         SCAUSE_S_EXTERNAL_INTR == (cause & 0xff))
     {
-        IRQ_Number irqno = PLIC_Claim(0);
+        IRQ_Number irqno = PLIC_Claim(MultiCoreGetBootCore());
         if (irqno != 0)
         {
             IRQ_Handle(irqno);

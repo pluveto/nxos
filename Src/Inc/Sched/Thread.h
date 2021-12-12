@@ -92,4 +92,6 @@ PUBLIC OS_Error ThreadWakeup(Thread *thread);
 PUBLIC void ThreadsInit(void);
 PUBLIC void TestThread(void);
 
+PUBLIC void SchedToFirstThread(void);
+
 #endif /* __SCHED_THREAD__ */

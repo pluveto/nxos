@@ -35,7 +35,7 @@ PUBLIC void HAL_ClockHandler(void)
 {
     ClockTickGo();
     /* update timer */
-    SBI_SetTimer(GetTimerCounter() + TickDelta);
+    sbi_set_timer(GetTimerCounter() + TickDelta);
 }
 
 PUBLIC void HAL_InitClock(void)
@@ -44,7 +44,7 @@ PUBLIC void HAL_InitClock(void)
     ClearCSR(sie, SIE_STIE);
 
     /* Set timer */
-    SBI_SetTimer(GetTimerCounter() + TickDelta);
+    sbi_set_timer(GetTimerCounter() + TickDelta);
 
     /* Enable the Supervisor-Timer bit in SIE */
     SetCSR(sie, SIE_STIE);

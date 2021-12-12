@@ -13,6 +13,7 @@
 #define __UTILS_DEBUG__
 
 #include <XBook.h>
+#include <IO/IRQ.h>
 #include <Utils/Log.h>
 
 #ifdef CONFIG_DEBUG
