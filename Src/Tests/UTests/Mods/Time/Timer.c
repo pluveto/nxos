@@ -17,24 +17,26 @@
 
 PRIVATE int TimerOneshotFlags = 0;
 
-PRIVATE void TimerHandler(Timer *timer, void *arg)
+PRIVATE Bool TimerHandler(Timer *timer, void *arg)
 {
     TimerOneshotFlags++;
     if (arg == (void *)0x1234abcd)
     {
         TimerOneshotFlags++;    
     }
+    return TRUE;
 }
 
 #define TIMER_PERIOD_COUNT 10
 PRIVATE int TimerPeriodFlags = 0;
-PRIVATE void TimerHandler2(Timer *timer, void *arg)
+PRIVATE Bool TimerHandler2(Timer *timer, void *arg)
 {
     TimerPeriodFlags++;
     if (TimerPeriodFlags == TIMER_PERIOD_COUNT)
     {
-        TimerStop(timer);
+        return FALSE; /* no next timer */
     }
+    return TRUE;
 }
 
 TEST(TimerCreateAndDestroy)
@@ -51,7 +53,7 @@ TEST(TimerCreateAndDestroy)
     Timer *timer3 = TimerCreate(10, NULL, (void *)0x1234abcd, TIMER_ONESHOT);
     EXPECT_NULL(timer3);
 
-    Timer *timer4 = TimerCreate(10, TimerHandler, NULL, TIMER_PERIOD);
+    Timer *timer4 = TimerCreate(10, TimerHandler, NULL, TIMER_ONESHOT);
     EXPECT_NOT_NULL(timer4);
 
     EXPECT_NE(TimerDestroy(NULL), OS_EOK);
@@ -80,17 +82,18 @@ TEST(TimerStart)
     EXPECT_EQ(TimerPeriodFlags, TIMER_PERIOD_COUNT);
 }
 
-PRIVATE void TimerStopHandler(Timer *timer, void *arg)
+PRIVATE Bool TimerStopHandler(Timer *timer, void *arg)
 {
     EXPECT_FALSE(1); /* should never occur! */
+    return TRUE;
 }
 
 PRIVATE int StopTimerOccurTimes = 0;
-PRIVATE void TimerStopHandler2(Timer *timer, void *arg)
+PRIVATE Bool TimerStopHandler2(Timer *timer, void *arg)
 {
     StopTimerOccurTimes++;
-    EXPECT_EQ(TimerStop(timer), OS_EOK);
     EXPECT_EQ(StopTimerOccurTimes, 1);
+    return FALSE; /* no next timer */
 }
 
 TEST(TimerStop)

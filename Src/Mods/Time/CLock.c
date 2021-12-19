@@ -17,6 +17,7 @@
 
 #include <Sched/Thread.h>
 #include <Sched/Sched.h>
+#include <Sched/MultiCore.h>
 
 #include <IO/DelayIRQ.h>
 
@@ -41,13 +42,17 @@ PUBLIC void ClockTickSet(ClockTick tick)
 
 PUBLIC void ClockTickGo(void)
 {
-    SystemClockTicks++;
-    if ((SystemClockTicks % TICKS_PER_SECOND) == 0)
+    /* only boot core change system clock and timer */
+    if (MultiCoreGetBootCore() == MultiCoreGetId())
     {
-        //LOG_I("1s");
+        SystemClockTicks++;
+        if ((SystemClockTicks % TICKS_PER_SECOND) == 0)
+        {
+            //LOG_I("1s");
+        }
+        
+        IRQ_DelayWorkHandle(&TimerWork);
     }
-    
-    IRQ_DelayWorkHandle(&TimerWork);
 #ifdef CONFIG_ENABLE_SCHED
     IRQ_DelayWorkHandle(&SchedWork);
 #endif

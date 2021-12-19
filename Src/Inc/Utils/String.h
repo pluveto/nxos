@@ -20,6 +20,7 @@ PUBLIC int StrCmp(const char *a, const char *b);
 PUBLIC int StrLen(const char *str);
 PUBLIC char *StrCopyN(const char *dst, const char *src, Size len);
 
-int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args);
+PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args);
+PUBLIC int StrPrintfN(char *buf, int buflen, const char *fmt, ...);
 
 #endif  /* __UTILS_STRING__ */

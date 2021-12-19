@@ -150,7 +150,7 @@ PRIVATE char *_Number(char * str, long num, int base, int size, int precision,	i
 	return str;
 }
 
-int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
+PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
 {
 	char *str, *s;
 	int flags;
@@ -357,4 +357,11 @@ int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
 	}
 	*str = '\0';
 	return str - buf;
+}
+
+PUBLIC int StrPrintfN(char *buf, int buflen, const char *fmt, ...)
+{
+	VarList arg;
+	VarStart(arg, fmt);
+	return VarStrPrintfN(buf, buflen, fmt, arg);
 }

@@ -13,6 +13,7 @@
 #include <MM/Alloc.h>
 
 #include <Utils/Debug.h>
+#include <Sched/Spin.h>
 
 #define IDLE_TIMER_TIMEOUT  MAX_TIMER_TIMEOUT
 #define IDLE_TIMER_TIMEOUT_TICKS  (IDLE_TIMER_TIMEOUT / (1000 / TICKS_PER_SECOND))
@@ -27,8 +28,10 @@ PRIVATE VOLATILE ClockTick NextTimeoutTicks = 0;
 
 PRIVATE Timer IdleTimer;
 
+PRIVATE Spin TimersSpin;
+
 PUBLIC OS_Error TimerInit(Timer *timer, Uint milliseconds, 
-                          void (*handler)(struct Timer *, void *arg), void *arg, 
+                          Bool (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags)
 {
     if (timer == NULL || !milliseconds || handler == NULL || flags == 0)
@@ -56,7 +59,7 @@ PUBLIC OS_Error TimerInit(Timer *timer, Uint milliseconds,
 }
 
 PUBLIC Timer *TimerCreate(Uint milliseconds, 
-                          void (*handler)(struct Timer *, void *arg), void *arg, 
+                          Bool (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags)
 {
     Timer *timer = MemAlloc(sizeof(Timer));
@@ -117,7 +120,12 @@ PUBLIC OS_Error TimerDestroy(Timer *timer)
         return OS_EAGAIN;
     case TIMER_STOPPED:
     case TIMER_INITED:
-        TimerRemove(timer, FALSE, TRUE);
+        {
+            Uint level;
+            SpinLockIRQ(&TimersSpin, &level);
+            TimerRemove(timer, FALSE, TRUE);
+            SpinUnlockIRQ(&TimersSpin, level);
+        }
         break;
     default:
         return OS_EINVAL;
@@ -132,19 +140,21 @@ PUBLIC OS_Error TimerStart(Timer *timer)
         return OS_EINVAL;
     }
     
-    Uint level = INTR_SaveLevel();
+    Uint level;
+
+    SpinLockIRQ(&TimersSpin, &level);
 
     /* timeout is invalid */
     if (IDLE_TIMER_TIMEOUT_TICKS - timer->timeTicks < TimerTicks)
     {
-        INTR_RestoreLevel(level);
+        SpinUnlockIRQ(&TimersSpin, level);
         return OS_EINVAL;
     }
 
     /* make sure not on the list */
     if (ListFind(&timer->list, &TimerListHead))
     {
-        INTR_RestoreLevel(level);
+        SpinUnlockIRQ(&TimersSpin, level);
         return OS_EAGAIN;
     }
     
@@ -180,7 +190,36 @@ PUBLIC OS_Error TimerStart(Timer *timer)
         }
     }
 
-    INTR_RestoreLevel(level);
+    SpinUnlockIRQ(&TimersSpin, level);
+    return OS_EOK;
+}
+
+/**
+ * only stop a timer, not destroy
+ */
+PRIVATE OS_Error TimerStopUnlocked(Timer *timer)
+{
+    if (timer == NULL)
+    {
+        return OS_EINVAL;
+    }
+
+    TimerState state = timer->state;
+
+    /* stop must when state is waiting or processing */
+    if (state != TIMER_PROCESSING && state != TIMER_WAITING)
+    {
+        return OS_EAGAIN;
+    }
+
+    timer->state = TIMER_STOPPED;
+
+    /* direct del timer when waiting timer */
+    if (state == TIMER_WAITING)
+    {
+        TimerRemove(timer, TRUE, FALSE);
+    }
+
     return OS_EOK;
 }
 
@@ -194,33 +233,29 @@ PUBLIC OS_Error TimerStop(Timer *timer)
         return OS_EINVAL;
     }
 
-    Uint level = INTR_SaveLevel();
+    OS_Error err;
+    Uint level;
+    SpinLockIRQ(&TimersSpin, &level);
+
+    err = TimerStopUnlocked(timer);
     
-    TimerState state = timer->state;
-
-    /* stop must when state is waiting or processing */
-    if (state != TIMER_PROCESSING && state != TIMER_WAITING)
-    {    
-        INTR_RestoreLevel(level);
-        return OS_EAGAIN;
-    }
-
-    timer->state = TIMER_STOPPED;
-
-    /* direct del timer when waiting timer */
-    if (state == TIMER_WAITING)
-    {
-        TimerRemove(timer, TRUE, FALSE);
-    }
-
-    INTR_RestoreLevel(level);
-    return OS_EOK;
+    SpinUnlockIRQ(&TimersSpin, level);
+    return err;
 }
 
 PRIVATE void TimerInvoke(Timer *timer)
 {
     timer->state = TIMER_PROCESSING;
-    timer->handler(timer, timer->arg);
+    
+    /* stop timer here */
+    if (timer->handler(timer, timer->arg) == FALSE)
+    {
+        /* stop period timer if return false */
+        if (timer->flags & TIMER_PERIOD)
+        {
+            timer->state = TIMER_STOPPED;
+        }
+    }
 
     /* when calling the handler, called stop timer, need stop here */
     if (timer->state == TIMER_STOPPED)
@@ -259,8 +294,10 @@ PUBLIC void TimerGo(void)
         return;
     }
 
-    Uint level = INTR_SaveLevel();
+    Uint level;
     
+    SpinLockIRQ(&TimersSpin, &level);
+
     ListForEachEntrySafe(timer, next, &TimerListHead, list)
     {
         if (timer->timeout > TimerTicks) /* not timeout */
@@ -280,14 +317,26 @@ PUBLIC void TimerGo(void)
         }
     }
     NextTimeoutTicks = timer->timeout;
-    INTR_RestoreLevel(level);
+    SpinUnlockIRQ(&TimersSpin, level);
+}
+
+PUBLIC void TimerDump(Timer *timer)
+{
+    LOG_I("==== Timer ====");
+    LOG_I("addr:%p", timer);
+    LOG_I("state:%d", timer->state);
+    LOG_I("timeout:%p", timer->timeout);
+    LOG_I("timeTicks:%p", timer->timeTicks);
+    LOG_I("flags:%x", timer->flags);
+    LOG_I("handler:%p", timer->handler);
+    LOG_I("arg:%p", timer->arg);
 }
 
 /**
  * recalc all timers timeout
  * this will called with interrupt disabled
  */
-PRIVATE void IdleTimerHandler(Timer *timer, void *arg)
+PRIVATE Bool IdleTimerHandler(Timer *timer, void *arg)
 {
     ClockTick delta = IdleTimer.timeout;
     TimerTicks -= delta;
@@ -296,10 +345,12 @@ PRIVATE void IdleTimerHandler(Timer *timer, void *arg)
     {
         tmp->timeout -= delta;
     }
+    return TRUE;
 }
 
 PUBLIC void TimersInit(void)
 {
+    SpinInit(&TimersSpin);
     ASSERT(TimerInit(&IdleTimer, IDLE_TIMER_TIMEOUT, IdleTimerHandler, NULL, TRUE) == OS_EOK);
     ASSERT(TimerStart(&IdleTimer) == OS_EOK);
 }

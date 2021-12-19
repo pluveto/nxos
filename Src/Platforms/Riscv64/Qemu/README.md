@@ -15,8 +15,12 @@
 - [ ] 添加内核MMU映射
 
 - [ ] 添加SMP支持
-  - [ ] 添加SMP启动
+  - [x] 添加SMP启动
   - [ ] 添加SMP调度
+    - [ ] 线程sleep有BUG。
+    - [ ] SpinLockIRQ中添加level支持
+    
+  
 
 # 内存布局
 

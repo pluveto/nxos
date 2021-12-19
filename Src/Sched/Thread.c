@@ -16,28 +16,12 @@
 #include <Sched/ThreadID.h>
 #include <Sched/Sched.h>
 #include <Sched/Mutex.h>
+#include <Sched/MultiCore.h>
 #include <MM/Alloc.h>
 #include <Utils/String.h>
 #include <Mods/Time/Timer.h>
 
-/* TODO: add lock lock for thread list */
-PUBLIC List ThreadGlobalList;
-PUBLIC List ThreadExitList;
-PUBLIC List ThreadReadyList;
-PUBLIC Thread *CurrentThread = NULL;
-
-PUBLIC Thread *ThreadFindById(U32 tid)
-{
-    Thread *thread;
-    ListForEachEntry (thread, &ThreadGlobalList, globalList)
-    {
-        if (thread->tid == tid)
-        {
-            return thread;
-        }
-    }
-    return NULL;
-}
+PUBLIC ThreadManager ThreadManagerObject;
 
 PRIVATE OS_Error ThreadInit(Thread *thread, 
     const char *name,
@@ -63,12 +47,18 @@ PRIVATE OS_Error ThreadInit(Thread *thread,
     thread->timeslice = 3;
     thread->ticks = thread->timeslice;
     thread->needSched = 0;
+    thread->isTerminated = 0;
     thread->stackBase = stack;
     thread->stackSize = stackSize;
     thread->stack = thread->stackBase + stackSize - sizeof(Uint);
     thread->stack = HAL_ContextInit(handler, arg, thread->stack, (void *)ThreadExit);
     
+    thread->onCore = NR_MULTI_CORES; /* not on any core */
+    thread->coreAffinity = NR_MULTI_CORES; /* no core affinity */
+
     thread->resource.sleepTimer = NULL;
+
+    SpinInit(&thread->lock);
     return OS_EOK;
 }
 
@@ -132,15 +122,54 @@ PUBLIC OS_Error ThreadDestroy(Thread *thread)
     return OS_EOK;
 }
 
+PUBLIC void ThreadReadyRunLocked(Thread *thread, int flags)
+{
+    thread->state = THREAD_READY;
+
+    if (thread->onCore < NR_MULTI_CORES)
+    {
+        MultiCoreEnqueueThreadIrqDisabled(thread->onCore, thread, flags);
+    }
+    else
+    {
+        if (flags & SCHED_HEAD)
+        {
+            ListAdd(&thread->list, &ThreadManagerObject.pendingList);
+        }
+        else
+        {
+            ListAddTail(&thread->list, &ThreadManagerObject.pendingList);
+        }
+    }
+}
+
+PUBLIC void ThreadReadyRunUnlocked(Thread *thread, int flags)
+{
+    Uint level;
+    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+
+    ThreadReadyRunLocked(thread, flags);
+    
+    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+}
+
 PUBLIC OS_Error ThreadRun(Thread *thread)
 {
     if (thread == NULL)
     {
         return OS_EINVAL;
     }
-    thread->state = THREAD_READY;
-    ListAdd(&thread->list, &ThreadReadyList);
-    ListAdd(&thread->globalList, &ThreadGlobalList);
+
+    Uint level;
+    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+
+    /* add to global list */
+    ListAdd(&thread->globalList, &ThreadManagerObject.globalList);
+    
+    /* add to ready list */
+    ThreadReadyRunLocked(thread, SCHED_TAIL);
+    
+    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
     return OS_EOK;
 }
 
@@ -202,8 +231,12 @@ PUBLIC void ThreadExit(void)
     /* release the resource here that not the must for a thread! */
     ThreadReleaseResouce(thread);
 
+    Uint level;
+    SpinLockIRQ(&ThreadManagerObject.lock, &level);
     /* thread exit from global list */
     ListDel(&thread->globalList);
+    
+    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
     
     SchedExit();
     PANIC("Thread Exit should never arrival here!");
@@ -211,7 +244,9 @@ PUBLIC void ThreadExit(void)
 
 PUBLIC Thread *ThreadSelf(void)
 {
-    return CurrentThread;
+    Thread *cur = CLS_GetRunning();
+    ASSERT(cur != NULL);
+    return cur;
 }
 
 /**
@@ -230,10 +265,7 @@ PRIVATE void ThreadBlockInterruptDisabled(ThreadState state, Uint irqLevel)
  */
 PRIVATE void ThreadUnblockInterruptDisabled(Thread *thread)
 {
-    /* add thread to ready list */
-    CurrentThread->state = THREAD_READY;
-    /* add to list head so that can be run quickly */
-    ListAdd(&thread->list, &ThreadReadyList);    
+    ThreadReadyRunLocked(thread, SCHED_HEAD);
 }
 
 /**
@@ -253,21 +285,23 @@ PUBLIC OS_Error ThreadWakeup(Thread *thread)
     return OS_EOK;
 }
 
-PRIVATE void ThreadSleepTimeout(Timer *timer, void *arg)
+PRIVATE Bool TimerThreadSleepTimeout(Timer *timer, void *arg)
 {
     Thread *thread = (Thread *)arg; /* the thread wait for timeout  */
-    
+
+    ASSERT(thread->state == THREAD_SLEEP);
+
+    thread->resource.sleepTimer = NULL; /* cleanup sleep timer */
+
     if (ThreadWakeup(thread) != OS_EOK)
     {
-        LOG_E("Wakeup thread:%s/%d failed!\n", thread->name, thread->tid);
+        LOG_E("Wakeup thread:%s/%d failed!", thread->name, thread->tid);
     }
     else
     {
-        LOG_I("Wakeup thread:%s/%d success!\n", thread->name, thread->tid);
+        LOG_I("Wakeup thread:%s/%d success!", thread->name, thread->tid);
     }
-    
-    thread->resource.sleepTimer = NULL; /* cleanup sleep timer */
-
+    return TRUE;
 }
 
 /* if thread sleep less equal than 2s, use delay instead */
@@ -287,7 +321,7 @@ PUBLIC OS_Error ThreadSleep(Uint microseconds)
     Thread *self = ThreadSelf();
     Timer sleepTimer;
     OS_Error err;
-    err = TimerInit(&sleepTimer, microseconds, ThreadSleepTimeout, (void *)self, TIMER_ONESHOT);
+    err = TimerInit(&sleepTimer, microseconds, TimerThreadSleepTimeout, (void *)self, TIMER_ONESHOT);
     if (err != OS_EOK)
     {
         return err;
@@ -313,12 +347,75 @@ PUBLIC OS_Error ThreadSleep(Uint microseconds)
     return OS_EOK;
 }
 
+PUBLIC OS_Error ThreadSetAffinity(Thread *thread, Uint coreId)
+{
+    if (thread == NULL || coreId >= NR_MULTI_CORES)
+    {
+        return OS_EINVAL;
+    }
+    Uint level;
+    SpinLockIRQ(&thread->lock, &level);
+    thread->coreAffinity = coreId;
+    thread->onCore = coreId;
+    SpinUnlockIRQ(&thread->lock, level);
+    return OS_EOK;
+}
+
+PUBLIC void ThreadEnqueuePendingList(Thread *thread)
+{
+    Uint level;
+    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    ListAdd(&thread->list, &ThreadManagerObject.pendingList);
+    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+}
+
+PUBLIC Thread *ThreadDequeuePendingList(void)
+{
+    Thread *thread;
+    SpinLock(&ThreadManagerObject.lock, TRUE);
+    thread = ListFirstEntryOrNULL(&ThreadManagerObject.pendingList, Thread, list);
+    if (thread != NULL)
+    {
+        ListDel(&thread->list);
+    }
+    SpinUnlock(&ThreadManagerObject.lock);
+    return thread;
+}
+
+PUBLIC void ThreadEnququeExitList(Thread *thread)
+{
+    Uint level;
+    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    ListAdd(&thread->globalList, &ThreadManagerObject.exitList);
+    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+}
+
+PUBLIC Thread *ThreadFindById(U32 tid)
+{
+    Thread *thread = NULL, *find = NULL;
+    Uint level;
+
+    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+
+    ListForEachEntry (thread, &ThreadManagerObject.globalList, globalList)
+    {
+        if (thread->tid == tid)
+        {
+            find = thread;
+            break;
+        }
+    }
+
+    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    return find;
+}
+
 /**
  * system idle thread on per cpu.
  */
-PRIVATE void IdleThread(void *arg)
+PRIVATE void IdleThreadEntry(void *arg)
 {
-    LOG_I("Hello, idle thread");
+    LOG_I("Idle thread: %s startting...", ThreadSelf()->name);
     int i = 0;
     while (1)
     {
@@ -330,15 +427,15 @@ PRIVATE void IdleThread(void *arg)
 /**
  * system deamon thread for all cpus 
  */
-PRIVATE void DaemonThread(void *arg)
+PRIVATE void DaemonThreadEntry(void *arg)
 {
     LOG_I("Daemon thread started.\n");
     Thread *thread, *safe;
+    Uint level;
     while (1)
     {
-        /* TODO: lock thread instead interrupt disable */
-        INTR_Disable();
-        ListForEachEntrySafe (thread, safe, &ThreadExitList, globalList)
+        SpinLockIRQ(&ThreadManagerObject.lock, &level);
+        ListForEachEntrySafe (thread, safe, &ThreadManagerObject.exitList, globalList)
         {
             LOG_D("daemon release thread: %s/%d", thread->name, thread->tid);
             /* del from exit list */
@@ -346,28 +443,46 @@ PRIVATE void DaemonThread(void *arg)
 
             ThreadReleaseSelf(thread);
         }
-        INTR_Enable();
+        SpinUnlockIRQ(&ThreadManagerObject.lock, level);
 
-        /* do delay or timeout */
+        /* do delay or timeout, sleep 0.5s */
         ThreadYield();
     }
 }
 
+PUBLIC void ThreadManagerInit(void)
+{
+    AtomicSet(&ThreadManagerObject.averageThreadThreshold, 0);
+    ListInit(&ThreadManagerObject.exitList);
+    ListInit(&ThreadManagerObject.globalList);
+    ListInit(&ThreadManagerObject.pendingList);
+    
+    SpinInit(&ThreadManagerObject.lock);
+}
+
 PUBLIC void ThreadsInit(void)
 {
+    Thread *idleThread;
+    Thread *deamonThread;
+    int coreId;
+    char name[8];
     ThreadsInitID();
-    ListInit(&ThreadGlobalList);
-    ListInit(&ThreadExitList);
-    ListInit(&ThreadReadyList);
-    CurrentThread = NULL;
+    ThreadManagerInit();
 
     /* init idle thread */
-    Thread *thread = ThreadCreate("idle/N", IdleThread, NULL);
-    ASSERT(thread != NULL);
-    ASSERT(ThreadRun(thread) == OS_EOK);
+    for (coreId = 0; coreId < NR_MULTI_CORES; coreId++)
+    {
+        StrPrintfN(name, 8, "Idle%d", coreId);
+        idleThread = ThreadCreate(name, IdleThreadEntry, NULL);
+        ASSERT(idleThread != NULL);
+        /* bind idle on each core */
+        ThreadSetAffinity(idleThread, coreId);
+
+        ASSERT(ThreadRun(idleThread) == OS_EOK);
+    }
 
     /* init daemon thread */
-    thread = ThreadCreate("daemon", DaemonThread, NULL);
-    ASSERT(thread != NULL);
-    ASSERT(ThreadRun(thread) == OS_EOK);
+    deamonThread = ThreadCreate("daemon", DaemonThreadEntry, NULL);
+    ASSERT(deamonThread != NULL);
+    ASSERT(ThreadRun(deamonThread) == OS_EOK);
 }

@@ -46,6 +46,7 @@ _SetSP3:
 
 _EnterMain:
     csrw sscratch, sp /* first set sscrach as cpu stack here */
+    csrc sstatus, 0x2 /* disable interrupt */
     call OS_Main
 
 loop:

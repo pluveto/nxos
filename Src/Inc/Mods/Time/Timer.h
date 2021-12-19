@@ -39,22 +39,24 @@ struct Timer
     ClockTick timeout;  /* timeout ticks */ 
     ClockTick timeTicks;
     int flags;
-    void (*handler)(struct Timer *, void *arg);
+    Bool (*handler)(struct Timer *, void *arg);
     void *arg;
 };
 typedef struct Timer Timer;
 
 PUBLIC OS_Error TimerInit(Timer *timer, Uint milliseconds, 
-                          void (*handler)(struct Timer *, void *arg), void *arg, 
+                          Bool (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags);
                           
 PUBLIC Timer *TimerCreate(Uint milliseconds, 
-                          void (*handler)(struct Timer *, void *arg), void *arg, 
+                          Bool (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags);
                           
 PUBLIC OS_Error TimerStart(Timer *timer);
 PUBLIC OS_Error TimerStop(Timer *timer);
 PUBLIC OS_Error TimerDestroy(Timer *timer);
+
+PUBLIC void TimerDump(Timer *timer);
 
 PUBLIC void TimersInit(void);
 PUBLIC void TimerGo(void);

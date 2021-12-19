@@ -16,17 +16,14 @@
 #include <XBook/HAL.h>
 #include <Sched/MultiCore.h>
 
-IMPORT List ThreadReadyList;
-IMPORT List ThreadExitList;
-IMPORT Thread *CurrentThread;
+IMPORT ThreadManager ThreadManagerObject;
 
 PUBLIC void SchedToFirstThread(void)
 {
-    /* get a thread from ready list */
-    Thread *thread = ListFirstEntry(&ThreadReadyList, Thread, list);
-    ListDel(&thread->list);
-    thread->state = THREAD_RUNNING;
-    CurrentThread = thread;
+    Uint coreId = MultiCoreGetId();
+    Thread *thread = MultiCoreDeququeThreadIrqDisabled(coreId);
+    ASSERT(thread != NULL);
+    ASSERT(MultiCoreSetRunning(coreId, thread) == OS_EOK);
     LOG_D("Sched to first thread:%s/%d", thread->name, thread->tid);
     HAL_ContextSwitchNext((Addr)&thread->stack);
     /* should never be here */
@@ -38,7 +35,8 @@ PUBLIC void SchedToFirstThread(void)
  */
 PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
 {
-    Thread *next, *prev;
+    Thread *next, *prev, *thread;
+    Uint coreId = MultiCoreGetId();
 
     /* put prev into list */
     prev = CurrentThread;
@@ -48,13 +46,17 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
         prev = NULL;    /* not save prev context */
     }
     
-    /* get next from list */
-    next = ListFirstEntry(&ThreadReadyList, Thread, list);
-    ListDel(&next->list);
-    next->state = THREAD_RUNNING;
+    /* pull thread from pending list */
+    thread = ThreadDequeuePendingList();
+    if (thread != NULL)
+    {
+        thread->onCore = coreId;
+        ThreadReadyRunLocked(thread, SCHED_HEAD);
+    }
 
-    /* set current */
-    CurrentThread = next;
+    /* get next from local list */
+    next = MultiCoreDeququeThreadIrqDisabled(coreId);
+    MultiCoreSetRunning(coreId, next);
 
     if (prev != NULL)
     {
@@ -73,9 +75,11 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
 PUBLIC void SchedYield(void)
 {
     Uint level = INTR_SaveLevel();
-    /* put thread to tail of ready list */
-    CurrentThread->state = THREAD_READY;
-    ListAddTail(&CurrentThread->list, &ThreadReadyList);
+
+    Thread *cur = CurrentThread;
+    
+    ThreadReadyRunUnlocked(cur, SCHED_TAIL);
+
     SchedWithInterruptDisabled(level);
 }
 
@@ -83,10 +87,12 @@ PUBLIC void SchedExit(void)
 {
     Uint level = INTR_SaveLevel();
 
-    /* set exit state, del from global list and add to exit list */
-    CurrentThread->state = THREAD_EXIT;
-    LOG_D("Thread exit: %d", CurrentThread->tid);
-    ListAdd(&CurrentThread->globalList, &ThreadExitList);
+    Thread *cur = CurrentThread;
+    LOG_D("Thread exit: %d", cur->tid);
+
+    cur->state = THREAD_EXIT;
+    ThreadEnququeExitList(cur);
+
     SchedWithInterruptDisabled(level);
 }
 
@@ -106,10 +112,10 @@ PUBLIC void ReSchedCheck(void)
         Uint level = INTR_SaveLevel();
         thread->needSched = 0;
 
-        /* put thread to tail of thread and reset ticks from timeslice */
+        /* reset ticks from timeslice */
         thread->ticks = thread->timeslice;
-        thread->state = THREAD_READY;
-        ListAddTail(&thread->list, &ThreadReadyList);
+
+        ThreadReadyRunUnlocked(thread, SCHED_TAIL);
 
         SchedWithInterruptDisabled(level);
     }

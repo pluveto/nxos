@@ -22,11 +22,12 @@ struct Spin
 {
     Atomic value;
     U32 magic;  /* magic for spin init */
+    Uint irqLevel;  /* save irq level */
 };
 typedef struct Spin Spin;
 
-#define STATIC_SPIN_UNLOCKED(name) Spin name = {ATOMIC_INIT_VALUE(0), SPIN_MAGIC}
-#define STATIC_SPIN_LOCKED(name) Spin name = {ATOMIC_INIT_VALUE(1), SPIN_MAGIC}
+#define STATIC_SPIN_UNLOCKED(name) Spin name = {ATOMIC_INIT_VALUE(0), SPIN_MAGIC, 0}
+#define STATIC_SPIN_LOCKED(name) Spin name = {ATOMIC_INIT_VALUE(1), SPIN_MAGIC, 0}
 
 PUBLIC OS_Error SpinInit(Spin *lock);
 PUBLIC OS_Error SpinLock(Spin *lock, Bool forever);

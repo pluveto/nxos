@@ -14,6 +14,9 @@
 
 #include <XBook.h>
 
+#define SCHED_HEAD          0x01
+#define SCHED_TAIL          0x02
+
 PUBLIC void SchedToFirstThread(void);
 PUBLIC void SchedWithInterruptDisabled(Uint irqLevel);
 PUBLIC void SchedYield(void);

@@ -32,7 +32,7 @@ PUBLIC int OS_Main(Uint coreId)
         AtomicInc(&MainEnterReference);
         
         /* init multi core before enter platform */
-        MultiCoreInit(coreId);
+        MultiCorePreload(coreId);
         
         /* platfrom init */
         if (PlatformInit(coreId) != OS_EOK)
@@ -52,6 +52,9 @@ PUBLIC int OS_Main(Uint coreId)
         
         /* init timer */
         TimersInit();
+
+        /* init multi core */
+        MultiCoreInit(coreId);
 
         /* init thread */
         ThreadsInit();

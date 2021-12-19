@@ -26,6 +26,7 @@ PUBLIC OS_Error SpinInit(Spin *lock)
 
     AtomicSet(&lock->value, 0);
     lock->magic = SPIN_MAGIC;
+    lock->irqLevel = 0;
     return OS_EOK;
 }
 
