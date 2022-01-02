@@ -11,7 +11,7 @@
 
 #include <Utils/Demo.h>
 #include <Utils/Log.h>
-#include <XBook/HAL.h>
+#include <Sched/Context.h>
 
 #ifdef CONFIG_DEMO_HAL_CONTEXT
 
@@ -32,7 +32,7 @@ PRIVATE void thread_entry1(void *arg)
     while (1)
     {
         LOG_D("Hello 1");
-        HAL_ContextSwitchPrevNext((Uint)&threadSP1, (Uint)&threadSP2);
+        ContextSwitchPrevNext((Uint)&threadSP1, (Uint)&threadSP2);
     }
 }
 
@@ -43,7 +43,7 @@ PRIVATE void thread_entry2(void *arg)
     while (1)
     {
         LOG_D("Hello 2");
-        HAL_ContextSwitchPrevNext((Uint)&threadSP2, (Uint)&threadSP3);
+        ContextSwitchPrevNext((Uint)&threadSP2, (Uint)&threadSP3);
     }
 }
 
@@ -54,19 +54,19 @@ PRIVATE void thread_entry3(void *arg)
     while (1)
     {
         LOG_D("Hello 3");
-        HAL_ContextSwitchPrevNext((Uint)&threadSP3, (Uint)&threadSP1);
+        ContextSwitchPrevNext((Uint)&threadSP3, (Uint)&threadSP1);
     }
 }
 
 PUBLIC void Demo_HAL_Context(void)
 {
     LOG_I("start demo: HAL_Context");
-    threadSP1 = HAL_ContextInit(thread_entry1, (void *) 0x12345678, threadStack1 + STACK_SZ, NULL);
-    threadSP2 = HAL_ContextInit(thread_entry2, (void *) 0x12345678, threadStack2 + STACK_SZ, NULL);
-    threadSP3 = HAL_ContextInit(thread_entry3, (void *) 0x12345678, threadStack3 + STACK_SZ, NULL);
+    threadSP1 = ContextInit(thread_entry1, NULL, (void *) 0x12345678, threadStack1 + STACK_SZ);
+    threadSP2 = ContextInit(thread_entry2, NULL, (void *) 0x12345678, threadStack2 + STACK_SZ);
+    threadSP3 = ContextInit(thread_entry3, NULL, (void *) 0x12345678, threadStack3 + STACK_SZ);
     
     LOG_I("demo: HAL_Context: switch");
-    HAL_ContextSwitchNext((Uint)&threadSP1);
+    ContextSwitchNext((Uint)&threadSP1);
     LOG_I("end demo: HAL_Context");
 }
 

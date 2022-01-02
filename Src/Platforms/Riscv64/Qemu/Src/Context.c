@@ -9,18 +9,21 @@
  * 2021-10-16     JasonHu           Init
  */
 
-#include <XBook/HAL.h>
+#include <Sched/Context.h>
 #include <Utils/Memory.h>
 #include <Utils/Log.h>
 #include <Context.h>
 #include <Regs.h>
 
-INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackTop, void *exit)
+IMPORT void HAL_ContextSwitchNext(Addr nextSP);
+IMPORT void HAL_ContextSwitchPrevNext(Addr prevSP, Addr nextSP);
+
+PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void *stackTop)
 {
     U8 *stack = NULL;
     HAL_Context *context = NULL;
 
-    stack = stackTop;
+    stack = (U8 *)stackTop;
     stack = (U8 *)ALIGN_DOWN((Uint)stack, sizeof(Uint));
 
     stack -= sizeof(HAL_Context);
@@ -29,9 +32,9 @@ INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackTop, void *exit)
     Zero(context, sizeof(HAL_Context));
 
     context->a0 = (Uint)arg;
-    context->epc = (Uint)entry;
+    context->epc = (Uint)startEntry;
     context->sp = (Uint)(((Uint)stack) + sizeof(HAL_Context));
-    context->ra = (Uint)exit;
+    context->ra = (Uint)exitEntry;
     
     /**
      * allow to access user space memory,
@@ -40,5 +43,12 @@ INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackTop, void *exit)
      */
     context->sstatus = SSTATUS_SUM | SSTATUS_SPP | SSTATUS_SPIE;
 
-    return stack;
+    return (void *)stack;
 }
+
+INTERFACE struct ContextOps ContextOpsInterface = 
+{
+    .init           = HAL_ContextInit,
+    .switchNext     = HAL_ContextSwitchNext,
+    .switchPrevNext = HAL_ContextSwitchPrevNext,
+};

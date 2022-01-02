@@ -10,9 +10,12 @@
  */
 
 #include <Context.h>
-#include <XBook/HAL.h>
+#include <Sched/Context.h>
 #include <Interrupt.h>
 #include <Utils/Debug.h>
+
+IMPORT void HAL_ContextSwitchNext(Addr nextSP);
+IMPORT void HAL_ContextSwitchPrevNext(Addr prevSP, Addr nextSP);
 
 /**
  * any thread will come here when first start
@@ -26,7 +29,7 @@ PRIVATE void ThreadEntry(HAL_ThreadHandler handler, void *arg, void (*texit)())
     PANIC("Thread execute done, should never be here!");
 }
 
-INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackTop, void *exit)
+PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void *stackTop)
 {
     U8 *stack = NULL;
 
@@ -37,9 +40,16 @@ INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackTop, void *exit)
 
     HAL_Context *context = (HAL_Context *)stack;
     context->eip = ThreadEntry;
-    context->handler = entry;
+    context->handler = startEntry;
     context->arg = arg;
-    context->exit = exit;
+    context->exit = exitEntry;
     context->ebp = context->ebx = context->esi = context->edi = 0;
     return stack;
 }
+
+INTERFACE struct ContextOps ContextOpsInterface = 
+{
+    .init           = HAL_ContextInit,
+    .switchNext     = HAL_ContextSwitchNext,
+    .switchPrevNext = HAL_ContextSwitchPrevNext,
+};

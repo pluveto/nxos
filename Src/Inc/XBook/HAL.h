@@ -29,9 +29,4 @@ INTERFACE OS_Error PlatformStage2(void);
 /* Conosle HAL */
 INTERFACE void HAL_ConsoleOutChar(char ch);
 
-/* Context HAL */
-INTERFACE U8 *HAL_ContextInit(void *entry, void *arg, U8 *stackBase, void *exit);
-INTERFACE void HAL_ContextSwitchNext(Addr nextSP);
-INTERFACE void HAL_ContextSwitchPrevNext(Addr prevSP, Addr nextSP);
-
 #endif  /* __XBOOK_HAL__ */

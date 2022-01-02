@@ -17,6 +17,7 @@
 #include <Sched/Sched.h>
 #include <Sched/Mutex.h>
 #include <Sched/MultiCore.h>
+#include <Sched/Context.h>
 #include <MM/Alloc.h>
 #include <Utils/String.h>
 #include <Mods/Time/Timer.h>
@@ -51,7 +52,7 @@ PRIVATE OS_Error ThreadInit(Thread *thread,
     thread->stackBase = stack;
     thread->stackSize = stackSize;
     thread->stack = thread->stackBase + stackSize - sizeof(Uint);
-    thread->stack = HAL_ContextInit(handler, arg, thread->stack, (void *)ThreadExit);
+    thread->stack = ContextInit(handler, (void *)ThreadExit, arg, thread->stack);
     
     thread->onCore = NR_MULTI_CORES; /* not on any core */
     thread->coreAffinity = NR_MULTI_CORES; /* no core affinity */

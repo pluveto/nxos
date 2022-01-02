@@ -16,6 +16,7 @@
 #include <Sched/Thread.h>
 #include <XBook/HAL.h>
 #include <Sched/MultiCore.h>
+#include <Sched/Context.h>
 
 IMPORT ThreadManager ThreadManagerObject;
 
@@ -26,7 +27,7 @@ PUBLIC void SchedToFirstThread(void)
     ASSERT(thread != NULL);
     ASSERT(MultiCoreSetRunning(coreId, thread) == OS_EOK);
     LOG_D("Sched to first thread:%s/%d", thread->name, thread->tid);
-    HAL_ContextSwitchNext((Addr)&thread->stack);
+    ContextSwitchNext((Addr)&thread->stack);
     /* should never be here */
     PANIC("Sched to first thread failed!");
 }
@@ -100,11 +101,11 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
     {
         ASSERT(prev && next);
         LOG_D("CPU#%d Sched prev: %s/%d next: %s/%d", MultiCoreGetId(), prev->name, prev->tid, next->name, next->tid);
-        HAL_ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
+        ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
     }
     else
     {
-        HAL_ContextSwitchNext((Addr)&next->stack);
+        ContextSwitchNext((Addr)&next->stack);
     }
     INTR_RestoreLevel(irqLevel);
 }
