@@ -11,7 +11,6 @@
  */
 
 #include <XBook.h>
-#include <XBook/HAL.h>
 #include <IO/DelayIRQ.h>
 #include <Drivers/DirectUart.h>
 #include <Utils/Log.h>

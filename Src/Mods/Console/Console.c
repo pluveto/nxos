@@ -14,6 +14,9 @@
 #include <Utils/String.h>
 #include <Utils/VarArgs.h>
 
+/* Conosle HAL */
+INTERFACE WEAK_SYM void HAL_ConsoleOutChar(char ch) {}
+
 PUBLIC void ConsoleOutChar(char ch)
 {
     HAL_ConsoleOutChar(ch);

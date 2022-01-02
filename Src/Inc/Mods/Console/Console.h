@@ -13,7 +13,6 @@
 #define __MODS_CONSOLE_HEADER__
 
 #include <XBook.h>
-#include <XBook/HAL.h>
 
 #define CON_NEWLINE "\n"
 

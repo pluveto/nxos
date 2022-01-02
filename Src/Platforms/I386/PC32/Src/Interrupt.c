@@ -13,7 +13,6 @@
 #include <Interrupt.h>
 #include <Utils/String.h>
 #include <Utils/Memory.h>
-#include <XBook/HAL.h>
 #include <PIC.h>
 #include <IO/IRQ.h>
 

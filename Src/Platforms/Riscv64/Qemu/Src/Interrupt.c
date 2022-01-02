@@ -10,7 +10,6 @@
  */
 
 #include <XBook.h>
-#include <XBook/HAL.h>
 #include <Regs.h>
 #include <IO/IRQ.h>
 #include <PLIC.h>

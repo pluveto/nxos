@@ -14,7 +14,6 @@
 
 #include <Sched/Sched.h>
 #include <Sched/Thread.h>
-#include <XBook/HAL.h>
 #include <Sched/MultiCore.h>
 #include <Sched/Context.h>
 

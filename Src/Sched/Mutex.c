@@ -10,7 +10,6 @@
  */
 
 #include <Sched/Mutex.h>
-#include <XBook/HAL.h>
 #include <Sched/Sched.h>
 #include <Sched/Thread.h>
 #include <IO/IRQ.h>

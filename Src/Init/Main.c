@@ -9,7 +9,6 @@
  * 2021-10-3      JasonHu           Init
  */
 
-#include <XBook/HAL.h>
 #define LOG_NAME "OS Main"
 #include <Utils/Debug.h>
 
@@ -21,6 +20,21 @@
 #include <MM/PageHeap.h>
 #include <IO/IRQ.h>
 #include <Mods/Time/Timer.h>
+
+/* Platform init */
+INTERFACE OS_Error PlatformInit(Uint coreId);
+
+/**
+ * stage2 means you can do:
+ * 1. use MemAlloc/MemFree
+ * 2. use Bind IRQ
+ * 3. use Thread
+ * 4. use Timer
+ */
+INTERFACE WEAK_SYM OS_Error PlatformStage2(void)
+{
+    return OS_EOK;
+}
 
 /* used to record how many core entered main */
 PRIVATE STATIC_ATOMIC_INIT(MainEnterReference);

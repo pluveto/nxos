@@ -10,7 +10,6 @@
  */
 
 #include <Sched/Spin.h>
-#include <XBook/HAL.h>
 #include <IO/IRQ.h>
 
 PUBLIC OS_Error SpinInit(Spin *lock)

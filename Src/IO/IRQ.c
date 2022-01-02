@@ -13,7 +13,6 @@
 #include <IO/DelayIRQ.h>
 #include <Utils/Memory.h>
 #include <Utils/String.h>
-#include <XBook/HAL.h>
 #include <MM/Alloc.h>
 
 PRIVATE IRQ_Node IRQ_NodeTable[NR_IRQS];
