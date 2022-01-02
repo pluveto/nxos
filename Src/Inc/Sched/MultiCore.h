@@ -24,7 +24,7 @@ struct CoreLocalStorage
     Thread *threadRunning;  /* the thread running on core */
 
     Spin lock;     /* lock for CLS */
-    Atomic readyThreadCount;    /* ready thread count on this core */
+    Atomic threadCount;    /* ready thread count on this core */
 };
 typedef struct CoreLocalStorage CoreLocalStorage;
 
@@ -53,6 +53,8 @@ PUBLIC Thread *MultiCoreDeququeThreadIrqDisabled(Uint coreId);
 PUBLIC OS_Error MultiCoreSetRunning(Uint coreId, Thread *thread);
 
 PUBLIC CoreLocalStorage *CLS_GetIndex(Uint coreId);
+
+PUBLIC Thread *MultiCoreDeququeNoAffinityThread(Uint coreId);
 
 /**
  * get CLS by core id

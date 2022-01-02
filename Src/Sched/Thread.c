@@ -140,6 +140,7 @@ PUBLIC void ThreadReadyRunLocked(Thread *thread, int flags)
         {
             ListAddTail(&thread->list, &ThreadManagerObject.pendingList);
         }
+        AtomicInc(&ThreadManagerObject.pendingThreadCount);
     }
 }
 
@@ -153,6 +154,18 @@ PUBLIC void ThreadReadyRunUnlocked(Thread *thread, int flags)
     SpinUnlockIRQ(&ThreadManagerObject.lock, level);
 }
 
+INLINE void ThreadEnququeGlobalListUnlocked(Thread *thread)
+{
+    ListAdd(&thread->globalList, &ThreadManagerObject.globalList);    
+    AtomicInc(&ThreadManagerObject.activeThreadCount);
+}
+
+INLINE void ThreadDeququeGlobalListUnlocked(Thread *thread)
+{
+    ListDel(&thread->globalList);
+    AtomicDec(&ThreadManagerObject.activeThreadCount);
+}
+
 PUBLIC OS_Error ThreadRun(Thread *thread)
 {
     if (thread == NULL)
@@ -163,9 +176,8 @@ PUBLIC OS_Error ThreadRun(Thread *thread)
     Uint level;
     SpinLockIRQ(&ThreadManagerObject.lock, &level);
 
-    /* add to global list */
-    ListAdd(&thread->globalList, &ThreadManagerObject.globalList);
-    
+    ThreadEnququeGlobalListUnlocked(thread);
+
     /* add to ready list */
     ThreadReadyRunLocked(thread, SCHED_TAIL);
     
@@ -233,9 +245,9 @@ PUBLIC void ThreadExit(void)
 
     Uint level;
     SpinLockIRQ(&ThreadManagerObject.lock, &level);
-    /* thread exit from global list */
-    ListDel(&thread->globalList);
-    
+
+    ThreadDeququeGlobalListUnlocked(thread);
+
     SpinUnlockIRQ(&ThreadManagerObject.lock, level);
     
     SchedExit();
@@ -366,6 +378,7 @@ PUBLIC void ThreadEnqueuePendingList(Thread *thread)
     Uint level;
     SpinLockIRQ(&ThreadManagerObject.lock, &level);
     ListAdd(&thread->list, &ThreadManagerObject.pendingList);
+    AtomicInc(&ThreadManagerObject.pendingThreadCount);
     SpinUnlockIRQ(&ThreadManagerObject.lock, level);
 }
 
@@ -377,6 +390,7 @@ PUBLIC Thread *ThreadDequeuePendingList(void)
     if (thread != NULL)
     {
         ListDel(&thread->list);
+        AtomicDec(&ThreadManagerObject.pendingThreadCount);
     }
     SpinUnlock(&ThreadManagerObject.lock);
     return thread;
@@ -385,9 +399,9 @@ PUBLIC Thread *ThreadDequeuePendingList(void)
 PUBLIC void ThreadEnququeExitList(Thread *thread)
 {
     Uint level;
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
     ListAdd(&thread->globalList, &ThreadManagerObject.exitList);
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
 }
 
 PUBLIC Thread *ThreadFindById(U32 tid)
@@ -434,16 +448,17 @@ PRIVATE void DaemonThreadEntry(void *arg)
     Uint level;
     while (1)
     {
-        SpinLockIRQ(&ThreadManagerObject.lock, &level);
+        SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
         ListForEachEntrySafe (thread, safe, &ThreadManagerObject.exitList, globalList)
         {
-            LOG_D("daemon release thread: %s/%d", thread->name, thread->tid);
+            LOG_D("---> daemon release thread: %s/%d", thread->name, thread->tid);
             /* del from exit list */
             ListDel(&thread->globalList);
-
+            SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
             ThreadReleaseSelf(thread);
+            SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
         }
-        SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+        SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
 
         /* do delay or timeout, sleep 0.5s */
         ThreadYield();
@@ -453,11 +468,14 @@ PRIVATE void DaemonThreadEntry(void *arg)
 PUBLIC void ThreadManagerInit(void)
 {
     AtomicSet(&ThreadManagerObject.averageThreadThreshold, 0);
+    AtomicSet(&ThreadManagerObject.activeThreadCount, 0);
+    AtomicSet(&ThreadManagerObject.pendingThreadCount, 0);
     ListInit(&ThreadManagerObject.exitList);
     ListInit(&ThreadManagerObject.globalList);
     ListInit(&ThreadManagerObject.pendingList);
     
     SpinInit(&ThreadManagerObject.lock);
+    SpinInit(&ThreadManagerObject.exitLock);
 }
 
 PUBLIC void ThreadsInit(void)

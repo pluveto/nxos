@@ -13,6 +13,7 @@
 #define __MM_HEAP_CACHE__
 
 #include <XBook.h>
+#include <XBook/Atomic.h>
 #include <Utils/List.h>
 
 /**
@@ -47,6 +48,8 @@ struct HeapCache
     List spanFreeList;
     List objectFreeList;
     Size classSize; /* heap cache size */
+    Atomic spanFreeCount;
+    Atomic objectFreeCount;
 };
 typedef struct HeapCache HeapCache;
 

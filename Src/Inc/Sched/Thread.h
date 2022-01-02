@@ -86,8 +86,11 @@ struct ThreadManager
     List exitList;      /* for thread will exit soon */
     List pendingList;   /* for thread ready to be pulled by the core */
     Atomic averageThreadThreshold;    /* Average number of threads on core for load balance */
+    Atomic activeThreadCount;
+    Atomic pendingThreadCount;
 
     Spin lock;    /* lock for thread manager */
+    Spin exitLock;    /* lock for thread exit */
 };
 typedef struct ThreadManager ThreadManager;
 

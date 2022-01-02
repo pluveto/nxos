@@ -17,7 +17,6 @@ sinclude Platform.mk
 #
 # Tools name
 #
-MAKE = make
 
 #
 # Use build dir for target

@@ -67,6 +67,8 @@ PRIVATE void HeapCacheInitOne(HeapCache *cache, Size classSize)
     cache->classSize = classSize;
     ListInit(&cache->objectFreeList);
     ListInit(&cache->spanFreeList);
+    AtomicSet(&cache->spanFreeCount, 0);
+    AtomicSet(&cache->objectFreeCount, 0);
 }
 
 PRIVATE void HeapSizeClassInit(void)
@@ -142,12 +144,13 @@ PRIVATE void *DoHeapAlloc(Size size)
     {
         cache = SizeToCache(size);
     }
-
-    if (ListEmpty(&cache->objectFreeList)) /* no object, need split from span */
+    ASSERT(AtomicGet(&cache->objectFreeCount) >= 0);
+    if (AtomicGet(&cache->objectFreeCount) == 0) /* no object, need split from span */
     {
         Size objectCount;
         
-        if (ListEmpty(&cache->spanFreeList))    /* no span, need alloc from page heap */
+        ASSERT(AtomicGet(&cache->spanFreeCount) >= 0);
+        if (AtomicGet(&cache->spanFreeCount) == 0)    /* no span, need alloc from page heap */
         {
             span = (Span *)PageHeapAlloc(pageCount);
             if (span == NULL)
@@ -159,7 +162,8 @@ PRIVATE void *DoHeapAlloc(Size size)
         else    /* get span from span list */
         {
             span = ListFirstEntry(&cache->spanFreeList, Span, list);
-            ListDelInit(&span->list);            
+            ListDelInit(&span->list);
+            AtomicDec(&cache->spanFreeCount);
         }
 
         if (cache == &MiddleSizeCache)  /* return span if middle cache */
@@ -185,12 +189,15 @@ PRIVATE void *DoHeapAlloc(Size size)
         {
             objectNode = (SmallCacheObject *)start;
             ListAddTail(&objectNode->list, &cache->objectFreeList);
+            AtomicInc(&cache->objectFreeCount);
             start += size;
         }
     }
     /* get a object from list */
     objectNode = ListFirstEntry(&cache->objectFreeList, SmallCacheObject, list);
     ListDel(&objectNode->list); /* del from free list */
+    AtomicDec(&cache->objectFreeCount);
+    
     return (void *)objectNode;
 }
 
@@ -229,7 +236,7 @@ PRIVATE OS_Error DoHeapFree(void *object)
         else    /* free to middle cache */
         {
             /* if len is too long, free to page heap */
-            if (ListLength(&MiddleSizeCache.spanFreeList) + 1 >= MAX_MIDDLE_OBJECT_THRESOLD) 
+            if (AtomicGet(&MiddleSizeCache.spanFreeCount) + 1 >= MAX_MIDDLE_OBJECT_THRESOLD) 
             {
                 return PageHeapFree(span);
             }
@@ -237,6 +244,7 @@ PRIVATE OS_Error DoHeapFree(void *object)
             {
                 Span *spanNode = (Span *) span;
                 ListAdd(&spanNode->list, &MiddleSizeCache.spanFreeList);
+                AtomicInc(&MiddleSizeCache.spanFreeCount);
             }
             return OS_EOK;
         }
@@ -253,13 +261,14 @@ PRIVATE OS_Error DoHeapFree(void *object)
         HeapCache *cache = SizeToCache(sizeClass);
  
         /* if objects in span is full, free all objects */
-        if (ListLength(&cache->objectFreeList) + 1 >= pageNode->maxObjectsOnSpan)
+        if (AtomicGet(&cache->objectFreeCount) + 1 >= pageNode->maxObjectsOnSpan)
         {
             /* empty object free list */
             ListInit(&cache->objectFreeList);
+            AtomicSet(&cache->objectFreeCount, 0);
 
             /* free span to page heap */
-            if (ListLength(&cache->spanFreeList) + 1 >= MAX_SMALL_SPAN_THRESOLD)
+            if (AtomicGet(&cache->spanFreeCount) + 1 >= MAX_SMALL_SPAN_THRESOLD)
             {
                 return PageHeapFree(span);
             }
@@ -267,12 +276,14 @@ PRIVATE OS_Error DoHeapFree(void *object)
             {
                 Span *spanNode = (Span *) span;
                 ListAdd(&spanNode->list, &cache->spanFreeList);
+                AtomicInc(&cache->spanFreeCount);
             }
         }
         else    /* free to object free list */
         {
             SmallCacheObject *objectNode = (SmallCacheObject *)object;
             ListAdd(&objectNode->list, &cache->objectFreeList);
+            AtomicInc(&cache->objectFreeCount);
         }
     }
     return OS_EOK;

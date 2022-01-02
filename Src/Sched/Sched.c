@@ -9,6 +9,7 @@
  * 2021-11-8      JasonHu           Init
  */
 
+#define LOG_LEVEL LOG_INFO
 #include <Utils/Debug.h>
 
 #include <Sched/Sched.h>
@@ -30,12 +31,54 @@ PUBLIC void SchedToFirstThread(void)
     PANIC("Sched to first thread failed!");
 }
 
+PRIVATE void PullOrPushThread(Uint coreId)
+{
+    Thread *thread;
+    CoreLocalStorage *cls = CLS_GetIndex(coreId);
+    Int coreThreadCount = AtomicGet(&cls->threadCount);
+
+    /**
+     * Adding 1 is to allow the processor core to do more pull operations instead of push operations.
+     * Can avoid the threads of the pending queue not running.
+     */
+    Uint threadsPerCore = AtomicGet(&ThreadManagerObject.activeThreadCount) / NR_MULTI_CORES + 1;
+
+    LOG_D("core#%d: core threads:%d", coreId, coreThreadCount);
+    LOG_D("core#%d: active threads:%d", coreId, AtomicGet(&ThreadManagerObject.activeThreadCount));
+    LOG_D("core#%d: pending threads:%d", coreId, AtomicGet(&ThreadManagerObject.pendingThreadCount));
+    LOG_D("core#%d: threads per core:%d", coreId, threadsPerCore);
+
+    if (coreThreadCount < threadsPerCore)
+    {
+        /* pull from pending */
+        thread = ThreadDequeuePendingList();
+        if (thread != NULL)
+        {
+            LOG_D("---> core#%d: pull thread:%s/%d", coreId, thread->name, thread->tid);
+            thread->onCore = coreId;
+            ThreadReadyRunLocked(thread, SCHED_HEAD);
+        }
+    }
+
+    if (coreThreadCount > threadsPerCore)
+    {
+        /* push to pending */
+        thread = MultiCoreDeququeNoAffinityThread(coreId);
+        if (thread != NULL)
+        {
+            LOG_D("---> core#%d: push thread:%s/%d", coreId, thread->name, thread->tid);
+            thread->onCore = NR_MULTI_CORES;
+            ThreadEnqueuePendingList(thread);
+        }
+    }
+}
+
 /**
  * NOTE: must disable interrupt before call this!
  */
 PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
 {
-    Thread *next, *prev, *thread;
+    Thread *next, *prev;
     Uint coreId = MultiCoreGetId();
 
     /* put prev into list */
@@ -46,13 +89,8 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
         prev = NULL;    /* not save prev context */
     }
     
-    /* pull thread from pending list */
-    thread = ThreadDequeuePendingList();
-    if (thread != NULL)
-    {
-        thread->onCore = coreId;
-        ThreadReadyRunLocked(thread, SCHED_HEAD);
-    }
+    /* pull thread from pending list or push thread to pending list */
+    PullOrPushThread(coreId);
 
     /* get next from local list */
     next = MultiCoreDeququeThreadIrqDisabled(coreId);
@@ -61,8 +99,7 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
     if (prev != NULL)
     {
         ASSERT(prev && next);
-        //LOG_D("Sched prev: %s/%d next: %s/%d", prev->name, prev->tid, next->name, next->tid);
-        //LOG_D("CPU#%d Sched", MultiCoreGetId());
+        LOG_D("CPU#%d Sched prev: %s/%d next: %s/%d", MultiCoreGetId(), prev->name, prev->tid, next->name, next->tid);
         HAL_ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
     }
     else

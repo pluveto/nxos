@@ -13,6 +13,7 @@
 #define __MM_PAGE_HEAP__
 
 #include <Utils/List.h>
+#include <XBook/Atomic.h>
 
 /**
  * Maximum number of pages in small span
@@ -65,6 +66,8 @@ struct PageHeap
 {
     List spanFreeList[SMALL_SPAN_PAGES_MAX];  /* list head for span list */
     List largeSpanFreeList;     /* list for large span page */
+    Atomic spanFreeCount[SMALL_SPAN_PAGES_MAX];
+    Atomic largeSpanFreeCount;
 };
 typedef struct PageHeap PageHeap;
 

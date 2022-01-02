@@ -28,12 +28,6 @@ PRIVATE void TimerHandler2(Timer *timer, void *arg)
     LOG_I("Timer#%s timeout\n", (char *)arg);
     timerCounter++;
     LOG_I("timerCounter:%d\n", timerCounter);
-#if 0
-    if (timerCounter == 5)
-    {
-        TimerStop(timer);
-    }
-#endif
 }
 
 INTEGRATION_TEST(Timer)

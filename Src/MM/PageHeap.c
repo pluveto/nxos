@@ -104,15 +104,18 @@ PRIVATE void *DoPageHeapAlloc(Size count)
     List *listHead;
     Span *spanNode = NULL;
     Span *spanNodeBest = NULL;
+    Atomic *freeCount = NULL;
 
     if (count >= SMALL_SPAN_PAGES_MAX)    /* alloc from large list */
     {
         isLargeSpan = 1;
         listHead = &PageHeapObject.largeSpanFreeList;
+        freeCount = &PageHeapObject.largeSpanFreeCount;
     }
     else    /* alloc from normal list */
     {
         listHead = &PageHeapObject.spanFreeList[count];
+        freeCount = &PageHeapObject.spanFreeCount[count];
     }
 
     if (ListEmpty(listHead))
@@ -150,6 +153,8 @@ PRIVATE void *DoPageHeapAlloc(Size count)
     }
     /* del span node from list */
     ListDelInit(&spanNodeBest->list);
+    AtomicDec(freeCount);
+
     /* return base addr as spin */
     return (void *)spanNodeBest;
 }
@@ -180,6 +185,7 @@ PRIVATE OS_Error DoPageHeapFree(void *page)
 {
     void *span = PageToSpan(page);
     Size count = PageToSpanCount(page);
+    Atomic *freeCount = NULL;
 
     if (!count)
     {
@@ -194,6 +200,7 @@ PRIVATE OS_Error DoPageHeapFree(void *page)
     {
         maxThresold = LARGE_SPAN_FREE_THRESHOLD_MAX;
         listHead = &PageHeapObject.largeSpanFreeList;
+        freeCount = &PageHeapObject.largeSpanFreeCount;
     }
     else    /* free from normal list */
     {
@@ -206,9 +213,10 @@ PRIVATE OS_Error DoPageHeapFree(void *page)
             maxThresold = SMALL_SPAN_FREE_THRESHOLD_MAX;
         }
         listHead = &PageHeapObject.spanFreeList[count];
+        freeCount = &PageHeapObject.spanFreeCount[count];
     }
 
-    if (ListLength(listHead) >= maxThresold)    /* directly free */
+    if (AtomicGet(freeCount) >= maxThresold)    /* directly free */
     {
         ClearSpan(span, count);
         PageFreeVirtual(span);
@@ -218,6 +226,7 @@ PRIVATE OS_Error DoPageHeapFree(void *page)
         Span *spanNode = (Span *)span;
         spanNode->pageCount = count;
         ListAdd(&spanNode->list, listHead);
+        AtomicInc(freeCount);
     }
     return OS_EOK;
 }
@@ -242,8 +251,11 @@ PUBLIC void PageHeapInit(void)
     for (i = 0; i < sizeof(PageHeapObject.spanFreeList) / sizeof(PageHeapObject.spanFreeList[0]); i++)
     {
         ListInit(&PageHeapObject.spanFreeList[i]);
+        AtomicSet(&PageHeapObject.spanFreeCount[i], 0);
     }
     ListInit(&PageHeapObject.largeSpanFreeList);
+    AtomicSet(&PageHeapObject.largeSpanFreeCount, 0);
+
     SpanBaseAddr = PageZoneGetBase(PZ_NORMAL);
     LOG_I("span base addr: %p", SpanBaseAddr);
 

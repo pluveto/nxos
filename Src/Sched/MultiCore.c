@@ -45,7 +45,7 @@ PUBLIC void MultiCoreInit(Uint coreId)
         CLS[i].threadRunning = NULL;
         ListInit(&CLS[i].threadReadyList);
         SpinInit(&CLS[i].lock);
-        AtomicSet(&CLS[i].readyThreadCount, 0);
+        AtomicSet(&CLS[i].threadCount, 0);
     }
 }
 
@@ -101,6 +101,8 @@ PUBLIC void MultiCoreEnqueueThreadIrqDisabled(Uint coreId, Thread *thread, int f
         ListAddTail(&thread->list, &cls->threadReadyList);
     }
 
+    AtomicInc(&cls->threadCount);
+
     SpinUnlock(&cls->lock);
 }
 
@@ -114,9 +116,37 @@ PUBLIC Thread *MultiCoreDeququeThreadIrqDisabled(Uint coreId)
     thread = ListFirstEntry(&cls->threadReadyList, Thread, list);
     ListDel(&thread->list);
 
+    AtomicDec(&cls->threadCount);
+
     SpinUnlock(&cls->lock);
 
     return thread;
+}
+
+/**
+ * NOTE: this must called irq disabled
+ */
+PUBLIC Thread *MultiCoreDeququeNoAffinityThread(Uint coreId)
+{
+    Thread *thread, *findThread = NULL;
+    CoreLocalStorage *cls = CLS_GetIndex(coreId);
+    
+    SpinLock(&cls->lock, TRUE);
+    
+    ListForEachEntry(thread, &cls->threadReadyList, list)
+    {
+        if (thread->coreAffinity >= NR_MULTI_CORES) /* no affinity on any core */
+        {
+            findThread = thread;
+            ListDel(&thread->list);
+            AtomicDec(&cls->threadCount);
+            break;
+        }
+    }
+    
+    SpinUnlock(&cls->lock);
+
+    return findThread;
 }
 
 PUBLIC OS_Error MultiCoreSetRunning(Uint coreId, Thread *thread)
