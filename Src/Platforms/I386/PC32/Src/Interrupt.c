@@ -129,14 +129,14 @@ PRIVATE void HAL_IrqDisable(void)
     CASM("cli");
 }
 
-PRIVATE Uint HAL_IrqSaveLevel(void)
+PRIVATE UArch HAL_IrqSaveLevel(void)
 {
-    Uint level = 0;
+    UArch level = 0;
     CASM("pushfl; popl %0; cli":"=g" (level): :"memory");
     return level;
 }
 
-PRIVATE void HAL_IrqRestoreLevel(Uint level)
+PRIVATE void HAL_IrqRestoreLevel(UArch level)
 {
     CASM("pushl %0; popfl": :"g" (level):"memory", "cc");
 }

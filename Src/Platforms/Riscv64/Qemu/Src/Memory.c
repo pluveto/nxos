@@ -26,13 +26,13 @@
  */
 PUBLIC void PageInit(void)
 {    
-    Size memSize = DRAM_SIZE_DEFAULT;
+    USize memSize = DRAM_SIZE_DEFAULT;
     
-    LOG_I("Memory Size: %x Bytes %d MB", memSize, memSize / SZ_MB);
+    LOG_I("Memory USize: %x Bytes %d MB", memSize, memSize / SZ_MB);
 
     if (memSize == 0)
     {
-        PANIC("Get Memory Size Failed!");
+        PANIC("Get Memory USize Failed!");
     }
     if (memSize < MEM_MIN_SIZE)
     {
@@ -41,7 +41,7 @@ PUBLIC void PageInit(void)
     }
     
     /* calc normal base & size */
-    Size normalSize = memSize - MEM_KERNEL_SZ;
+    USize normalSize = memSize - MEM_KERNEL_SZ;
     normalSize /= 2;
     if (normalSize > MEM_KERNEL_SPACE_SZ)
     {
@@ -50,10 +50,10 @@ PUBLIC void PageInit(void)
     
     /* calc user base & size */
     Addr userBase = MEM_NORMAL_BASE + normalSize;
-    Size userSize = memSize - normalSize;
+    USize userSize = memSize - normalSize;
 
-    LOG_I("Normal memory base: %x Size:%d MB", MEM_NORMAL_BASE, normalSize / SZ_MB);
-    LOG_I("User memory base: %x Size:%d MB", userBase, userSize / SZ_MB);
+    LOG_I("Normal memory base: %x USize:%d MB", MEM_NORMAL_BASE, normalSize / SZ_MB);
+    LOG_I("User memory base: %x USize:%d MB", userBase, userSize / SZ_MB);
 
     /* init page zone */
     PageInitZone(PZ_NORMAL, (void *)MEM_NORMAL_BASE, normalSize);

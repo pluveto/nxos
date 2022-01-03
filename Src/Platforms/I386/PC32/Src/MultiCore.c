@@ -13,18 +13,18 @@
 #define LOG_NAME "Multi Core"
 #include <Utils/Log.h>
 
-PUBLIC Uint HAL_CoreGetId(void)
+PUBLIC UArch HAL_CoreGetId(void)
 {
     return 0;
 }
 
-PUBLIC OS_Error HAL_CoreBootApp(Uint bootCoreId)
+PUBLIC OS_Error HAL_CoreBootApp(UArch bootCoreId)
 {
     LOG_I("boot core is:%d", bootCoreId);
     return OS_ENORES;
 }
 
-PUBLIC OS_Error HAL_CoreEnterApp(Uint appCoreId)
+PUBLIC OS_Error HAL_CoreEnterApp(UArch appCoreId)
 {
     return OS_ENORES;
 }

@@ -34,7 +34,7 @@ struct UTestCase
     OS_Error (*setup)(void);
     OS_Error (*clean)(void);
     UTest *unitTable;
-    Size unitCount;
+    USize unitCount;
 };
 typedef struct UTestCase UTestCase;
 

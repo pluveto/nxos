@@ -32,7 +32,7 @@ PRIVATE void thread_entry1(void *arg)
     while (1)
     {
         LOG_D("Hello 1");
-        ContextSwitchPrevNext((Uint)&threadSP1, (Uint)&threadSP2);
+        ContextSwitchPrevNext((UArch)&threadSP1, (UArch)&threadSP2);
     }
 }
 
@@ -43,7 +43,7 @@ PRIVATE void thread_entry2(void *arg)
     while (1)
     {
         LOG_D("Hello 2");
-        ContextSwitchPrevNext((Uint)&threadSP2, (Uint)&threadSP3);
+        ContextSwitchPrevNext((UArch)&threadSP2, (UArch)&threadSP3);
     }
 }
 
@@ -54,7 +54,7 @@ PRIVATE void thread_entry3(void *arg)
     while (1)
     {
         LOG_D("Hello 3");
-        ContextSwitchPrevNext((Uint)&threadSP3, (Uint)&threadSP1);
+        ContextSwitchPrevNext((UArch)&threadSP3, (UArch)&threadSP1);
     }
 }
 
@@ -66,7 +66,7 @@ PUBLIC void Demo_HAL_Context(void)
     threadSP3 = ContextInit(thread_entry3, NULL, (void *) 0x12345678, threadStack3 + STACK_SZ);
     
     LOG_I("demo: HAL_Context: switch");
-    ContextSwitchNext((Uint)&threadSP1);
+    ContextSwitchNext((UArch)&threadSP1);
     LOG_I("end demo: HAL_Context");
 }
 

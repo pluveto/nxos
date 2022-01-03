@@ -12,7 +12,7 @@
 #define __ASSEMBLY__
 #include <Multiboot2.h>
 
-# the Size of bootStack is 16KB
+# the USize of bootStack is 16KB
 #define BOOT_STACK_SIZE 0x4000
 
 .code32
@@ -39,7 +39,7 @@ MultibootHeader:
     .align 8
     .short MULTIBOOT_HEADER_TAG_END # type
     .short 0                        # flags
-    .long  8                        # Size
+    .long  8                        # USize
 MultibootHeaderEnd:
 MultibootEntry:
     # initialize the bootStack pointer

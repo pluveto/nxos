@@ -30,7 +30,7 @@ PRIVATE Timer IdleTimer;
 
 PRIVATE Spin TimersSpin;
 
-PUBLIC OS_Error TimerInit(Timer *timer, Uint milliseconds, 
+PUBLIC OS_Error TimerInit(Timer *timer, UArch milliseconds, 
                           Bool (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags)
 {
@@ -58,7 +58,7 @@ PUBLIC OS_Error TimerInit(Timer *timer, Uint milliseconds,
     return OS_EOK;
 }
 
-PUBLIC Timer *TimerCreate(Uint milliseconds, 
+PUBLIC Timer *TimerCreate(UArch milliseconds, 
                           Bool (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags)
 {
@@ -121,7 +121,7 @@ PUBLIC OS_Error TimerDestroy(Timer *timer)
     case TIMER_STOPPED:
     case TIMER_INITED:
         {
-            Uint level;
+            UArch level;
             SpinLockIRQ(&TimersSpin, &level);
             TimerRemove(timer, FALSE, TRUE);
             SpinUnlockIRQ(&TimersSpin, level);
@@ -140,7 +140,7 @@ PUBLIC OS_Error TimerStart(Timer *timer)
         return OS_EINVAL;
     }
     
-    Uint level;
+    UArch level;
 
     SpinLockIRQ(&TimersSpin, &level);
 
@@ -234,7 +234,7 @@ PUBLIC OS_Error TimerStop(Timer *timer)
     }
 
     OS_Error err;
-    Uint level;
+    UArch level;
     SpinLockIRQ(&TimersSpin, &level);
 
     err = TimerStopUnlocked(timer);
@@ -294,7 +294,7 @@ PUBLIC void TimerGo(void)
         return;
     }
 
-    Uint level;
+    UArch level;
     
     SpinLockIRQ(&TimersSpin, &level);
 

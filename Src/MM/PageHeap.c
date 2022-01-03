@@ -24,7 +24,7 @@ PRIVATE SpanMark *SpanMarkMap;
 PRIVATE void *SpanBaseAddr;
 PRIVATE Mutex PageHeapLock;
 
-PRIVATE void *PageAllocVirtual(Size count)
+PRIVATE void *PageAllocVirtual(USize count)
 {
     void *ptr = PageAlloc(count);
     if (ptr == NULL)
@@ -46,10 +46,10 @@ PRIVATE void PageFreeVirtual(void *ptr)
 /**
  * mark span with count
  */
-PRIVATE void MarkSpan(void *span, Size count)
+PRIVATE void MarkSpan(void *span, USize count)
 {
     Addr dis = (Addr)span - (Addr)SpanBaseAddr;
-    Size idx = dis >> PAGE_SHIFT;
+    USize idx = dis >> PAGE_SHIFT;
 
     SpanMark *mark = SpanMarkMap + idx;
     int i;
@@ -64,10 +64,10 @@ PRIVATE void MarkSpan(void *span, Size count)
 /**
  * clear span with count
  */
-PRIVATE void ClearSpan(void *span, Size count)
+PRIVATE void ClearSpan(void *span, USize count)
 {
     Addr dis = (Addr)span - (Addr)SpanBaseAddr;
-    Size idx = dis >> PAGE_SHIFT;
+    USize idx = dis >> PAGE_SHIFT;
 
     SpanMark *mark = SpanMarkMap + idx;
 
@@ -82,23 +82,23 @@ PRIVATE void ClearSpan(void *span, Size count)
 
 PUBLIC void *PageToSpan(void *page)
 {
-    Size dis = (Addr)page - (Addr)SpanBaseAddr;
-    Size idx = dis >> PAGE_SHIFT;
+    USize dis = (Addr)page - (Addr)SpanBaseAddr;
+    USize idx = dis >> PAGE_SHIFT;
 
     SpanMark *mark = SpanMarkMap + idx;
     return (void *)((Addr)page - mark->idx * PAGE_SIZE);
 }
 
-PUBLIC Size PageToSpanCount(void *span)
+PUBLIC USize PageToSpanCount(void *span)
 {
-    Size dis = (Addr)span - (Addr)SpanBaseAddr;
-    Size idx = dis >> PAGE_SHIFT;
+    USize dis = (Addr)span - (Addr)SpanBaseAddr;
+    USize idx = dis >> PAGE_SHIFT;
 
     SpanMark *mark = SpanMarkMap + idx;
     return mark->count;
 }
 
-PRIVATE void *DoPageHeapAlloc(Size count)
+PRIVATE void *DoPageHeapAlloc(USize count)
 {
     int isLargeSpan = 0;
     List *listHead;
@@ -162,7 +162,7 @@ PRIVATE void *DoPageHeapAlloc(Size count)
 /**
  * alloc span from heap, if no free page, alloc from buddy system
  */
-PUBLIC void *PageHeapAlloc(Size count)
+PUBLIC void *PageHeapAlloc(USize count)
 {
     if (!count)
     {
@@ -184,7 +184,7 @@ PUBLIC void *PageHeapAlloc(Size count)
 PRIVATE OS_Error DoPageHeapFree(void *page)
 {
     void *span = PageToSpan(page);
-    Size count = PageToSpanCount(page);
+    USize count = PageToSpanCount(page);
     Atomic *freeCount = NULL;
 
     if (!count)
@@ -194,7 +194,7 @@ PRIVATE OS_Error DoPageHeapFree(void *page)
     }
 
     List *listHead;
-    Size maxThresold = 0;
+    USize maxThresold = 0;
 
     if (count >= SMALL_SPAN_PAGES_MAX)    /* free to large list */
     {
@@ -259,9 +259,9 @@ PUBLIC void PageHeapInit(void)
     SpanBaseAddr = PageZoneGetBase(PZ_NORMAL);
     LOG_I("span base addr: %p", SpanBaseAddr);
 
-    Size pages = PageZoneGetPages(PZ_NORMAL);
+    USize pages = PageZoneGetPages(PZ_NORMAL);
     /* alloc span mark array */
-    Size spanMarkPages = DIV_ROUND_UP(pages * sizeof(SpanMark), PAGE_SIZE);
+    USize spanMarkPages = DIV_ROUND_UP(pages * sizeof(SpanMark), PAGE_SIZE);
     LOG_I("span mark used page: %d", spanMarkPages);
 
     SpanMarkMap = PageAllocVirtual(spanMarkPages);

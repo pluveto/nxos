@@ -21,7 +21,7 @@ IMPORT ThreadManager ThreadManagerObject;
 
 PUBLIC void SchedToFirstThread(void)
 {
-    Uint coreId = MultiCoreGetId();
+    UArch coreId = MultiCoreGetId();
     Thread *thread = MultiCoreDeququeThreadIrqDisabled(coreId);
     ASSERT(thread != NULL);
     ASSERT(MultiCoreSetRunning(coreId, thread) == OS_EOK);
@@ -31,17 +31,17 @@ PUBLIC void SchedToFirstThread(void)
     PANIC("Sched to first thread failed!");
 }
 
-PRIVATE void PullOrPushThread(Uint coreId)
+PRIVATE void PullOrPushThread(UArch coreId)
 {
     Thread *thread;
     CoreLocalStorage *cls = CLS_GetIndex(coreId);
-    Int coreThreadCount = AtomicGet(&cls->threadCount);
+    IArch coreThreadCount = AtomicGet(&cls->threadCount);
 
     /**
      * Adding 1 is to allow the processor core to do more pull operations instead of push operations.
      * Can avoid the threads of the pending queue not running.
      */
-    Uint threadsPerCore = AtomicGet(&ThreadManagerObject.activeThreadCount) / NR_MULTI_CORES + 1;
+    UArch threadsPerCore = AtomicGet(&ThreadManagerObject.activeThreadCount) / NR_MULTI_CORES + 1;
 
     LOG_D("core#%d: core threads:%d", coreId, coreThreadCount);
     LOG_D("core#%d: active threads:%d", coreId, AtomicGet(&ThreadManagerObject.activeThreadCount));
@@ -76,10 +76,10 @@ PRIVATE void PullOrPushThread(Uint coreId)
 /**
  * NOTE: must disable interrupt before call this!
  */
-PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
+PUBLIC void SchedWithInterruptDisabled(UArch irqLevel)
 {
     Thread *next, *prev;
-    Uint coreId = MultiCoreGetId();
+    UArch coreId = MultiCoreGetId();
 
     /* put prev into list */
     prev = CurrentThread;
@@ -111,7 +111,7 @@ PUBLIC void SchedWithInterruptDisabled(Uint irqLevel)
 
 PUBLIC void SchedYield(void)
 {
-    Uint level = INTR_SaveLevel();
+    UArch level = INTR_SaveLevel();
 
     Thread *cur = CurrentThread;
     
@@ -122,7 +122,7 @@ PUBLIC void SchedYield(void)
 
 PUBLIC void SchedExit(void)
 {
-    Uint level = INTR_SaveLevel();
+    UArch level = INTR_SaveLevel();
 
     Thread *cur = CurrentThread;
     LOG_D("Thread exit: %d", cur->tid);
@@ -146,7 +146,7 @@ PUBLIC void ReSchedCheck(void)
     }
     if (thread->needSched)
     {
-        Uint level = INTR_SaveLevel();
+        UArch level = INTR_SaveLevel();
         thread->needSched = 0;
 
         /* reset ticks from timeslice */

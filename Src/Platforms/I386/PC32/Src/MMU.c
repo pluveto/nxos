@@ -16,7 +16,7 @@
 #define LOG_NAME "MMU"
 #include <Utils/Log.h>
 
-PUBLIC void MMU_EarlyMap(MMU *mmu, Addr virStart, Size size)
+PUBLIC void MMU_EarlyMap(MMU *mmu, Addr virStart, USize size)
 {
     virStart = virStart & PAGE_ADDR_MASK;
     Addr phyStart = virStart;
@@ -26,9 +26,9 @@ PUBLIC void MMU_EarlyMap(MMU *mmu, Addr virStart, Size size)
     
     MMU_PDE *pdt = (MMU_PDE *)mmu->table;
     
-    Size pdeCnt = (virEnd - virStart) / (PTE_CNT_PER_PAGE * PAGE_SIZE);
-    Size pteCnt = ((virEnd - virStart) / PAGE_SIZE) % PTE_CNT_PER_PAGE;
-    Addr *pte = (Uint *) PAGE_TABLE_ADDR;
+    USize pdeCnt = (virEnd - virStart) / (PTE_CNT_PER_PAGE * PAGE_SIZE);
+    USize pteCnt = ((virEnd - virStart) / PAGE_SIZE) % PTE_CNT_PER_PAGE;
+    Addr *pte = (UArch *) PAGE_TABLE_ADDR;
     U32 pdeIdx = PAGE_GET_L1(virStart);
     int i, j;
     for (i = 0; i < pdeCnt; i++)

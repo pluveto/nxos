@@ -24,17 +24,17 @@ PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void
     HAL_Context *context = NULL;
 
     stack = (U8 *)stackTop;
-    stack = (U8 *)ALIGN_DOWN((Uint)stack, sizeof(Uint));
+    stack = (U8 *)ALIGN_DOWN((UArch)stack, sizeof(UArch));
 
     stack -= sizeof(HAL_Context);
     context = (HAL_Context *)stack;
     
     Zero(context, sizeof(HAL_Context));
 
-    context->a0 = (Uint)arg;
-    context->epc = (Uint)startEntry;
-    context->sp = (Uint)(((Uint)stack) + sizeof(HAL_Context));
-    context->ra = (Uint)exitEntry;
+    context->a0 = (UArch)arg;
+    context->epc = (UArch)startEntry;
+    context->sp = (UArch)(((UArch)stack) + sizeof(HAL_Context));
+    context->ra = (UArch)exitEntry;
     
     /**
      * allow to access user space memory,

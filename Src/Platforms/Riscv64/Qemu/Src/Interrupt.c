@@ -55,15 +55,15 @@ PRIVATE void HAL_IrqDisable(void)
     WriteCSR(sstatus, ReadCSR(sstatus) & ~SSTATUS_SIE);
 }
 
-PRIVATE Uint HAL_IrqSaveLevel(void)
+PRIVATE UArch HAL_IrqSaveLevel(void)
 {
-    Uint level = 0;
+    UArch level = 0;
     level = ReadCSR(sstatus);
     WriteCSR(sstatus, level & ~SSTATUS_SIE);
     return level & SSTATUS_SIE;
 }
 
-PRIVATE void HAL_IrqRestoreLevel(Uint level)
+PRIVATE void HAL_IrqRestoreLevel(UArch level)
 {
     WriteCSR(sstatus, ReadCSR(sstatus) | (level & SSTATUS_SIE));
 }

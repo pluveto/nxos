@@ -18,7 +18,7 @@
 #define SCHED_TAIL          0x02
 
 PUBLIC void SchedToFirstThread(void);
-PUBLIC void SchedWithInterruptDisabled(Uint irqLevel);
+PUBLIC void SchedWithInterruptDisabled(UArch irqLevel);
 PUBLIC void SchedYield(void);
 PUBLIC void ReSchedCheck(void);
 PUBLIC void SchedExit(void);

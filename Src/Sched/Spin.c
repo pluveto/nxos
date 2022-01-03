@@ -61,7 +61,7 @@ PUBLIC OS_Error SpinUnlock(Spin *lock)
     return OS_EOK;
 }
 
-PUBLIC OS_Error SpinLockIRQ(Spin *lock, Uint *level)
+PUBLIC OS_Error SpinLockIRQ(Spin *lock, UArch *level)
 {
     if (lock == NULL || level == NULL)
     {
@@ -71,7 +71,7 @@ PUBLIC OS_Error SpinLockIRQ(Spin *lock, Uint *level)
     return SpinLock(lock, TRUE);
 }
 
-PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, Uint level)
+PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, UArch level)
 {
     if (lock == NULL)
     {

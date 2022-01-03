@@ -30,24 +30,24 @@ struct Page
     List list;
     U32 flags;
     I32 order;
-    Size sizeClass;         /* size class on this span */
-    Size maxObjectsOnSpan;  /* max memory objects on this span */
+    USize sizeClass;         /* size class on this span */
+    USize maxObjectsOnSpan;  /* max memory objects on this span */
 };
 typedef struct Page Page;
 
 struct BuddySystem
 {
     List pageBuddy[MAX_PAGE_ORDER + 1];
-    Size count[MAX_PAGE_ORDER + 1];
-    Size bitmap;    /* map order has free page */
+    USize count[MAX_PAGE_ORDER + 1];
+    USize bitmap;    /* map order has free page */
     void *pageStart;    /* page start addr */
-    Size maxPFN;
+    USize maxPFN;
     Page map[0];    /* pages array */
 };
 typedef struct BuddySystem BuddySystem;
 
-PUBLIC BuddySystem* BuddyCreate(void *mem, Size size);
-PUBLIC void *BuddyAllocPage(BuddySystem* system, Size count);
+PUBLIC BuddySystem* BuddyCreate(void *mem, USize size);
+PUBLIC void *BuddyAllocPage(BuddySystem* system, USize count);
 PUBLIC void BuddyFreePage(BuddySystem* system, void *ptr);
 
 PUBLIC Page* PageFromPtr(BuddySystem* system, void *ptr);

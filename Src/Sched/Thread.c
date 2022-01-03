@@ -27,7 +27,7 @@ PUBLIC ThreadManager ThreadManagerObject;
 PRIVATE OS_Error ThreadInit(Thread *thread, 
     const char *name,
     ThreadHandler handler, void *arg,
-    U8 *stack, Size stackSize)
+    U8 *stack, USize stackSize)
 {
     if (thread == NULL || name == NULL || handler == NULL || stack == NULL || !stackSize)
     {
@@ -51,7 +51,7 @@ PRIVATE OS_Error ThreadInit(Thread *thread,
     thread->isTerminated = 0;
     thread->stackBase = stack;
     thread->stackSize = stackSize;
-    thread->stack = thread->stackBase + stackSize - sizeof(Uint);
+    thread->stack = thread->stackBase + stackSize - sizeof(UArch);
     thread->stack = ContextInit(handler, (void *)ThreadExit, arg, thread->stack);
     
     thread->onCore = NR_MULTI_CORES; /* not on any core */
@@ -147,7 +147,7 @@ PUBLIC void ThreadReadyRunLocked(Thread *thread, int flags)
 
 PUBLIC void ThreadReadyRunUnlocked(Thread *thread, int flags)
 {
-    Uint level;
+    UArch level;
     SpinLockIRQ(&ThreadManagerObject.lock, &level);
 
     ThreadReadyRunLocked(thread, flags);
@@ -174,7 +174,7 @@ PUBLIC OS_Error ThreadRun(Thread *thread)
         return OS_EINVAL;
     }
 
-    Uint level;
+    UArch level;
     SpinLockIRQ(&ThreadManagerObject.lock, &level);
 
     ThreadEnququeGlobalListUnlocked(thread);
@@ -202,7 +202,7 @@ PUBLIC OS_Error ThreadTerminate(Thread *thread)
         return OS_EPERM;
     }
 
-    Uint level = INTR_SaveLevel();
+    UArch level = INTR_SaveLevel();
     thread->isTerminated = 1;
     ThreadWakeup(thread);
     INTR_RestoreLevel(level);
@@ -244,7 +244,7 @@ PUBLIC void ThreadExit(void)
     /* release the resource here that not the must for a thread! */
     ThreadReleaseResouce(thread);
 
-    Uint level;
+    UArch level;
     SpinLockIRQ(&ThreadManagerObject.lock, &level);
 
     ThreadDeququeGlobalListUnlocked(thread);
@@ -265,7 +265,7 @@ PUBLIC Thread *ThreadSelf(void)
 /**
  * must called when interrupt disabled
  */
-PRIVATE void ThreadBlockInterruptDisabled(ThreadState state, Uint irqLevel)
+PRIVATE void ThreadBlockInterruptDisabled(ThreadState state, UArch irqLevel)
 {
     ASSERT(state == THREAD_SLEEP || state == THREAD_DEEPSLEEP);
     CurrentThread->state = state;
@@ -320,7 +320,7 @@ PRIVATE Bool TimerThreadSleepTimeout(Timer *timer, void *arg)
 /* if thread sleep less equal than 2s, use delay instead */
 #define THREAD_SLEEP_TIMEOUT_THRESHOLD 2
 
-PUBLIC OS_Error ThreadSleep(Uint microseconds)
+PUBLIC OS_Error ThreadSleep(UArch microseconds)
 {
     if (microseconds == 0)
     {
@@ -340,7 +340,7 @@ PUBLIC OS_Error ThreadSleep(Uint microseconds)
         return err;
     }
 
-    Uint irqLevel = INTR_SaveLevel();
+    UArch irqLevel = INTR_SaveLevel();
     /* lock thread */
     self->resource.sleepTimer = &sleepTimer;
 
@@ -360,13 +360,13 @@ PUBLIC OS_Error ThreadSleep(Uint microseconds)
     return OS_EOK;
 }
 
-PUBLIC OS_Error ThreadSetAffinity(Thread *thread, Uint coreId)
+PUBLIC OS_Error ThreadSetAffinity(Thread *thread, UArch coreId)
 {
     if (thread == NULL || coreId >= NR_MULTI_CORES)
     {
         return OS_EINVAL;
     }
-    Uint level;
+    UArch level;
     SpinLockIRQ(&thread->lock, &level);
     thread->coreAffinity = coreId;
     thread->onCore = coreId;
@@ -376,7 +376,7 @@ PUBLIC OS_Error ThreadSetAffinity(Thread *thread, Uint coreId)
 
 PUBLIC void ThreadEnqueuePendingList(Thread *thread)
 {
-    Uint level;
+    UArch level;
     SpinLockIRQ(&ThreadManagerObject.lock, &level);
     ListAdd(&thread->list, &ThreadManagerObject.pendingList);
     AtomicInc(&ThreadManagerObject.pendingThreadCount);
@@ -399,7 +399,7 @@ PUBLIC Thread *ThreadDequeuePendingList(void)
 
 PUBLIC void ThreadEnququeExitList(Thread *thread)
 {
-    Uint level;
+    UArch level;
     SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
     ListAdd(&thread->globalList, &ThreadManagerObject.exitList);
     SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
@@ -408,7 +408,7 @@ PUBLIC void ThreadEnququeExitList(Thread *thread)
 PUBLIC Thread *ThreadFindById(U32 tid)
 {
     Thread *thread = NULL, *find = NULL;
-    Uint level;
+    UArch level;
 
     SpinLockIRQ(&ThreadManagerObject.lock, &level);
 
@@ -446,7 +446,7 @@ PRIVATE void DaemonThreadEntry(void *arg)
 {
     LOG_I("Daemon thread started.\n");
     Thread *thread, *safe;
-    Uint level;
+    UArch level;
     while (1)
     {
         SpinLockIRQ(&ThreadManagerObject.exitLock, &level);

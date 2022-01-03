@@ -32,13 +32,13 @@ PRIVATE VOLATILE U32 kernelTable[PAGE_SIZE / sizeof(U32)] CALIGN(PAGE_SIZE);
  */
 PUBLIC void PageInit(void)
 {    
-    Size memSize = *(Size *)GRUB2_READ_MEMORY_BYTES_ADDR;
+    USize memSize = *(USize *)GRUB2_READ_MEMORY_BYTES_ADDR;
     
-    LOG_I("Memory Size: %x Bytes %d MB", memSize, memSize / SZ_MB);
+    LOG_I("Memory USize: %x Bytes %d MB", memSize, memSize / SZ_MB);
 
     if (memSize == 0)
     {
-        PANIC("Get Memory Size Failed!");
+        PANIC("Get Memory USize Failed!");
     }
     if (memSize < MEM_MIN_SIZE)
     {
@@ -47,7 +47,7 @@ PUBLIC void PageInit(void)
     }
     
     /* calc normal base & size */
-    Size normalSize = memSize - MEM_DMA_SIZE - MEM_KERNEL_SZ;
+    USize normalSize = memSize - MEM_DMA_SIZE - MEM_KERNEL_SZ;
     normalSize /= 2;
     if (normalSize > MEM_KERNEL_SPACE_SZ)
     {
@@ -56,11 +56,11 @@ PUBLIC void PageInit(void)
     
     /* calc user base & size */
     Addr userBase = MEM_NORMAL_BASE + normalSize;
-    Size userSize = memSize - normalSize;
+    USize userSize = memSize - normalSize;
 
-    LOG_I("DMA memory base: %x Size:%d MB", MEM_DMA_BASE, MEM_DMA_SIZE / SZ_MB);
-    LOG_I("Normal memory base: %x Size:%d MB", MEM_NORMAL_BASE, normalSize / SZ_MB);
-    LOG_I("User memory base: %x Size:%d MB", userBase, userSize / SZ_MB);
+    LOG_I("DMA memory base: %x USize:%d MB", MEM_DMA_BASE, MEM_DMA_SIZE / SZ_MB);
+    LOG_I("Normal memory base: %x USize:%d MB", MEM_NORMAL_BASE, normalSize / SZ_MB);
+    LOG_I("User memory base: %x USize:%d MB", userBase, userSize / SZ_MB);
 
     /* init page zone */
     PageInitZone(PZ_DMA, (void *)MEM_DMA_BASE, MEM_DMA_SIZE);
@@ -74,7 +74,7 @@ PUBLIC void PageInit(void)
 
     MMU_EarlyMap(&kernelMMU, kernelMMU.virStart, kernelMMU.earlyEnd);
 
-    MMU_SetPageTable((Uint)kernelMMU.table);
+    MMU_SetPageTable((UArch)kernelMMU.table);
     MMU_Enable();
 
     LOG_I("MMU enabled");

@@ -33,8 +33,8 @@ PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void
 {
     U8 *stack = NULL;
 
-    stack = stackTop + sizeof(Uint);
-    stack = (U8 *)ALIGN_DOWN((Uint)stack, sizeof(Uint));
+    stack = stackTop + sizeof(UArch);
+    stack = (U8 *)ALIGN_DOWN((UArch)stack, sizeof(UArch));
     stack -= sizeof(HAL_TrapFrame);
     stack -= sizeof(HAL_Context);
 

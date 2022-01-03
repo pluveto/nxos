@@ -123,39 +123,39 @@
 
 struct HAL_Context
 {
-    Uint epc;   //sepc
-    Uint ra;    // Return address
-    Uint sp;    // Stack pointer
-    Uint gp;    // Global pointer
-    Uint tp;    // Thread pointer
-    Uint t0;    // Temporary
-    Uint t1;    // Temporary
-    Uint t2;    // Temporary
-    Uint s0;    // Saved register/frame pointer
-    Uint s1;    // Saved register
-    Uint a0;    // Function argument/return value
-    Uint a1;    // Function argument/return value
-    Uint a2;    // Function argument
-    Uint a3;    // Function argument
-    Uint a4;    // Function argument
-    Uint a5;    // Function argument
-    Uint a6;    // Function argument
-    Uint a7;    // Function argument
-    Uint s2;    // Saved register
-    Uint s3;    // Saved register
-    Uint s4;    // Saved register
-    Uint s5;    // Saved register
-    Uint s6;    // Saved register
-    Uint s7;    // Saved register
-    Uint s8;    // Saved register
-    Uint s9;    // Saved register
-    Uint s10;   // Saved register
-    Uint s11;   // Saved register
-    Uint t3;    // Temporary
-    Uint t4;    // Temporary
-    Uint t5;    // Temporary
-    Uint t6;    // Temporary
-    Uint sstatus;// sstatus
+    UArch epc;   //sepc
+    UArch ra;    // Return address
+    UArch sp;    // Stack pointer
+    UArch gp;    // Global pointer
+    UArch tp;    // Thread pointer
+    UArch t0;    // Temporary
+    UArch t1;    // Temporary
+    UArch t2;    // Temporary
+    UArch s0;    // Saved register/frame pointer
+    UArch s1;    // Saved register
+    UArch a0;    // Function argument/return value
+    UArch a1;    // Function argument/return value
+    UArch a2;    // Function argument
+    UArch a3;    // Function argument
+    UArch a4;    // Function argument
+    UArch a5;    // Function argument
+    UArch a6;    // Function argument
+    UArch a7;    // Function argument
+    UArch s2;    // Saved register
+    UArch s3;    // Saved register
+    UArch s4;    // Saved register
+    UArch s5;    // Saved register
+    UArch s6;    // Saved register
+    UArch s7;    // Saved register
+    UArch s8;    // Saved register
+    UArch s9;    // Saved register
+    UArch s10;   // Saved register
+    UArch s11;   // Saved register
+    UArch t3;    // Temporary
+    UArch t4;    // Temporary
+    UArch t5;    // Temporary
+    UArch t6;    // Temporary
+    UArch sstatus;// sstatus
 } PACKED;
 typedef struct HAL_Context HAL_Context;
 #endif /* __ASSEMBLY__ */

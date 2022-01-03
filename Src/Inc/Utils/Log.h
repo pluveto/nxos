@@ -82,13 +82,13 @@
 #define LOG_TIMELINE
 #endif
 
-PUBLIC OS_Error LogLineLock(Uint *level);
-PUBLIC OS_Error LogLineUnlock(Uint level);
+PUBLIC OS_Error LogLineLock(UArch *level);
+PUBLIC OS_Error LogLineUnlock(UArch level);
 
 #define LOG_LINE(logName, color, ...) \
     do \
     { \
-        Uint _level; \
+        UArch _level; \
         LogLineLock(&_level); \
         LOG_TIMELINE \
         __LOG_BEGIN(logName, color); \
@@ -100,7 +100,7 @@ PUBLIC OS_Error LogLineUnlock(Uint level);
 #define __LOG_RAW(...) LOG_TIMELINE \
     do \
     { \
-        Uint _level; \
+        UArch _level; \
         LogLineLock(&_level); \
         Printf(__VA_ARGS__); \
         LogLineUnlock(_level); \

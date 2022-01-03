@@ -22,7 +22,7 @@ struct Spin
 {
     Atomic value;
     U32 magic;  /* magic for spin init */
-    Uint irqLevel;  /* save irq level */
+    UArch irqLevel;  /* save irq level */
 };
 typedef struct Spin Spin;
 
@@ -32,7 +32,7 @@ typedef struct Spin Spin;
 PUBLIC OS_Error SpinInit(Spin *lock);
 PUBLIC OS_Error SpinLock(Spin *lock, Bool forever);
 PUBLIC OS_Error SpinUnlock(Spin *lock);
-PUBLIC OS_Error SpinLockIRQ(Spin *lock, Uint *level);
-PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, Uint level);
+PUBLIC OS_Error SpinLockIRQ(Spin *lock, UArch *level);
+PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, UArch level);
 
 #endif /* __SCHED_SPIN___ */

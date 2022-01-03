@@ -35,7 +35,7 @@ INLINE int BuddyFLS(U32 word)
 
 /* Possibly 64-bit version of BuddyFLS. */
 #if defined(CONFIG_CPU_64BITS)
-PRIVATE int BuddyFlsSizet(Size size)
+PRIVATE int BuddyFlsSizet(USize size)
 {
     int high = (int)(size >> 32);
     int bits = 0;
@@ -50,7 +50,7 @@ PRIVATE int BuddyFlsSizet(Size size)
     return bits;
 }
 
-PRIVATE int BuddyFfsSizet(Size size)
+PRIVATE int BuddyFfsSizet(USize size)
 {
     int low = (int)(size);
     int bits = 0;
@@ -69,19 +69,19 @@ PRIVATE int BuddyFfsSizet(Size size)
 #define BuddyFfsSizet BuddyFFS
 #endif
 
-PRIVATE Size BuddyAlignUp(Size x, Size align)
+PRIVATE USize BuddyAlignUp(USize x, USize align)
 {
     BUDDY_ASSERT(0 == (align & (align - 1)), "must align to a power of two");
     return (x + (align - 1)) & ~(align - 1);
 }
 
-USED PRIVATE Size BuddyAlignDown(Size x, Size align)
+USED PRIVATE USize BuddyAlignDown(USize x, USize align)
 {
     BUDDY_ASSERT(0 == (align & (align - 1)), "must align to a power of two");
     return x - (x & (align - 1));
 }
 
-PRIVATE void *BuddyAlignPtr(const void *ptr, Size align)
+PRIVATE void *BuddyAlignPtr(const void *ptr, USize align)
 {
     ASSERT(ptr && align);
 

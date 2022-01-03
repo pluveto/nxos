@@ -133,7 +133,7 @@
 /* functions */
 PUBLIC void UTestAssert(int value, const char *file, int line, const char *func, const char *msg, Bool dieAction);
 PUBLIC void UTestAssertString(const char *a, const char *b, Bool equal, const char *file, int line, const char *func, const char *msg, Bool dieAction);
-PUBLIC void UTestAssertBuf(const char *a, const char *b, Size sz, Bool equal, const char *file, int line, const char *func, const char *msg, Bool dieAction);
+PUBLIC void UTestAssertBuf(const char *a, const char *b, USize sz, Bool equal, const char *file, int line, const char *func, const char *msg, Bool dieAction);
 
 #endif /* CONFIG_ENABLE_TEST_UTEST */
 

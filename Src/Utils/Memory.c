@@ -11,7 +11,7 @@
 
 #include <Utils/Memory.h>
 
-PUBLIC void *Set(void *dst, U8 value, Size sz)
+PUBLIC void *Set(void *dst, U8 value, USize sz)
 {
     U8 *dstPtr = (U8 *)dst;
 	while (sz > 0)
@@ -25,7 +25,7 @@ PUBLIC void *Set(void *dst, U8 value, Size sz)
 /**
  * memset for compiler
  */
-PUBLIC void *memset(void *dst, U8 value, Size sz)
+PUBLIC void *memset(void *dst, U8 value, USize sz)
 {
     U8 *dstPtr = (U8 *)dst;
 	while (sz > 0)
@@ -36,7 +36,7 @@ PUBLIC void *memset(void *dst, U8 value, Size sz)
 	return dst;
 }
 
-PUBLIC void Copy(void *dst, void *src, Size sz)
+PUBLIC void Copy(void *dst, void *src, USize sz)
 {
     U8 *dstPtr = (U8 *)dst;
     U8 *srcPtr = (U8 *)src;
@@ -46,12 +46,12 @@ PUBLIC void Copy(void *dst, void *src, Size sz)
     }
 }
 
-PUBLIC void *Zero(void *dst, Size sz)
+PUBLIC void *Zero(void *dst, USize sz)
 {
     return Set(dst, 0, sz);
 }
 
-PUBLIC int CompareN(const void *s1, const void *s2, Size nBytes)
+PUBLIC int CompareN(const void *s1, const void *s2, USize nBytes)
 {
 	if ((s1 == 0) || (s2 == 0)) 
     {

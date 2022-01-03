@@ -122,7 +122,7 @@ PRIVATE void SmallObjectTest(void)
         for (j = 0; j < 10; j++)
         {
             p = HeapAlloc(i);
-            LOG_D("Alloc & Free: %p Size: %d", p, HeapGetObjectSize(p));
+            LOG_D("Alloc & Free: %p USize: %d", p, HeapGetObjectSize(p));
             HeapFree(p);
         }
     }

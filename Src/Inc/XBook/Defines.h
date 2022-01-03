@@ -60,7 +60,7 @@
 /**
  * Offset of struct
  */
-#define OffsetOfStruct(type, member) ((Size) &((type *)0)->member)
+#define OffsetOfStruct(type, member) ((USize) &((type *)0)->member)
 
 /**
  * Ptr of struct base addr 

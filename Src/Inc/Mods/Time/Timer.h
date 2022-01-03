@@ -44,11 +44,11 @@ struct Timer
 };
 typedef struct Timer Timer;
 
-PUBLIC OS_Error TimerInit(Timer *timer, Uint milliseconds, 
+PUBLIC OS_Error TimerInit(Timer *timer, UArch milliseconds, 
                           Bool (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags);
                           
-PUBLIC Timer *TimerCreate(Uint milliseconds, 
+PUBLIC Timer *TimerCreate(UArch milliseconds, 
                           Bool (*handler)(struct Timer *, void *arg), void *arg, 
                           int flags);
                           

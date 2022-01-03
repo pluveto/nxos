@@ -28,8 +28,8 @@
 #define MILLISECOND_TO_TICKS(msec) ((msec) / TICKS_PER_MILLISECOND)
 #define TICKS_TO_MILLISECOND(ticks) ((ticks) * TICKS_PER_MILLISECOND)
 
-typedef Uint TimeVal;
-typedef Uint ClockTick;
+typedef UArch TimeVal;
+typedef UArch ClockTick;
 
 PUBLIC ClockTick ClockTickGet(void);
 PUBLIC void ClockTickSet(ClockTick tick);

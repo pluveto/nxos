@@ -30,11 +30,11 @@
 #define PAGE_ALIGNUP(value) (((value) + PAGE_MASK) & PAGE_UMASK)
 #define PAGE_ALIGNDOWN(value) ((value) & PAGE_UMASK)
 
-PUBLIC void PageInitZone(PageZone zone, void *mem, Size size);
-PUBLIC void *PageAllocInZone(PageZone zone, Size count);
+PUBLIC void PageInitZone(PageZone zone, void *mem, USize size);
+PUBLIC void *PageAllocInZone(PageZone zone, USize count);
 PUBLIC void PageFreeInZone(PageZone zone, void *ptr);
 PUBLIC void *PageZoneGetBase(PageZone zone);
-PUBLIC Size PageZoneGetPages(PageZone zone);
+PUBLIC USize PageZoneGetPages(PageZone zone);
 
 PUBLIC void *PageZoneGetBuddySystem(PageZone zone);
 

@@ -14,9 +14,9 @@
 
 #include <XBook.h>
 
-PUBLIC void *Set(void *dst, U8 value, Size sz);
-PUBLIC void Copy(void *dst, void *src, Size sz);
-PUBLIC void *Zero(void *dst, Size sz);
-PUBLIC int CompareN(const void *s1, const void *s2, Size nBytes);
+PUBLIC void *Set(void *dst, U8 value, USize sz);
+PUBLIC void Copy(void *dst, void *src, USize sz);
+PUBLIC void *Zero(void *dst, USize sz);
+PUBLIC int CompareN(const void *s1, const void *s2, USize nBytes);
 
 #endif  /* __UTILS_MEMORY__ */

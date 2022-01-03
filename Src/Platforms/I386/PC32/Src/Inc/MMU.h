@@ -34,7 +34,7 @@
 
 #define PAGE_TABLE_ADDR     0X3F3000
 
-#define MAKE_PTE(paddr, attr) (Uint) (((Uint)(paddr) & PAGE_ADDR_MASK) | ((attr) & PAGE_MASK))
+#define MAKE_PTE(paddr, attr) (UArch) (((UArch)(paddr) & PAGE_ADDR_MASK) | ((attr) & PAGE_MASK))
 
 // page table entry (PTE) fields
 #define PTE_P     0x001 // Present
@@ -70,7 +70,7 @@ struct MMU
 };
 typedef struct MMU MMU;
 
-PUBLIC void MMU_EarlyMap(MMU *mmu, Addr virStart, Size size);
+PUBLIC void MMU_EarlyMap(MMU *mmu, Addr virStart, USize size);
 PUBLIC void MMU_SetPageTable(Addr addr);
 PUBLIC void MMU_Enable(void);
 

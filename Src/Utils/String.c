@@ -26,7 +26,7 @@ PUBLIC char *StrCopy(const char *dst, const char *src)
     return (char *)dst;
 }
 
-PUBLIC char *StrCopyN(const char *dst, const char *src, Size len)
+PUBLIC char *StrCopyN(const char *dst, const char *src, USize len)
 {
     if (dst == NULL || src == NULL || !len)
     {

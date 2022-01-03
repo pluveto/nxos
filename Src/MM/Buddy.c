@@ -45,12 +45,12 @@ PRIVATE void *PageToPtr(BuddySystem* system, Page* page)
 
 PUBLIC Page* PageFromPtr(BuddySystem* system, void *ptr)
 {
-    ASSERT(0 == ((Size)ptr % PAGE_SIZE));
+    ASSERT(0 == ((USize)ptr % PAGE_SIZE));
     PtrDiff diff = ArraryCast(ptr, PAGE_SIZE) - ArraryCast(system->pageStart, PAGE_SIZE);
     return &system->map[diff];
 }
 
-PRIVATE Size PageToPFN(BuddySystem* system, Page* page)
+PRIVATE USize PageToPFN(BuddySystem* system, Page* page)
 {
     ASSERT(system);
 
@@ -58,13 +58,13 @@ PRIVATE Size PageToPFN(BuddySystem* system, Page* page)
     return diff;
 }
 
-USED PRIVATE Page* PageFromPFN(BuddySystem* system, Size pfn)
+USED PRIVATE Page* PageFromPFN(BuddySystem* system, USize pfn)
 {
     ASSERT(system);
     return &system->map[pfn];
 }
 
-PRIVATE int IsValidPFN(BuddySystem* system, Size pfn)
+PRIVATE int IsValidPFN(BuddySystem* system, USize pfn)
 {
     ASSERT(system);
 
@@ -92,7 +92,7 @@ PRIVATE BuddySystem* BuddyCreateFromMemory(void *mem)
     return system;
 }
 
-PUBLIC BuddySystem* BuddyCreate(void *mem, Size size)
+PUBLIC BuddySystem* BuddyCreate(void *mem, USize size)
 {
     ASSERT(mem && size);
     LOG_I("mem: 0x%p size: 0x%p", mem, size);
@@ -106,16 +106,16 @@ PUBLIC BuddySystem* BuddyCreate(void *mem, Size size)
     mem += sizeof(BuddySystem);
     size -= sizeof(BuddySystem);
 
-    Size page_count = size >> PAGE_SHIFT;
+    USize page_count = size >> PAGE_SHIFT;
 
     // Alloc page map
-    Size map_size = BuddyAlignUp(page_count * sizeof(Page), PAGE_SIZE);
+    USize map_size = BuddyAlignUp(page_count * sizeof(Page), PAGE_SIZE);
     page_count -= map_size / PAGE_SIZE;
     mem += map_size;
     size -= map_size;
 
     // Alloc page
-    Size mem_diff = (TypeCast(PtrDiff, BuddyAlignPtr(mem, PAGE_SIZE)) - TypeCast(PtrDiff, mem));
+    USize mem_diff = (TypeCast(PtrDiff, BuddyAlignPtr(mem, PAGE_SIZE)) - TypeCast(PtrDiff, mem));
     mem += mem_diff;
     size -= mem_diff;
     page_count = size >> PAGE_SHIFT;
@@ -123,9 +123,9 @@ PUBLIC BuddySystem* BuddyCreate(void *mem, Size size)
     system->pageStart = mem;
     system->maxPFN = page_count - 1;
 
-    BUDDY_ASSERT(((Size)mem & PAGE_MASK) == 0, "must align to PAGE_SIZE");
+    BUDDY_ASSERT(((USize)mem & PAGE_MASK) == 0, "must align to PAGE_SIZE");
 
-    Size i;
+    USize i;
     for (i = 0; i < page_count; i++)
     {
         system->map[i].order = PAGE_INVALID_ORDER;
@@ -133,7 +133,7 @@ PUBLIC BuddySystem* BuddyCreate(void *mem, Size size)
 
     int order = PAGE_INVALID_ORDER;
 
-    Size count;
+    USize count;
     for (i = 0, count = page_count; count; i += 1UL << order, count -= 1UL << order)
     {
         order = BuddyFlsSizet(count);
@@ -158,7 +158,7 @@ PRIVATE Page* BuddyLocateFree(BuddySystem* system, int order)
 
     if (ListEmpty(&system->pageBuddy[order]))
     {
-        Size bitmap = system->bitmap & (~0UL << order);
+        USize bitmap = system->bitmap & (~0UL << order);
         if (!bitmap)
         {
             LOG_E("Cannot find free page!");
@@ -192,11 +192,11 @@ PRIVATE Page* PageMerge(BuddySystem* system, Page* page)
     ASSERT(system && page);
 
     int order = page->order;
-    Size pfn = PageToPFN(system, page);
+    USize pfn = PageToPFN(system, page);
 
     for (; order <= MAX_PAGE_ORDER;)
     {
-        Size buddyPFN = pfn ^ (1UL << order);
+        USize buddyPFN = pfn ^ (1UL << order);
         Page* buddy = page + (buddyPFN - pfn);
 
         if (!IsValidPFN(system, buddyPFN))
@@ -208,11 +208,11 @@ PRIVATE Page* PageMerge(BuddySystem* system, Page* page)
 
         BuddyDelPage(system, buddy);
 
-        Size privatePFN = buddyPFN | pfn;
+        USize privatePFN = buddyPFN | pfn;
         Page* private = page + (privatePFN - pfn);
         private->order = PAGE_INVALID_ORDER;
 
-        Size combinedPFN = buddyPFN & pfn;
+        USize combinedPFN = buddyPFN & pfn;
         page = page + (combinedPFN - pfn);
         pfn = combinedPFN;
         order++;
@@ -236,7 +236,7 @@ PRIVATE void *PagePrepareUsed(BuddySystem* system, Page* page, int order)
     return PageToPtr(system, page);
 }
 
-PUBLIC void *BuddyAllocPage(BuddySystem* system, Size count)
+PUBLIC void *BuddyAllocPage(BuddySystem* system, USize count)
 {
     ASSERT(system && count);
 

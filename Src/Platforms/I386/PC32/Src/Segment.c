@@ -12,7 +12,7 @@
 #include <Segment.h>
 #include <TSS.h>
 
-PUBLIC void CPU_LoadGDT(Uint Size, Uint gdtr);
+PUBLIC void CPU_LoadGDT(UArch USize, UArch gdtr);
 
 struct CPU_Segment
 {
@@ -21,8 +21,8 @@ struct CPU_Segment
     U8 limitHigh, baseHigh;
 };
 
-PRIVATE void SetSegment(struct CPU_Segment *seg, Uint limit,
-                        Uint base, Uint attributes)
+PRIVATE void SetSegment(struct CPU_Segment *seg, UArch limit,
+                        UArch base, UArch attributes)
 {
     seg->limitLow    = limit & 0xffff;
     seg->baseLow     = base & 0xffff;
@@ -47,7 +47,7 @@ PUBLIC void CPU_InitSegment(void)
     SetSegment(GDT_OFF2PTR(gdt, INDEX_KERNEL_DATA), GDT_BOUND_TOP, GDT_BOUND_BOTTOM, GDT_KERNEL_DATA_ATTR);
 
     struct CPU_TSS *tss = CPU_GetTSS();
-    SetSegment(GDT_OFF2PTR(gdt, INDEX_TSS), sizeof(struct CPU_TSS) - 1, (Uint)tss, GDT_TSS_ATTR);
+    SetSegment(GDT_OFF2PTR(gdt, INDEX_TSS), sizeof(struct CPU_TSS) - 1, (UArch)tss, GDT_TSS_ATTR);
 
     SetSegment(GDT_OFF2PTR(gdt, INDEX_USER_CODE), GDT_BOUND_TOP, GDT_BOUND_BOTTOM, GDT_USER_CODE_ATTR);
     SetSegment(GDT_OFF2PTR(gdt, INDEX_USER_DATA), GDT_BOUND_TOP, GDT_BOUND_BOTTOM, GDT_USER_DATA_ATTR);

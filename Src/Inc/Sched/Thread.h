@@ -64,7 +64,7 @@ struct Thread
     
     /* thread stack */
     U8 *stackBase;  /* stack base */
-    Size stackSize; 
+    USize stackSize; 
     U8 *stack;      /* stack top */
     
     /* thread sched */
@@ -72,8 +72,8 @@ struct Thread
     U32 ticks;
     U32 needSched;
     U32 isTerminated;
-    Uint onCore;        /* thread on which core */
-    Uint coreAffinity;  /* thread would like to run on the core */
+    UArch onCore;        /* thread on which core */
+    UArch coreAffinity;  /* thread would like to run on the core */
 
     /* thread resource */
     ThreadResource resource;
@@ -106,9 +106,9 @@ PUBLIC Thread *ThreadFindById(U32 tid);
 
 PUBLIC OS_Error ThreadRun(Thread *thread);
 PUBLIC void ThreadYield(void);
-PUBLIC OS_Error ThreadSetAffinity(Thread *thread, Uint coreId);
+PUBLIC OS_Error ThreadSetAffinity(Thread *thread, UArch coreId);
 
-PUBLIC OS_Error ThreadSleep(Uint microseconds);
+PUBLIC OS_Error ThreadSleep(UArch microseconds);
 PUBLIC OS_Error ThreadWakeup(Thread *thread);
 
 PUBLIC void ThreadsInit(void);

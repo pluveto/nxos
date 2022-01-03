@@ -20,7 +20,7 @@
 #include <XBook/InitCall.h>
 
 PRIVATE Integration *IntegrationTable = NULL;
-PRIVATE Size IntegrationCount;
+PRIVATE USize IntegrationCount;
 
 IMPORT const Addr __IntegrationTableStart;
 IMPORT const Addr __IntegrationTableEnd;
@@ -32,7 +32,7 @@ PRIVATE void IntegrationInvoke(void)
     LOG_I("[==========] Total integrations: %d", IntegrationCount);
     int integrationIndex;
     OS_Error err;
-    Size passedTests = 0; 
+    USize passedTests = 0; 
     for (integrationIndex = 0; integrationIndex < IntegrationCount; integrationIndex++)
     {
         LOG_I("[==========] [ integration ] Running (%d/%d) test (%s).", integrationIndex + 1, IntegrationCount, IntegrationTable->integrationName);

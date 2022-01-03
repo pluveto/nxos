@@ -42,8 +42,8 @@ struct IRQ_Controller
     
     void (*enable)(void);
     void (*disable)(void);
-    Uint (*saveLevel)(void);
-    void (*restoreLevel)(Uint level);
+    UArch (*saveLevel)(void);
+    void (*restoreLevel)(UArch level);
 };
 typedef struct IRQ_Controller IRQ_Controller;
 

@@ -105,7 +105,7 @@ PUBLIC void TrapFrameDump(HAL_TrapFrame *frame)
     LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_SPP) ? "Last Privilege is Supervisor Mode" : "Last Privilege is User Mode");
     LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_FS) ? "FPU Enabled" : "FPU not Enabled");
     
-    Size satp = ReadCSR(satp);
+    USize satp = ReadCSR(satp);
     LOG_RAW("satp = 0x%p\n", satp);
     
     LOG_RAW("\tCurrent PPN = 0x%p\n", (satp & ((1UL << 28) - 1)));
@@ -143,7 +143,7 @@ IMPORT Addr TrapEntry1;
 IMPORT Addr TrapEntry2;
 IMPORT Addr TrapEntry3;
 
-PUBLIC void CPU_InitTrap(Uint coreId)
+PUBLIC void CPU_InitTrap(UArch coreId)
 {
     Addr *trapEntry = 0;
     switch (coreId)
@@ -177,7 +177,7 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
     U64 stval = ReadCSR(stval);
 
     const char *msg = NULL;
-    Uint id = cause & ((1UL << (RISCV_XLEN - 2)) - 1);
+    UArch id = cause & ((1UL << (RISCV_XLEN - 2)) - 1);
 
     /* supervisor external interrupt */
     if ((SCAUSE_INTERRUPT & cause) && 
@@ -232,7 +232,7 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
  */
 PUBLIC U8 *TrapSwitchStack(HAL_TrapFrame *frame)
 {
-    Uint sstatus = ReadCSR(sstatus);
+    UArch sstatus = ReadCSR(sstatus);
     U8 *sp;
     if ((sstatus & SSTATUS_SPP)) /* trap from supervisor */
     {

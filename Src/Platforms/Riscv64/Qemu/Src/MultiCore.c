@@ -30,7 +30,7 @@ IMPORT Addr TrapEntry3;
 /**
  * Within SBI, we can't read mhartid, so I try to use `trap entry` to see who am I.
  */
-PRIVATE Uint HAL_CoreGetId(void)
+PRIVATE UArch HAL_CoreGetId(void)
 {
     Addr trapEntry = ReadCSR(stvec);
 
@@ -54,10 +54,10 @@ PRIVATE Uint HAL_CoreGetId(void)
     while (1);
 }
 
-PRIVATE OS_Error HAL_CoreBootApp(Uint bootCoreId)
+PRIVATE OS_Error HAL_CoreBootApp(UArch bootCoreId)
 {
     LOG_I("boot core is:%d", bootCoreId);
-    Uint coreId;
+    UArch coreId;
     for (coreId = 0; coreId < NR_MULTI_CORES; coreId++)
     {
         LOG_I("core#%d state:%d", coreId, sbi_hsm_hart_status(coreId));
@@ -74,7 +74,7 @@ PRIVATE OS_Error HAL_CoreBootApp(Uint bootCoreId)
     return OS_EOK;
 }
 
-PRIVATE OS_Error HAL_CoreEnterApp(Uint appCoreId)
+PRIVATE OS_Error HAL_CoreEnterApp(UArch appCoreId)
 {
     /* NOTE: init trap first before do anything */
     CPU_InitTrap(appCoreId);

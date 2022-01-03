@@ -20,7 +20,7 @@
 #include <XBook/InitCall.h>
 
 PRIVATE UTestCase *TestCaseTable = NULL;
-PRIVATE Size TestCaseCount;
+PRIVATE USize TestCaseCount;
 PRIVATE UTestSum LocalUtestSum = {FALSE, 0, 0};
 PRIVATE UTestSum UtestSum = {FALSE, 0, 0};
 PRIVATE UTestSum UtestCaseSum = {FALSE, 0, 0};
@@ -189,7 +189,7 @@ PUBLIC void UTestAssertString(const char *a, const char *b, Bool equal,
     }
 }
 
-PUBLIC void UTestAssertBuf(const char *a, const char *b, Size sz, Bool equal,
+PUBLIC void UTestAssertBuf(const char *a, const char *b, USize sz, Bool equal,
     const char *file, int line, const char *func, const char *msg, Bool dieAction)
 {
     if (a == NULL || b == NULL)

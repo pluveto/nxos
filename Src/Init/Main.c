@@ -22,7 +22,7 @@
 #include <Mods/Time/Timer.h>
 
 /* Platform init */
-INTERFACE OS_Error PlatformInit(Uint coreId);
+INTERFACE OS_Error PlatformInit(UArch coreId);
 
 /**
  * stage2 means you can do:
@@ -39,7 +39,7 @@ INTERFACE WEAK_SYM OS_Error PlatformStage2(void)
 /* used to record how many core entered main */
 PRIVATE STATIC_ATOMIC_INIT(MainEnterReference);
 
-PUBLIC int OS_Main(Uint coreId)
+PUBLIC int OS_Main(UArch coreId)
 {
     if (!AtomicGet(&MainEnterReference))
     {

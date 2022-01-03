@@ -18,17 +18,17 @@
 #include <Utils/Debug.h>
 
 /* init as zero, avoid cleared by clear bss action */
-PRIVATE VOLATILE Uint BootCoreId = 0;
+PRIVATE VOLATILE UArch BootCoreId = 0;
 
 PRIVATE CoreLocalStorage CLS[NR_MULTI_CORES];
 
-PUBLIC void MultiCorePreload(Uint coreId)
+PUBLIC void MultiCorePreload(UArch coreId)
 {
     /* recored boot core */
     BootCoreId = coreId;
 }
 
-PUBLIC Uint MultiCoreGetBootCore(void)
+PUBLIC UArch MultiCoreGetBootCore(void)
 {
     return BootCoreId;
 }
@@ -36,7 +36,7 @@ PUBLIC Uint MultiCoreGetBootCore(void)
 /**
  * init multi core before thread
  */
-PUBLIC void MultiCoreInit(Uint coreId)
+PUBLIC void MultiCoreInit(UArch coreId)
 {
     /* init core array */
     int i;
@@ -52,13 +52,13 @@ PUBLIC void MultiCoreInit(Uint coreId)
 /**
  * get CLS by index
  */
-PUBLIC CoreLocalStorage *CLS_GetIndex(Uint coreId)
+PUBLIC CoreLocalStorage *CLS_GetIndex(UArch coreId)
 {
     ASSERT(coreId < NR_MULTI_CORES);
     return &CLS[coreId];
 }
 
-PUBLIC void MultiCoreMain(Uint coreId)
+PUBLIC void MultiCoreMain(UArch coreId)
 {
     /* boot other cores */
     if (MultiCoreBootApp(coreId) != OS_EOK)
@@ -71,7 +71,7 @@ PUBLIC void MultiCoreMain(Uint coreId)
     }
 }
 
-PUBLIC void MultiCoreStage2(Uint appCoreId)
+PUBLIC void MultiCoreStage2(UArch appCoreId)
 {
     // LOG_I("core %d stage2", appCoreId);
     OS_Error err;
@@ -86,7 +86,7 @@ PUBLIC void MultiCoreStage2(Uint appCoreId)
     }
 }
 
-PUBLIC void MultiCoreEnqueueThreadIrqDisabled(Uint coreId, Thread *thread, int flags)
+PUBLIC void MultiCoreEnqueueThreadIrqDisabled(UArch coreId, Thread *thread, int flags)
 {
     CoreLocalStorage *cls = CLS_GetIndex(coreId);
 
@@ -106,7 +106,7 @@ PUBLIC void MultiCoreEnqueueThreadIrqDisabled(Uint coreId, Thread *thread, int f
     SpinUnlock(&cls->lock);
 }
 
-PUBLIC Thread *MultiCoreDeququeThreadIrqDisabled(Uint coreId)
+PUBLIC Thread *MultiCoreDeququeThreadIrqDisabled(UArch coreId)
 {
     Thread *thread;
     CoreLocalStorage *cls = CLS_GetIndex(coreId);
@@ -126,7 +126,7 @@ PUBLIC Thread *MultiCoreDeququeThreadIrqDisabled(Uint coreId)
 /**
  * NOTE: this must called irq disabled
  */
-PUBLIC Thread *MultiCoreDeququeNoAffinityThread(Uint coreId)
+PUBLIC Thread *MultiCoreDeququeNoAffinityThread(UArch coreId)
 {
     Thread *thread, *findThread = NULL;
     CoreLocalStorage *cls = CLS_GetIndex(coreId);
@@ -149,7 +149,7 @@ PUBLIC Thread *MultiCoreDeququeNoAffinityThread(Uint coreId)
     return findThread;
 }
 
-PUBLIC OS_Error MultiCoreSetRunning(Uint coreId, Thread *thread)
+PUBLIC OS_Error MultiCoreSetRunning(UArch coreId, Thread *thread)
 {
     if (coreId >= NR_MULTI_CORES || thread == NULL)
     {
@@ -157,7 +157,7 @@ PUBLIC OS_Error MultiCoreSetRunning(Uint coreId, Thread *thread)
     }
 
     CoreLocalStorage *cls = CLS_GetIndex(coreId);
-    Uint level;
+    UArch level;
     SpinLockIRQ(&cls->lock, &level);
     thread->state = THREAD_RUNNING;
     cls->threadRunning = thread;
@@ -172,7 +172,7 @@ PUBLIC Thread *CLS_GetRunning(void)
 {
     Thread *thread;
     CoreLocalStorage *cls = CLS_Get();
-    Uint level;
+    UArch level;
     SpinLockIRQ(&cls->lock, &level);
     thread = cls->threadRunning;
     SpinUnlockIRQ(&cls->lock, level);

@@ -47,7 +47,7 @@ struct HeapCache
 {
     List spanFreeList;
     List objectFreeList;
-    Size classSize; /* heap cache size */
+    USize classSize; /* heap cache size */
     Atomic spanFreeCount;
     Atomic objectFreeCount;
 };
@@ -55,7 +55,7 @@ typedef struct HeapCache HeapCache;
 
 struct SizeClass
 {
-    Size size;
+    USize size;
     struct HeapCache cache;
 };
 
@@ -68,9 +68,9 @@ typedef struct SmallCacheObject SmallCacheObject;
 
 PUBLIC void HeapCacheInit(void);
 
-PUBLIC void *HeapAlloc(Size size);
+PUBLIC void *HeapAlloc(USize size);
 PUBLIC OS_Error HeapFree(void *object);
-PUBLIC Size HeapGetObjectSize(void *object);
+PUBLIC USize HeapGetObjectSize(void *object);
 
 INLINE OS_Error __HeapFreeSatety(void **object)
 {

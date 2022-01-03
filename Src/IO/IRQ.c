@@ -87,7 +87,7 @@ PUBLIC OS_Error IRQ_Unbind(IRQ_Number irqno, void *data)
     IRQ_Action *action = NULL;
     IRQ_Action *actionFind = NULL;
 
-    Uint level = INTR_SaveLevel();
+    UArch level = INTR_SaveLevel();
     if (irqNode->flags & IRQ_FLAG_SHARED)
     {
         ListForEachEntry(action, &irqNode->actionList, list)

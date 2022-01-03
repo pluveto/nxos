@@ -21,7 +21,7 @@ PUBLIC struct CPU_TSS *CPU_GetTSS(void)
     return &tss;
 }
 
-PUBLIC void CPU_SetTssStack(Uint top)
+PUBLIC void CPU_SetTssStack(UArch top)
 {
     tss.esp0 = top; /* esp0 is kernel mode */
 }

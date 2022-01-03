@@ -30,9 +30,9 @@ typedef struct CoreLocalStorage CoreLocalStorage;
 
 struct MultiCoreOps
 {
-    Uint (*getId)(void);
-    OS_Error (*bootApp)(Uint bootCoreId);
-    OS_Error (*enterApp)(Uint appCoreId);
+    UArch (*getId)(void);
+    OS_Error (*bootApp)(UArch bootCoreId);
+    OS_Error (*enterApp)(UArch appCoreId);
 };
 
 INTERFACE IMPORT struct MultiCoreOps MultiCoreOpsInterface; 
@@ -41,20 +41,20 @@ INTERFACE IMPORT struct MultiCoreOps MultiCoreOpsInterface;
 #define MultiCoreEnterApp MultiCoreOpsInterface.enterApp
 #define MultiCoreGetId MultiCoreOpsInterface.getId
 
-PUBLIC void MultiCorePreload(Uint coreId);
-PUBLIC void MultiCoreInit(Uint coreId);
-PUBLIC void MultiCoreMain(Uint coreId);
-PUBLIC void MultiCoreStage2(Uint appCoreId);
+PUBLIC void MultiCorePreload(UArch coreId);
+PUBLIC void MultiCoreInit(UArch coreId);
+PUBLIC void MultiCoreMain(UArch coreId);
+PUBLIC void MultiCoreStage2(UArch appCoreId);
 
-PUBLIC Uint MultiCoreGetBootCore(void);
+PUBLIC UArch MultiCoreGetBootCore(void);
 
-PUBLIC void MultiCoreEnqueueThreadIrqDisabled(Uint coreId, Thread *thread, int flags);
-PUBLIC Thread *MultiCoreDeququeThreadIrqDisabled(Uint coreId);
-PUBLIC OS_Error MultiCoreSetRunning(Uint coreId, Thread *thread);
+PUBLIC void MultiCoreEnqueueThreadIrqDisabled(UArch coreId, Thread *thread, int flags);
+PUBLIC Thread *MultiCoreDeququeThreadIrqDisabled(UArch coreId);
+PUBLIC OS_Error MultiCoreSetRunning(UArch coreId, Thread *thread);
 
-PUBLIC CoreLocalStorage *CLS_GetIndex(Uint coreId);
+PUBLIC CoreLocalStorage *CLS_GetIndex(UArch coreId);
 
-PUBLIC Thread *MultiCoreDeququeNoAffinityThread(Uint coreId);
+PUBLIC Thread *MultiCoreDeququeNoAffinityThread(UArch coreId);
 
 /**
  * get CLS by core id

@@ -24,9 +24,9 @@ PRIVATE struct SizeClass CacheSizeAarray[MAX_SIZE_CLASS_NR];
 PRIVATE HeapCache MiddleSizeCache;
 PRIVATE Mutex HeapCacheLock;
 
-PRIVATE Size AlignDownToPow2(Size size)
+PRIVATE USize AlignDownToPow2(USize size)
 {
-    Size n = 19;    /* pow(2, 19) -> 512kb */
+    USize n = 19;    /* pow(2, 19) -> 512kb */
     while (PowInt(2, n) > size)
     {
         n--;
@@ -34,7 +34,7 @@ PRIVATE Size AlignDownToPow2(Size size)
     return PowInt(2, n);
 }
 
-PRIVATE Size SizeToPageCount(Size size)
+PRIVATE USize SizeToPageCount(USize size)
 {
     if (size > 0 && size <= 1024)
     {
@@ -62,7 +62,7 @@ PRIVATE Size SizeToPageCount(Size size)
     }
 }
 
-PRIVATE void HeapCacheInitOne(HeapCache *cache, Size classSize)
+PRIVATE void HeapCacheInitOne(HeapCache *cache, USize classSize)
 {
     cache->classSize = classSize;
     ListInit(&cache->objectFreeList);
@@ -101,7 +101,7 @@ PRIVATE void HeapSizeClassInit(void)
     HeapCacheInitOne(&MiddleSizeCache, 0);
 }
 
-INLINE HeapCache *SizeToCache(Size size)
+INLINE HeapCache *SizeToCache(USize size)
 {
     ASSERT(size <= MAX_SMALL_OBJECT_SIZE);
     HeapCache *cache = NULL;
@@ -119,13 +119,13 @@ INLINE HeapCache *SizeToCache(Size size)
     return cache;
 }
 
-PRIVATE void *DoHeapAlloc(Size size)
+PRIVATE void *DoHeapAlloc(USize size)
 {
     /* size align up with 8 */
     size = ALIGN_UP(size, 8);
 
     Span *span = NULL;
-    Size pageCount = SizeToPageCount(size);
+    USize pageCount = SizeToPageCount(size);
     HeapCache *cache = NULL;
     SmallCacheObject *objectNode = NULL;
 
@@ -147,7 +147,7 @@ PRIVATE void *DoHeapAlloc(Size size)
     ASSERT(AtomicGet(&cache->objectFreeCount) >= 0);
     if (AtomicGet(&cache->objectFreeCount) == 0) /* no object, need split from span */
     {
-        Size objectCount;
+        USize objectCount;
         
         ASSERT(AtomicGet(&cache->spanFreeCount) >= 0);
         if (AtomicGet(&cache->spanFreeCount) == 0)    /* no span, need alloc from page heap */
@@ -201,7 +201,7 @@ PRIVATE void *DoHeapAlloc(Size size)
     return (void *)objectNode;
 }
 
-PUBLIC void *HeapAlloc(Size size)
+PUBLIC void *HeapAlloc(USize size)
 {
     if (!size)
     {
@@ -223,8 +223,8 @@ PRIVATE OS_Error DoHeapFree(void *object)
     /* object to page, then to span */
     void *page = (void *)(((Addr) object) & PAGE_UMASK);
     void *span = PageToSpan(page);
-    Size pageCount = PageToSpanCount(page);
-    Size size = pageCount * PAGE_SIZE;
+    USize pageCount = PageToSpanCount(page);
+    USize size = pageCount * PAGE_SIZE;
 
     /* according size to free */
     if (size > MAX_SMALL_OBJECT_SIZE)   /* free to big span */
@@ -256,7 +256,7 @@ PRIVATE OS_Error DoHeapFree(void *object)
         ASSERT(pageNode != NULL);
 
         /* get class size from page */
-        Size sizeClass = pageNode->sizeClass;
+        USize sizeClass = pageNode->sizeClass;
         /* get left objects */
         HeapCache *cache = SizeToCache(sizeClass);
  
@@ -301,7 +301,7 @@ PUBLIC OS_Error HeapFree(void *object)
     return err;
 }
 
-PUBLIC Size HeapGetObjectSize(void *object)
+PUBLIC USize HeapGetObjectSize(void *object)
 {
     if (object == NULL) /* can't free NULL object */
     {

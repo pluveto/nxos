@@ -57,7 +57,7 @@ PUBLIC OS_Error IRQ_DelayQueueEnter(IRQ_DelayQueue queue, IRQ_DelayWork *work)
         return OS_EAGAIN;
     }
 
-    Uint level = INTR_SaveLevel();
+    UArch level = INTR_SaveLevel();
     work->queue = queue;
     work->flags |= IRQ_WORK_ON_QUEUED;
     ListAddTail(&work->list, &DelayIrqListTable[queue]);
@@ -77,7 +77,7 @@ PUBLIC OS_Error IRQ_DelayQueueLeave(IRQ_DelayQueue queue, IRQ_DelayWork *work)
         return OS_ENOSRCH;
     }
 
-    Uint level = INTR_SaveLevel();
+    UArch level = INTR_SaveLevel();
     work->queue = 0;
     work->flags &= ~IRQ_WORK_ON_QUEUED;
 

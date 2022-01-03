@@ -30,13 +30,13 @@ typedef signed short        I16;
 typedef unsigned char       U8;
 typedef signed char         I8;
 
-typedef unsigned long       Uint;
-typedef signed long         Int;
+typedef unsigned long       UArch;
+typedef signed long         IArch;
 
 typedef unsigned long       Addr;
 
-typedef unsigned long       Size;
-typedef signed long         SSize;
+typedef unsigned long       USize;
+typedef signed long         ISize;
 
 typedef long PtrDiff;
 

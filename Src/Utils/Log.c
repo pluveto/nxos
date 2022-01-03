@@ -15,12 +15,12 @@
 /* spin lock for log output */
 PRIVATE STATIC_SPIN_UNLOCKED(LogOutLock);
 
-PUBLIC OS_Error LogLineLock(Uint *level)
+PUBLIC OS_Error LogLineLock(UArch *level)
 {
     return SpinLockIRQ(&LogOutLock, level);
 }
 
-PUBLIC OS_Error LogLineUnlock(Uint level)
+PUBLIC OS_Error LogLineUnlock(UArch level)
 {
     return SpinUnlockIRQ(&LogOutLock, level);
 }
