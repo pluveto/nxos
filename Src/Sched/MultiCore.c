@@ -17,6 +17,8 @@
 
 #include <XBook/Debug.h>
 
+PUBLIC STATIC_ATOMIC_INIT(ActivedCoreCount, 0);
+
 /* init as zero, avoid cleared by clear bss action */
 PRIVATE VOLATILE UArch BootCoreId = 0;
 
@@ -157,10 +159,11 @@ PUBLIC OS_Error MultiCoreSetRunning(UArch coreId, Thread *thread)
     }
 
     CoreLocalStorage *cls = CLS_GetIndex(coreId);
-    SpinLockIRQ(&cls->lock);
+    UArch level;
+    SpinLockIRQ(&cls->lock, &level);
     thread->state = THREAD_RUNNING;
     cls->threadRunning = thread;
-    SpinUnlockIRQ(&cls->lock);
+    SpinUnlockIRQ(&cls->lock, level);
     return OS_EOK;
 }
 
@@ -171,8 +174,9 @@ PUBLIC Thread *CLS_GetRunning(void)
 {
     Thread *thread;
     CoreLocalStorage *cls = CLS_Get();
-    SpinLockIRQ(&cls->lock);
+    UArch level;
+    SpinLockIRQ(&cls->lock, &level);
     thread = cls->threadRunning;
-    SpinUnlockIRQ(&cls->lock);
+    SpinUnlockIRQ(&cls->lock, level);
     return thread;
 }

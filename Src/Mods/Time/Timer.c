@@ -12,8 +12,8 @@
 #include <Mods/Time/Timer.h>
 #include <MM/Alloc.h>
 
-#include <XBook/Debug.h>
 #include <Utils/Log.h>
+#include <XBook/Debug.h>
 #include <Sched/Spin.h>
 
 #define IDLE_TIMER_TIMEOUT  MAX_TIMER_TIMEOUT
@@ -121,9 +121,12 @@ PUBLIC OS_Error TimerDestroy(Timer *timer)
         return OS_EAGAIN;
     case TIMER_STOPPED:
     case TIMER_INITED:
-        SpinLockIRQ(&TimersSpin);
-        TimerRemove(timer, FALSE, TRUE);
-        SpinUnlockIRQ(&TimersSpin);
+        {
+            UArch level;
+            SpinLockIRQ(&TimersSpin, &level);
+            TimerRemove(timer, FALSE, TRUE);
+            SpinUnlockIRQ(&TimersSpin, level);
+        }
         break;
     default:
         return OS_EINVAL;
@@ -138,19 +141,21 @@ PUBLIC OS_Error TimerStart(Timer *timer)
         return OS_EINVAL;
     }
     
-    SpinLockIRQ(&TimersSpin);
+    UArch level;
+
+    SpinLockIRQ(&TimersSpin, &level);
 
     /* timeout is invalid */
     if (IDLE_TIMER_TIMEOUT_TICKS - timer->timeTicks < TimerTicks)
     {
-        SpinUnlockIRQ(&TimersSpin);
+        SpinUnlockIRQ(&TimersSpin, level);
         return OS_EINVAL;
     }
 
     /* make sure not on the list */
     if (ListFind(&timer->list, &TimerListHead))
     {
-        SpinUnlockIRQ(&TimersSpin);
+        SpinUnlockIRQ(&TimersSpin, level);
         return OS_EAGAIN;
     }
     
@@ -186,7 +191,7 @@ PUBLIC OS_Error TimerStart(Timer *timer)
         }
     }
 
-    SpinUnlockIRQ(&TimersSpin);
+    SpinUnlockIRQ(&TimersSpin, level);
     return OS_EOK;
 }
 
@@ -230,11 +235,12 @@ PUBLIC OS_Error TimerStop(Timer *timer)
     }
 
     OS_Error err;
-    SpinLockIRQ(&TimersSpin);
+    UArch level;
+    SpinLockIRQ(&TimersSpin, &level);
 
     err = TimerStopUnlocked(timer);
     
-    SpinUnlockIRQ(&TimersSpin);
+    SpinUnlockIRQ(&TimersSpin, level);
     return err;
 }
 
@@ -289,7 +295,9 @@ PUBLIC void TimerGo(void)
         return;
     }
 
-    SpinLockIRQ(&TimersSpin);
+    UArch level;
+    
+    SpinLockIRQ(&TimersSpin, &level);
 
     ListForEachEntrySafe(timer, next, &TimerListHead, list)
     {
@@ -310,7 +318,7 @@ PUBLIC void TimerGo(void)
         }
     }
     NextTimeoutTicks = timer->timeout;
-    SpinUnlockIRQ(&TimersSpin);
+    SpinUnlockIRQ(&TimersSpin, level);
 }
 
 PUBLIC void TimerDump(Timer *timer)

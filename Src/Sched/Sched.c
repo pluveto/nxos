@@ -20,6 +20,7 @@
 #include <Sched/Context.h>
 
 IMPORT ThreadManager ThreadManagerObject;
+IMPORT Atomic ActivedCoreCount;
 
 PUBLIC void SchedToFirstThread(void)
 {
@@ -43,7 +44,7 @@ PRIVATE void PullOrPushThread(UArch coreId)
      * Adding 1 is to allow the processor core to do more pull operations instead of push operations.
      * Can avoid the threads of the pending queue not running.
      */
-    UArch threadsPerCore = AtomicGet(&ThreadManagerObject.activeThreadCount) / NR_MULTI_CORES + 1;
+    UArch threadsPerCore = AtomicGet(&ThreadManagerObject.activeThreadCount) / AtomicGet(&ActivedCoreCount) + 1;
 
     LOG_D("core#%d: core threads:%d", coreId, coreThreadCount);
     LOG_D("core#%d: active threads:%d", coreId, AtomicGet(&ThreadManagerObject.activeThreadCount));

@@ -21,7 +21,7 @@ struct Atomic
 typedef struct Atomic Atomic;
 
 #define ATOMIC_INIT_VALUE(val) {val}
-#define STATIC_ATOMIC_INIT(name) Atomic name = ATOMIC_INIT_VALUE(0);
+#define STATIC_ATOMIC_INIT(name, val) Atomic name = ATOMIC_INIT_VALUE(val);
 
 struct AtomicOps
 {

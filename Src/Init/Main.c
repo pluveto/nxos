@@ -37,15 +37,13 @@ INTERFACE WEAK_SYM OS_Error PlatformStage2(void)
     return OS_EOK;
 }
 
-/* used to record how many core entered main */
-PRIVATE STATIC_ATOMIC_INIT(MainEnterReference);
+IMPORT Atomic ActivedCoreCount;
 
 PUBLIC int OS_Main(UArch coreId)
 {
-    if (!AtomicGet(&MainEnterReference))
+    if (AtomicGet(&ActivedCoreCount) == 0)
     {
-        AtomicInc(&MainEnterReference);
-        
+        AtomicInc(&ActivedCoreCount);
         /* init multi core before enter platform */
         MultiCorePreload(coreId);
         
@@ -92,6 +90,7 @@ PUBLIC int OS_Main(UArch coreId)
     }
     else
     {
+        AtomicInc(&ActivedCoreCount);
         MultiCoreStage2(coreId);
     }
     /* start sched */

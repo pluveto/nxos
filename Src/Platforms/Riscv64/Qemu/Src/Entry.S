@@ -52,6 +52,7 @@ _EnterMain:
 loop:
     j loop
 
+    /* set in data seciton, avoid clear bss to clean stack */
     .section .data.stack
     .align 12
 

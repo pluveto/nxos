@@ -11,7 +11,6 @@
 
 #include <Sched/Spin.h>
 #include <IO/IRQ.h>
-#include <XBook/Debug.h>
 
 PUBLIC OS_Error SpinInit(Spin *lock)
 {
@@ -26,8 +25,6 @@ PUBLIC OS_Error SpinInit(Spin *lock)
 
     AtomicSet(&lock->value, 0);
     lock->magic = SPIN_MAGIC;
-    lock->irqLevel = 0;
-    AtomicSet(&lock->irqDepth, 0);
     return OS_EOK;
 }
 
@@ -63,23 +60,19 @@ PUBLIC OS_Error SpinUnlock(Spin *lock)
     return OS_EOK;
 }
 
-PUBLIC OS_Error SpinLockIRQ(Spin *lock)
+PUBLIC OS_Error SpinLockIRQ(Spin *lock, UArch *level)
 {
-    if (lock == NULL || lock->magic != SPIN_MAGIC)
+    if (lock == NULL || level == NULL)
     {
         return OS_EINVAL;
     }
-    if (AtomicGet(&lock->irqDepth) == 0)
-    {
-        lock->irqLevel = INTR_SaveLevel();
-    }
-    AtomicInc(&lock->irqDepth);
+    *level = INTR_SaveLevel();
     return SpinLock(lock, TRUE);
 }
 
-PUBLIC OS_Error SpinUnlockIRQ(Spin *lock)
+PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, UArch level)
 {
-    if (lock == NULL || lock->magic != SPIN_MAGIC)
+    if (lock == NULL)
     {
         return OS_EINVAL;
     }
@@ -87,11 +80,6 @@ PUBLIC OS_Error SpinUnlockIRQ(Spin *lock)
     {
         return OS_EFAULT;
     }
-    AtomicDec(&lock->irqDepth);
-    if (AtomicGet(&lock->irqDepth) == 0)
-    {
-        INTR_RestoreLevel(lock->irqLevel);
-    }
-    ASSERT(AtomicGet(&lock->irqDepth) >= 0);
+    INTR_RestoreLevel(level);
     return OS_EOK;
 }
