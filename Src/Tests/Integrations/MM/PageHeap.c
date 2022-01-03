@@ -14,7 +14,7 @@
 #include <MM/Page.h>
 #define LOG_NAME "PageHeap"
 #include <Utils/Log.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 #include <Utils/Memory.h>
 
 #ifdef CONFIG_TEST_INTEGRATION_PAGE_HEAP

@@ -19,7 +19,7 @@
 #define LOG_NAME "Page"
 #include <Utils/Log.h>
 
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 /**
  * Init physic memory and map kernel on virtual memory.

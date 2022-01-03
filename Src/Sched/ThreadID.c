@@ -11,7 +11,7 @@
 
 #include <Sched/ThreadID.h>
 #include <MM/Alloc.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 #include <Utils/Memory.h>
 
 PRIVATE struct ThreadID ThreadIdObject;

@@ -19,10 +19,11 @@
 #include <Regs.h>
 #include <Drivers/DirectUart.h>
 #include <Sched/MultiCore.h>
+#include <Utils/Log.h>
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "INIT"
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 PUBLIC void ClearBSS(void);
 

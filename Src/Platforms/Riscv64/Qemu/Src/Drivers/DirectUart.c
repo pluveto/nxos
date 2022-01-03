@@ -14,7 +14,7 @@
 #include <IO/DelayIRQ.h>
 #include <Drivers/DirectUart.h>
 #include <Utils/Log.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 #ifdef CONFIG_UART0_FROM_SBI
 #include <SBI.h>

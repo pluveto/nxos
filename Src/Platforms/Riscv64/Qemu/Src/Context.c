@@ -12,6 +12,7 @@
 #include <Sched/Context.h>
 #include <Utils/Memory.h>
 #include <Utils/Log.h>
+#include <IO/IRQ.h>
 #include <Context.h>
 #include <Regs.h>
 

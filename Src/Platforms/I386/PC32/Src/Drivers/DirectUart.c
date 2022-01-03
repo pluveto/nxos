@@ -13,7 +13,7 @@
 #include <IO/DelayIRQ.h>
 #include <Drivers/DirectUart.h>
 #include <Utils/Log.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 #include <IO.h>
 #include <Interrupt.h>

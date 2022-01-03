@@ -10,7 +10,9 @@
  */
 
 #define LOG_NAME "Thread"
-#include <Utils/Debug.h>
+#include <Utils/Log.h>
+#include <XBook/Debug.h>
+#include <IO/IRQ.h>
 
 #include <Sched/Thread.h>
 #include <Sched/ThreadID.h>

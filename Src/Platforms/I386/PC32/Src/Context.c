@@ -12,7 +12,8 @@
 #include <Context.h>
 #include <Sched/Context.h>
 #include <Interrupt.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
+#include <IO/IRQ.h>
 
 IMPORT void HAL_ContextSwitchNext(Addr nextSP);
 IMPORT void HAL_ContextSwitchPrevNext(Addr prevSP, Addr nextSP);

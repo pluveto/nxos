@@ -15,7 +15,7 @@
 
 #include <Utils/String.h>
 #include <Utils/Memory.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 #include <Sched/Thread.h>
 #include <XBook/InitCall.h>
 

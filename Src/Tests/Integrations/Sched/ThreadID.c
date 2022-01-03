@@ -10,7 +10,7 @@
  */
 
 #include <Sched/ThreadID.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 #include <Mods/Test/Integration.h>
 
 #ifdef CONFIG_TEST_INTEGRATION_THREAD_ID

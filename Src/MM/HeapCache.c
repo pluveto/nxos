@@ -18,7 +18,8 @@
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "HeapCache"
-#include <Utils/Debug.h>
+#include <Utils/Log.h>
+#include <XBook/Debug.h>
 
 PRIVATE struct SizeClass CacheSizeAarray[MAX_SIZE_CLASS_NR];
 PRIVATE HeapCache MiddleSizeCache;

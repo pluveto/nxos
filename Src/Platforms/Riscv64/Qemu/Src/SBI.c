@@ -38,7 +38,7 @@
 
 #include <SBI.h>
 #include <Utils/Log.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 /* SBI Implementation-Specific Definitions */
 #define OPENSBI_VERSION_MAJOR_OFFSET    16

@@ -10,7 +10,9 @@
  */
 
 #define LOG_LEVEL LOG_INFO
-#include <Utils/Debug.h>
+#include <Utils/Log.h>
+#include <XBook/Debug.h>
+#include <IO/IRQ.h>
 
 #include <Sched/Sched.h>
 #include <Sched/Thread.h>

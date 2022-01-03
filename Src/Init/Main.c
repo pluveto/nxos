@@ -10,7 +10,8 @@
  */
 
 #define LOG_NAME "OS Main"
-#include <Utils/Debug.h>
+#include <Utils/Log.h>
+#include <XBook/Debug.h>
 
 #include <Mods/Test/UTest.h>
 #include <Sched/Thread.h>

@@ -19,7 +19,7 @@
 #define LOG_NAME "Page"
 #include <Utils/Log.h>
 
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 #define GRUB2_READ_MEMORY_BYTES_ADDR (0x000001000)
 

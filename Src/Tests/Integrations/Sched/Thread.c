@@ -10,7 +10,7 @@
  */
 
 #define LOG_NAME "Thread"
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 #include <Sched/Thread.h>
 #include <Mods/Test/Integration.h>

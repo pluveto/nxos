@@ -11,7 +11,8 @@
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "Buddy"
-#include <Utils/Debug.h>
+#include <Utils/Log.h>
+#include <XBook/Debug.h>
 #include <Utils/Bitops.h>
 #include <XBook.h>
 

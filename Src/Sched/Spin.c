@@ -11,7 +11,7 @@
 
 #include <Sched/Spin.h>
 #include <IO/IRQ.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 PUBLIC OS_Error SpinInit(Spin *lock)
 {

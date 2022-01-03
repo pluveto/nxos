@@ -17,7 +17,8 @@
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "PageHeap"
-#include <Utils/Debug.h>
+#include <Utils/Log.h>
+#include <XBook/Debug.h>
 
 PRIVATE PageHeap PageHeapObject;
 PRIVATE SpanMark *SpanMarkMap;

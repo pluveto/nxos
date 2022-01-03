@@ -15,7 +15,7 @@
 #define LOG_NAME "Core"
 #include <Utils/Log.h>
 
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 /* init as zero, avoid cleared by clear bss action */
 PRIVATE VOLATILE UArch BootCoreId = 0;

@@ -12,7 +12,8 @@
 #include <Mods/Time/Timer.h>
 #include <MM/Alloc.h>
 
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
+#include <Utils/Log.h>
 #include <Sched/Spin.h>
 
 #define IDLE_TIMER_TIMEOUT  MAX_TIMER_TIMEOUT

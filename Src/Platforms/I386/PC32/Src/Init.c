@@ -20,9 +20,10 @@
 
 #define LOG_LEVEL LOG_INFO
 #define LOG_NAME "INIT"
-#include <Utils/Debug.h>
+#include <Utils/Log.h>
 
 #include <Drivers/DirectUart.h>
+
 
 PUBLIC void ClearBSS(void);
 

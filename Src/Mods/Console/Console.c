@@ -14,6 +14,12 @@
 #include <Utils/String.h>
 #include <Utils/VarArgs.h>
 
+#ifdef CONFIG_PRINT_BUF_LEN
+#define PRINT_BUF_LEN CONFIG_PRINT_BUF_LEN
+#else
+#define PRINT_BUF_LEN 256
+#endif
+
 /* Conosle HAL */
 INTERFACE WEAK_SYM void HAL_ConsoleOutChar(char ch) {}
 
@@ -30,19 +36,6 @@ PUBLIC void ConsoleOutStr(const char *str)
         HAL_ConsoleOutChar(*p++);
     }
 }
-
-void AssertionFailure(char *exp, char *file, char *baseFile, int line)
-{
-	LOG_E("\nAssert(%s) failed:\nfile: %s\nbase_file: %s\nln: %d", 
-        exp, file, baseFile, line);
-	while (1);
-}
-
-#ifdef CONFIG_PRINT_BUF_LEN
-#define PRINT_BUF_LEN CONFIG_PRINT_BUF_LEN
-#else
-#define PRINT_BUF_LEN 256
-#endif
 
 void Printf(const char *fmt, ...)
 {

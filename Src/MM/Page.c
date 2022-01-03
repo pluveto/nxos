@@ -11,7 +11,8 @@
 
 #include <MM/Buddy.h>
 #include <MM/Page.h>
-#include <Utils/Debug.h>
+#include <Utils/Log.h>
+#include <XBook/Debug.h>
 
 PRIVATE BuddySystem *BuddySystemArray[PZ_NR]; 
 

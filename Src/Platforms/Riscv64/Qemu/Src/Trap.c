@@ -18,7 +18,7 @@
 
 #define LOG_NAME "Trap"
 #include <Utils/Log.h>
-#include <Utils/Debug.h>
+#include <XBook/Debug.h>
 
 #include <Sched/Thread.h>
 #include <Sched/MultiCore.h>
