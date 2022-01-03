@@ -17,10 +17,10 @@ PRIVATE STATIC_SPIN_UNLOCKED(LogOutLock);
 
 PUBLIC OS_Error LogLineLock(UArch *level)
 {
-    return SpinLockIRQ(&LogOutLock, level);
+    return SpinLockIRQ(&LogOutLock);
 }
 
 PUBLIC OS_Error LogLineUnlock(UArch level)
 {
-    return SpinUnlockIRQ(&LogOutLock, level);
+    return SpinUnlockIRQ(&LogOutLock);
 }

@@ -120,12 +120,9 @@ PUBLIC OS_Error TimerDestroy(Timer *timer)
         return OS_EAGAIN;
     case TIMER_STOPPED:
     case TIMER_INITED:
-        {
-            UArch level;
-            SpinLockIRQ(&TimersSpin, &level);
-            TimerRemove(timer, FALSE, TRUE);
-            SpinUnlockIRQ(&TimersSpin, level);
-        }
+        SpinLockIRQ(&TimersSpin);
+        TimerRemove(timer, FALSE, TRUE);
+        SpinUnlockIRQ(&TimersSpin);
         break;
     default:
         return OS_EINVAL;
@@ -140,21 +137,19 @@ PUBLIC OS_Error TimerStart(Timer *timer)
         return OS_EINVAL;
     }
     
-    UArch level;
-
-    SpinLockIRQ(&TimersSpin, &level);
+    SpinLockIRQ(&TimersSpin);
 
     /* timeout is invalid */
     if (IDLE_TIMER_TIMEOUT_TICKS - timer->timeTicks < TimerTicks)
     {
-        SpinUnlockIRQ(&TimersSpin, level);
+        SpinUnlockIRQ(&TimersSpin);
         return OS_EINVAL;
     }
 
     /* make sure not on the list */
     if (ListFind(&timer->list, &TimerListHead))
     {
-        SpinUnlockIRQ(&TimersSpin, level);
+        SpinUnlockIRQ(&TimersSpin);
         return OS_EAGAIN;
     }
     
@@ -190,7 +185,7 @@ PUBLIC OS_Error TimerStart(Timer *timer)
         }
     }
 
-    SpinUnlockIRQ(&TimersSpin, level);
+    SpinUnlockIRQ(&TimersSpin);
     return OS_EOK;
 }
 
@@ -234,12 +229,11 @@ PUBLIC OS_Error TimerStop(Timer *timer)
     }
 
     OS_Error err;
-    UArch level;
-    SpinLockIRQ(&TimersSpin, &level);
+    SpinLockIRQ(&TimersSpin);
 
     err = TimerStopUnlocked(timer);
     
-    SpinUnlockIRQ(&TimersSpin, level);
+    SpinUnlockIRQ(&TimersSpin);
     return err;
 }
 
@@ -294,9 +288,7 @@ PUBLIC void TimerGo(void)
         return;
     }
 
-    UArch level;
-    
-    SpinLockIRQ(&TimersSpin, &level);
+    SpinLockIRQ(&TimersSpin);
 
     ListForEachEntrySafe(timer, next, &TimerListHead, list)
     {
@@ -317,7 +309,7 @@ PUBLIC void TimerGo(void)
         }
     }
     NextTimeoutTicks = timer->timeout;
-    SpinUnlockIRQ(&TimersSpin, level);
+    SpinUnlockIRQ(&TimersSpin);
 }
 
 PUBLIC void TimerDump(Timer *timer)

@@ -157,11 +157,10 @@ PUBLIC OS_Error MultiCoreSetRunning(UArch coreId, Thread *thread)
     }
 
     CoreLocalStorage *cls = CLS_GetIndex(coreId);
-    UArch level;
-    SpinLockIRQ(&cls->lock, &level);
+    SpinLockIRQ(&cls->lock);
     thread->state = THREAD_RUNNING;
     cls->threadRunning = thread;
-    SpinUnlockIRQ(&cls->lock, level);
+    SpinUnlockIRQ(&cls->lock);
     return OS_EOK;
 }
 
@@ -172,9 +171,8 @@ PUBLIC Thread *CLS_GetRunning(void)
 {
     Thread *thread;
     CoreLocalStorage *cls = CLS_Get();
-    UArch level;
-    SpinLockIRQ(&cls->lock, &level);
+    SpinLockIRQ(&cls->lock);
     thread = cls->threadRunning;
-    SpinUnlockIRQ(&cls->lock, level);
+    SpinUnlockIRQ(&cls->lock);
     return thread;
 }

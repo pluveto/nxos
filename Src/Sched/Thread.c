@@ -147,12 +147,11 @@ PUBLIC void ThreadReadyRunLocked(Thread *thread, int flags)
 
 PUBLIC void ThreadReadyRunUnlocked(Thread *thread, int flags)
 {
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    SpinLockIRQ(&ThreadManagerObject.lock);
 
     ThreadReadyRunLocked(thread, flags);
     
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    SpinUnlockIRQ(&ThreadManagerObject.lock);
 }
 
 INLINE void ThreadEnququeGlobalListUnlocked(Thread *thread)
@@ -174,15 +173,14 @@ PUBLIC OS_Error ThreadRun(Thread *thread)
         return OS_EINVAL;
     }
 
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    SpinLockIRQ(&ThreadManagerObject.lock);
 
     ThreadEnququeGlobalListUnlocked(thread);
 
     /* add to ready list */
     ThreadReadyRunLocked(thread, SCHED_TAIL);
     
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    SpinUnlockIRQ(&ThreadManagerObject.lock);
     return OS_EOK;
 }
 
@@ -244,12 +242,11 @@ PUBLIC void ThreadExit(void)
     /* release the resource here that not the must for a thread! */
     ThreadReleaseResouce(thread);
 
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    SpinLockIRQ(&ThreadManagerObject.lock);
 
     ThreadDeququeGlobalListUnlocked(thread);
 
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    SpinUnlockIRQ(&ThreadManagerObject.lock);
     
     SchedExit();
     PANIC("Thread Exit should never arrival here!");
@@ -366,21 +363,19 @@ PUBLIC OS_Error ThreadSetAffinity(Thread *thread, UArch coreId)
     {
         return OS_EINVAL;
     }
-    UArch level;
-    SpinLockIRQ(&thread->lock, &level);
+    SpinLockIRQ(&thread->lock);
     thread->coreAffinity = coreId;
     thread->onCore = coreId;
-    SpinUnlockIRQ(&thread->lock, level);
+    SpinUnlockIRQ(&thread->lock);
     return OS_EOK;
 }
 
 PUBLIC void ThreadEnqueuePendingList(Thread *thread)
 {
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    SpinLockIRQ(&ThreadManagerObject.lock);
     ListAdd(&thread->list, &ThreadManagerObject.pendingList);
     AtomicInc(&ThreadManagerObject.pendingThreadCount);
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    SpinUnlockIRQ(&ThreadManagerObject.lock);
 }
 
 PUBLIC Thread *ThreadDequeuePendingList(void)
@@ -399,18 +394,16 @@ PUBLIC Thread *ThreadDequeuePendingList(void)
 
 PUBLIC void ThreadEnququeExitList(Thread *thread)
 {
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
+    SpinLockIRQ(&ThreadManagerObject.exitLock);
     ListAdd(&thread->globalList, &ThreadManagerObject.exitList);
-    SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
+    SpinUnlockIRQ(&ThreadManagerObject.exitLock);
 }
 
 PUBLIC Thread *ThreadFindById(U32 tid)
 {
     Thread *thread = NULL, *find = NULL;
-    UArch level;
 
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    SpinLockIRQ(&ThreadManagerObject.lock);
 
     ListForEachEntry (thread, &ThreadManagerObject.globalList, globalList)
     {
@@ -421,7 +414,7 @@ PUBLIC Thread *ThreadFindById(U32 tid)
         }
     }
 
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    SpinUnlockIRQ(&ThreadManagerObject.lock);
     return find;
 }
 
@@ -446,20 +439,20 @@ PRIVATE void DaemonThreadEntry(void *arg)
 {
     LOG_I("Daemon thread started.\n");
     Thread *thread, *safe;
-    UArch level;
+
     while (1)
     {
-        SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
+        SpinLockIRQ(&ThreadManagerObject.exitLock);
         ListForEachEntrySafe (thread, safe, &ThreadManagerObject.exitList, globalList)
         {
             LOG_D("---> daemon release thread: %s/%d", thread->name, thread->tid);
             /* del from exit list */
             ListDel(&thread->globalList);
-            SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
+            SpinUnlockIRQ(&ThreadManagerObject.exitLock);
             ThreadReleaseSelf(thread);
-            SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
+            SpinLockIRQ(&ThreadManagerObject.exitLock);
         }
-        SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
+        SpinUnlockIRQ(&ThreadManagerObject.exitLock);
 
         /* do delay or timeout, sleep 0.5s */
         ThreadYield();

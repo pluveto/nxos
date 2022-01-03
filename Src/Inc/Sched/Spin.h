@@ -23,16 +23,17 @@ struct Spin
     Atomic value;
     U32 magic;  /* magic for spin init */
     UArch irqLevel;  /* save irq level */
+    Atomic irqDepth;   /* depth of irq */
 };
 typedef struct Spin Spin;
 
-#define STATIC_SPIN_UNLOCKED(name) Spin name = {ATOMIC_INIT_VALUE(0), SPIN_MAGIC, 0}
-#define STATIC_SPIN_LOCKED(name) Spin name = {ATOMIC_INIT_VALUE(1), SPIN_MAGIC, 0}
+#define STATIC_SPIN_UNLOCKED(name) Spin name = {ATOMIC_INIT_VALUE(0), SPIN_MAGIC, 0, ATOMIC_INIT_VALUE(0)}
+#define STATIC_SPIN_LOCKED(name) Spin name = {ATOMIC_INIT_VALUE(1), SPIN_MAGIC, 0, ATOMIC_INIT_VALUE(0)}
 
 PUBLIC OS_Error SpinInit(Spin *lock);
 PUBLIC OS_Error SpinLock(Spin *lock, Bool forever);
 PUBLIC OS_Error SpinUnlock(Spin *lock);
-PUBLIC OS_Error SpinLockIRQ(Spin *lock, UArch *level);
-PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, UArch level);
+PUBLIC OS_Error SpinLockIRQ(Spin *lock);
+PUBLIC OS_Error SpinUnlockIRQ(Spin *lock);
 
 #endif /* __SCHED_SPIN___ */
