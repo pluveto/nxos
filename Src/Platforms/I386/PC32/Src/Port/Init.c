@@ -41,7 +41,7 @@ NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
     CPU_InitTSS();
     CPU_InitInterrupt();
     
-    NX_PageZoneInit();
+    HAL_PageZoneInit();
 
     return NX_EOK;
 }

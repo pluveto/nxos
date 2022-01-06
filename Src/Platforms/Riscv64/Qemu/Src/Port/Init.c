@@ -44,7 +44,7 @@ NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
     HAL_InitClock();
     PLIC_Init(NX_True);
     
-    NX_PageZoneInit();
+    HAL_PageZoneInit();
     
     return NX_EOK;
 }

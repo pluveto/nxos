@@ -30,7 +30,7 @@ NX_PRIVATE NX_VOLATILE NX_U32 kernelTable[NX_PAGE_SIZE / sizeof(NX_U32)] NX_CALI
 /**
  * Init physic memory and map kernel on virtual memory.
  */
-NX_PUBLIC void NX_PageZoneInit(void)
+NX_PUBLIC void HAL_PageZoneInit(void)
 {    
     NX_USize memSize = *(NX_USize *)GRUB2_READ_MEMORY_BYTES_ADDR;
     

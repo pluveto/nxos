@@ -24,7 +24,7 @@
 /**
  * Init physic memory and map kernel on virtual memory.
  */
-NX_PUBLIC void NX_PageZoneInit(void)
+NX_PUBLIC void HAL_PageZoneInit(void)
 {    
     NX_USize memSize = DRAM_SIZE_DEFAULT;
     
