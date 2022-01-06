@@ -52,7 +52,7 @@ NX_PUBLIC int NX_Main(NX_UArch coreId)
         {
             NX_PANIC("Platfrom init failed!");
         }
-        NX_LOG_I("Hello, NXOS!");
+        NX_LOG_I("Hello, NXOS on %s!", CONFIG_NX_PLATFROM_NAME);
 
         /* init irq */
         NX_IRQ_Init();
