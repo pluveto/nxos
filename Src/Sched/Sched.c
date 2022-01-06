@@ -16,7 +16,7 @@
 
 #include <Sched/Sched.h>
 #include <Sched/Thread.h>
-#include <Sched/MultiCore.h>
+#include <Sched/SMP.h>
 #include <Sched/Context.h>
 
 NX_IMPORT NX_ThreadManager NX_ThreadManagerObject;
@@ -24,10 +24,10 @@ NX_IMPORT NX_Atomic NX_ActivedCoreCount;
 
 NX_PUBLIC void NX_SchedToFirstThread(void)
 {
-    NX_UArch coreId = NX_MultiCoreGetId();
-    NX_Thread *thread = NX_MultiCoreDeququeThreadIrqDisabled(coreId);
+    NX_UArch coreId = NX_SMP_GetIdx();
+    NX_Thread *thread = NX_SMP_DeququeThreadIrqDisabled(coreId);
     NX_ASSERT(thread != NX_NULL);
-    NX_ASSERT(NX_MultiCoreSetRunning(coreId, thread) == NX_EOK);
+    NX_ASSERT(NX_SMP_SetRunning(coreId, thread) == NX_EOK);
     NX_LOG_D("Sched to first thread:%s/%d", thread->name, thread->tid);
     NX_ContextSwitchNext((NX_Addr)&thread->stack);
     /* should never be here */
@@ -37,8 +37,8 @@ NX_PUBLIC void NX_SchedToFirstThread(void)
 NX_PRIVATE void PullOrPushThread(NX_UArch coreId)
 {
     NX_Thread *thread;
-    NX_CoreLocalStorage *cls = CLS_GetIndex(coreId);
-    NX_IArch coreThreadCount = NX_AtomicGet(&cls->threadCount);
+    NX_Cpu *cpu = NX_CpuGetIndex(coreId);
+    NX_IArch coreThreadCount = NX_AtomicGet(&cpu->threadCount);
 
     /**
      * Adding 1 is to allow the processor core to do more pull operations instead of push operations.
@@ -66,7 +66,7 @@ NX_PRIVATE void PullOrPushThread(NX_UArch coreId)
     if (coreThreadCount > threadsPerCore)
     {
         /* push to pending */
-        thread = NX_MultiCoreDeququeNoAffinityThread(coreId);
+        thread = NX_SMP_DeququeNoAffinityThread(coreId);
         if (thread != NX_NULL)
         {
             NX_LOG_D("---> core#%d: push thread:%s/%d", coreId, thread->name, thread->tid);
@@ -82,7 +82,7 @@ NX_PRIVATE void PullOrPushThread(NX_UArch coreId)
 NX_PUBLIC void NX_SchedWithInterruptDisabled(NX_UArch irqLevel)
 {
     NX_Thread *next, *prev;
-    NX_UArch coreId = NX_MultiCoreGetId();
+    NX_UArch coreId = NX_SMP_GetIdx();
 
     /* put prev into list */
     prev = NX_CurrentThread;
@@ -96,13 +96,13 @@ NX_PUBLIC void NX_SchedWithInterruptDisabled(NX_UArch irqLevel)
     PullOrPushThread(coreId);
 
     /* get next from local list */
-    next = NX_MultiCoreDeququeThreadIrqDisabled(coreId);
-    NX_MultiCoreSetRunning(coreId, next);
+    next = NX_SMP_DeququeThreadIrqDisabled(coreId);
+    NX_SMP_SetRunning(coreId, next);
 
     if (prev != NX_NULL)
     {
         NX_ASSERT(prev && next);
-        NX_LOG_D("CPU#%d NX_Sched prev: %s/%d next: %s/%d", NX_MultiCoreGetId(), prev->name, prev->tid, next->name, next->tid);
+        NX_LOG_D("CPU#%d NX_Sched prev: %s/%d next: %s/%d", NX_SMP_GetIdx(), prev->name, prev->tid, next->name, next->tid);
         NX_ContextSwitchPrevNext((NX_Addr)&prev->stack, (NX_Addr)&next->stack);
     }
     else

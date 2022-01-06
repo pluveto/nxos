@@ -9,11 +9,11 @@
  * 2021-12-9      JasonHu           Init
  */
 
-#include <Sched/MultiCore.h>
+#include <Sched/SMP.h>
 #define NX_LOG_NAME "Multi Core"
 #include <Utils/Log.h>
 
-NX_PUBLIC NX_UArch HAL_CoreGetId(void)
+NX_PUBLIC NX_UArch HAL_CoreGetIndex(void)
 {
     return 0;
 }
@@ -29,9 +29,9 @@ NX_PUBLIC NX_Error HAL_CoreEnterApp(NX_UArch appCoreId)
     return NX_ENORES;
 }
 
-NX_INTERFACE struct NX_MultiCoreOps NX_MultiCoreOpsInterface = 
+NX_INTERFACE struct NX_SMP_Ops NX_SMP_OpsInterface = 
 {
-    .getId = HAL_CoreGetId,
+    .getIdx = HAL_CoreGetIndex,
     .bootApp = HAL_CoreBootApp,
     .enterApp = HAL_CoreEnterApp,
 };

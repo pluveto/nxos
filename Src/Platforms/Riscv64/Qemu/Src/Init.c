@@ -18,7 +18,7 @@
 #include <SBI.h>
 #include <Regs.h>
 #include <Drivers/DirectUart.h>
-#include <Sched/MultiCore.h>
+#include <Sched/SMP.h>
 #include <Utils/Log.h>
 
 #define NX_LOG_LEVEL NX_LOG_INFO

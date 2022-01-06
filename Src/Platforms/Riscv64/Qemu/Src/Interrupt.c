@@ -13,7 +13,7 @@
 #include <Regs.h>
 #include <IO/IRQ.h>
 #include <PLIC.h>
-#include <Sched/MultiCore.h>
+#include <Sched/SMP.h>
 
 NX_PRIVATE NX_Error HAL_IrqUnmask(NX_IRQ_Number irqno)
 {
@@ -22,7 +22,7 @@ NX_PRIVATE NX_Error HAL_IrqUnmask(NX_IRQ_Number irqno)
         return NX_EINVAL;
     }
 
-    return PLIC_EnableIRQ(NX_MultiCoreGetBootCore(), irqno);
+    return PLIC_EnableIRQ(NX_SMP_GetBootCore(), irqno);
 }
 
 NX_PRIVATE NX_Error HAL_IrqMask(NX_IRQ_Number irqno)
@@ -32,7 +32,7 @@ NX_PRIVATE NX_Error HAL_IrqMask(NX_IRQ_Number irqno)
         return NX_EINVAL;
     }
 
-    return PLIC_DisableIRQ(NX_MultiCoreGetBootCore(), irqno);
+    return PLIC_DisableIRQ(NX_SMP_GetBootCore(), irqno);
 }
 
 NX_PRIVATE NX_Error HAL_IrqAck(NX_IRQ_Number irqno)
@@ -42,7 +42,7 @@ NX_PRIVATE NX_Error HAL_IrqAck(NX_IRQ_Number irqno)
         return NX_EINVAL;
     }
     
-    return PLIC_Complete(NX_MultiCoreGetBootCore(), irqno);
+    return PLIC_Complete(NX_SMP_GetBootCore(), irqno);
 }
 
 NX_PRIVATE void HAL_IrqEnable(void)

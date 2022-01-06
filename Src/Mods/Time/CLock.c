@@ -17,7 +17,7 @@
 
 #include <Sched/Thread.h>
 #include <Sched/Sched.h>
-#include <Sched/MultiCore.h>
+#include <Sched/SMP.h>
 
 #include <IO/DelayIRQ.h>
 
@@ -43,7 +43,7 @@ NX_PUBLIC void NX_ClockTickSet(NX_ClockTick tick)
 NX_PUBLIC void NX_ClockTickGo(void)
 {
     /* only boot core change system clock and timer */
-    if (NX_MultiCoreGetBootCore() == NX_MultiCoreGetId())
+    if (NX_SMP_GetBootCore() == NX_SMP_GetIdx())
     {
         SystemClockTicks++;
 

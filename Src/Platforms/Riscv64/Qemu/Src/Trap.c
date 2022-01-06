@@ -21,7 +21,7 @@
 #include <XBook/Debug.h>
 
 #include <Sched/Thread.h>
-#include <Sched/MultiCore.h>
+#include <Sched/SMP.h>
 #include <Utils/Memory.h>
 
 /* trap name for riscv */
@@ -183,7 +183,7 @@ NX_PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
     if ((SCAUSE_INTERRUPT & cause) && 
         SCAUSE_S_EXTERNAL_INTR == (cause & 0xff))
     {
-        NX_IRQ_Number irqno = PLIC_Claim(NX_MultiCoreGetBootCore());
+        NX_IRQ_Number irqno = PLIC_Claim(NX_SMP_GetBootCore());
         if (irqno != 0)
         {
             NX_IRQ_Handle(irqno);

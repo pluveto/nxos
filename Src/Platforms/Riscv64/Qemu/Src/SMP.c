@@ -10,7 +10,7 @@
  */
 
 #include <XBook.h>
-#include <Sched/MultiCore.h>
+#include <Sched/SMP.h>
 #include <MM/Barrier.h>
 #include <Platform.h>
 #define NX_LOG_NAME "Multi Core"
@@ -30,7 +30,7 @@ NX_IMPORT NX_Addr TrapEntry3;
 /**
  * Within SBI, we can't read mhartid, so I try to use `trap entry` to see who am I.
  */
-NX_PRIVATE NX_UArch HAL_CoreGetId(void)
+NX_PRIVATE NX_UArch HAL_CoreGetIndex(void)
 {
     NX_Addr trapEntry = ReadCSR(stvec);
 
@@ -93,9 +93,9 @@ NX_PRIVATE NX_Error HAL_CoreEnterApp(NX_UArch appCoreId)
     return NX_EOK;
 }
 
-NX_INTERFACE struct NX_MultiCoreOps NX_MultiCoreOpsInterface = 
+NX_INTERFACE struct NX_SMP_Ops NX_SMP_OpsInterface = 
 {
-    .getId = HAL_CoreGetId,
+    .getIdx = HAL_CoreGetIndex,
     .bootApp = HAL_CoreBootApp,
     .enterApp = HAL_CoreEnterApp,
 };

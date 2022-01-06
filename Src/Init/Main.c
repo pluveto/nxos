@@ -16,7 +16,7 @@
 #include <Mods/Test/UTest.h>
 #include <Sched/Thread.h>
 #include <Sched/Sched.h>
-#include <Sched/MultiCore.h>
+#include <Sched/SMP.h>
 #include <MM/HeapCache.h>
 #include <MM/PageHeap.h>
 #include <IO/IRQ.h>
@@ -45,7 +45,7 @@ NX_PUBLIC int NX_Main(NX_UArch coreId)
     {
         NX_AtomicInc(&NX_ActivedCoreCount);
         /* init multi core before enter platform */
-        NX_MultiCorePreload(coreId);
+        NX_SMP_Preload(coreId);
         
         /* platfrom init */
         if (HAL_PlatformInit(coreId) != NX_EOK)
@@ -67,7 +67,7 @@ NX_PUBLIC int NX_Main(NX_UArch coreId)
         NX_TimersInit();
 
         /* init multi core */
-        NX_MultiCoreInit(coreId);
+        NX_SMP_Init(coreId);
 
         /* init thread */
         NX_ThreadsInit();
@@ -86,12 +86,12 @@ NX_PUBLIC int NX_Main(NX_UArch coreId)
             NX_PANIC("Platform stage2 failed!");
         }
         
-        NX_MultiCoreMain(coreId);
+        NX_SMP_Main(coreId);
     }
     else
     {
         NX_AtomicInc(&NX_ActivedCoreCount);
-        NX_MultiCoreStage2(coreId);
+        NX_SMP_Stage2(coreId);
     }
     /* start sched */
     NX_SchedToFirstThread();

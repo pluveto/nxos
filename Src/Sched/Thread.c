@@ -18,7 +18,7 @@
 #include <Sched/ThreadID.h>
 #include <Sched/Sched.h>
 #include <Sched/Mutex.h>
-#include <Sched/MultiCore.h>
+#include <Sched/SMP.h>
 #include <Sched/Context.h>
 #include <MM/Alloc.h>
 #include <Utils/String.h>
@@ -131,7 +131,7 @@ NX_PUBLIC void NX_ThreadReadyRunLocked(NX_Thread *thread, int flags)
 
     if (thread->onCore < NX_MULTI_CORES_NR)
     {
-        NX_MultiCoreEnqueueThreadIrqDisabled(thread->onCore, thread, flags);
+        NX_SMP_EnqueueThreadIrqDisabled(thread->onCore, thread, flags);
     }
     else
     {
@@ -259,7 +259,7 @@ NX_PUBLIC void NX_ThreadExit(void)
 
 NX_PUBLIC NX_Thread *NX_ThreadSelf(void)
 {
-    NX_Thread *cur = CLS_GetRunning();
+    NX_Thread *cur = NX_SMP_GetRunning();
     NX_ASSERT(cur != NX_NULL);
     return cur;
 }
