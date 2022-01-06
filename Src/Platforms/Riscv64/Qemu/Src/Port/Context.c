@@ -16,10 +16,10 @@
 #include <Context.h>
 #include <Regs.h>
 
-NX_IMPORT void HAL_NX_ContextSwitchNext(NX_Addr nextSP);
-NX_IMPORT void HAL_NX_ContextSwitchPrevNext(NX_Addr prevSP, NX_Addr nextSP);
+NX_IMPORT void HAL_ContextSwitchNext(NX_Addr nextSP);
+NX_IMPORT void HAL_ContextSwitchPrevNext(NX_Addr prevSP, NX_Addr nextSP);
 
-NX_PRIVATE void *HAL_NX_ContextInit(void *startEntry, void *exitEntry, void *arg, void *stackTop)
+NX_PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void *stackTop)
 {
     NX_U8 *stack = NX_NULL;
     HAL_Context *context = NX_NULL;
@@ -49,7 +49,7 @@ NX_PRIVATE void *HAL_NX_ContextInit(void *startEntry, void *exitEntry, void *arg
 
 NX_INTERFACE struct NX_ContextOps NX_ContextOpsInterface = 
 {
-    .init           = HAL_NX_ContextInit,
-    .switchNext     = HAL_NX_ContextSwitchNext,
-    .switchPrevNext = HAL_NX_ContextSwitchPrevNext,
+    .init           = HAL_ContextInit,
+    .switchNext     = HAL_ContextSwitchNext,
+    .switchPrevNext = HAL_ContextSwitchPrevNext,
 };

@@ -16,20 +16,20 @@
 #include <Regs.h>
 
 /**
- * void HAL_NX_ContextSwitchNext(NX_Addr nextSP);
+ * void HAL_ContextSwitchNext(NX_Addr nextSP);
  */
-.globl HAL_NX_ContextSwitchNext
-HAL_NX_ContextSwitchNext:
+.globl HAL_ContextSwitchNext
+HAL_ContextSwitchNext:
     LOAD sp, (a0)   /* sp = *nextSP */
 
     RESTORE_CONTEXT
     sret
 
 /**
- * void HAL_NX_ContextSwitchPrevNext(NX_Addr prevSP, NX_Addr nextSP);
+ * void HAL_ContextSwitchPrevNext(NX_Addr prevSP, NX_Addr nextSP);
  */
-.globl HAL_NX_ContextSwitchPrevNext
-HAL_NX_ContextSwitchPrevNext:
+.globl HAL_ContextSwitchPrevNext
+HAL_ContextSwitchPrevNext:
     mv t0, sp
 
     /**
@@ -40,8 +40,8 @@ HAL_NX_ContextSwitchPrevNext:
     csrs sstatus, t1
 
     /**
-     * set `sepc` as `ra`, `ra` saved return address of HAL_NX_ContextSwitchPrevNext
-     * when do `sret`, will return from HAL_NX_ContextSwitchPrevNext
+     * set `sepc` as `ra`, `ra` saved return address of HAL_ContextSwitchPrevNext
+     * when do `sret`, will return from HAL_ContextSwitchPrevNext
      */
     csrw sepc, ra
     
