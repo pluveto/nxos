@@ -15,8 +15,8 @@
 #include <XBook.h>
 #include <Interrupt.h>
 
-PUBLIC void CPU_InitTrap(UArch coreId);
+NX_PUBLIC void CPU_InitTrap(NX_UArch coreId);
 
-PUBLIC void TrapFrameDump(HAL_TrapFrame *frame);
+NX_PUBLIC void TrapFrameDump(HAL_TrapFrame *frame);
 
 #endif  /* __RISCV_TRAP__ */

@@ -12,7 +12,7 @@
 #ifndef __XBOOK_HEADER__
 #define __XBOOK_HEADER__
 
-#include <Configure.h>
+#include <NXConfigure.h>
 
 #if !defined(__ASSEMBLY__) && !defined(ASSEMBLY) 
 #include <XBook/Kernel.h>

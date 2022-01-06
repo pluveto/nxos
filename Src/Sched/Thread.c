@@ -9,7 +9,7 @@
  * 2021-11-7      JasonHu           Init
  */
 
-#define LOG_NAME "Thread"
+#define NX_LOG_NAME "Thread"
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 #include <IO/IRQ.h>
@@ -24,27 +24,27 @@
 #include <Utils/String.h>
 #include <Mods/Time/Timer.h>
 
-PUBLIC ThreadManager ThreadManagerObject;
+NX_PUBLIC NX_ThreadManager NX_ThreadManagerObject;
 
-PRIVATE OS_Error ThreadInit(Thread *thread, 
+NX_PRIVATE NX_Error ThreadInit(NX_Thread *thread, 
     const char *name,
-    ThreadHandler handler, void *arg,
-    U8 *stack, USize stackSize)
+    NX_ThreadHandler handler, void *arg,
+    NX_U8 *stack, NX_USize stackSize)
 {
-    if (thread == NULL || name == NULL || handler == NULL || stack == NULL || !stackSize)
+    if (thread == NX_NULL || name == NX_NULL || handler == NX_NULL || stack == NX_NULL || !stackSize)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
-    ListInit(&thread->list);
-    ListInit(&thread->globalList);
-    StrCopy(thread->name, name);
-    thread->tid = ThreadIdAlloc();
+    NX_ListInit(&thread->list);
+    NX_ListInit(&thread->globalList);
+    NX_StrCopy(thread->name, name);
+    thread->tid = NX_ThreadIdAlloc();
     if (thread->tid < 0)
     {
-        return OS_ENORES;
+        return NX_ENORES;
     }
-    thread->state = THREAD_INIT;
+    thread->state = NX_THREAD_INIT;
     thread->handler = handler;
     thread->threadArg = arg;
     thread->timeslice = 3;
@@ -53,368 +53,368 @@ PRIVATE OS_Error ThreadInit(Thread *thread,
     thread->isTerminated = 0;
     thread->stackBase = stack;
     thread->stackSize = stackSize;
-    thread->stack = thread->stackBase + stackSize - sizeof(UArch);
-    thread->stack = ContextInit(handler, (void *)ThreadExit, arg, thread->stack);
+    thread->stack = thread->stackBase + stackSize - sizeof(NX_UArch);
+    thread->stack = NX_ContextInit(handler, (void *)NX_ThreadExit, arg, thread->stack);
     
-    thread->onCore = NR_MULTI_CORES; /* not on any core */
-    thread->coreAffinity = NR_MULTI_CORES; /* no core affinity */
+    thread->onCore = NX_MULTI_CORES_NR; /* not on any core */
+    thread->coreAffinity = NX_MULTI_CORES_NR; /* no core affinity */
 
-    thread->resource.sleepTimer = NULL;
+    thread->resource.sleepTimer = NX_NULL;
 
-    SpinInit(&thread->lock);
-    return OS_EOK;
+    NX_SpinInit(&thread->lock);
+    return NX_EOK;
 }
 
-PRIVATE OS_Error ThreadDeInit(Thread *thread)
+NX_PRIVATE NX_Error ThreadDeInit(NX_Thread *thread)
 {
-    if (thread == NULL)
+    if (thread == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    if (thread->stackBase == NULL)
+    if (thread->stackBase == NX_NULL)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
-    ThreadIdFree(thread->tid);    
-    return OS_EOK;
+    NX_ThreadIdFree(thread->tid);    
+    return NX_EOK;
 }
 
-PUBLIC Thread *ThreadCreate(const char *name, ThreadHandler handler, void *arg)
+NX_PUBLIC NX_Thread *NX_ThreadCreate(const char *name, NX_ThreadHandler handler, void *arg)
 {
-    Thread *thread = (Thread *)MemAlloc(sizeof(Thread));
-    if (thread == NULL)
+    NX_Thread *thread = (NX_Thread *)NX_MemAlloc(sizeof(NX_Thread));
+    if (thread == NX_NULL)
     {
-        return NULL;
+        return NX_NULL;
     }
-    U8 *stack = MemAlloc(THREAD_STACK_SIZE_DEFAULT);
-    if (stack == NULL)
+    NX_U8 *stack = NX_MemAlloc(NX_THREAD_STACK_SIZE_DEFAULT);
+    if (stack == NX_NULL)
     {
-        MemFree(thread);
-        return NULL;
+        NX_MemFree(thread);
+        return NX_NULL;
     }
-    if (ThreadInit(thread, name, handler, arg, stack, THREAD_STACK_SIZE_DEFAULT) != OS_EOK)
+    if (ThreadInit(thread, name, handler, arg, stack, NX_THREAD_STACK_SIZE_DEFAULT) != NX_EOK)
     {
-        MemFree(stack);
-        MemFree(thread);
-        return NULL;
+        NX_MemFree(stack);
+        NX_MemFree(thread);
+        return NX_NULL;
     }
     return thread;
 }
 
-PUBLIC OS_Error ThreadDestroy(Thread *thread)
+NX_PUBLIC NX_Error NX_ThreadDestroy(NX_Thread *thread)
 {
-    if (thread == NULL)
+    if (thread == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    U8 *stackBase = thread->stackBase;
-    if (stackBase == NULL)
+    NX_U8 *stackBase = thread->stackBase;
+    if (stackBase == NX_NULL)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
 
-    OS_Error err = ThreadDeInit(thread);
-    if (err != OS_EOK)
+    NX_Error err = ThreadDeInit(thread);
+    if (err != NX_EOK)
     {
         return err;
     }
 
-    MemFree(stackBase);
+    NX_MemFree(stackBase);
 
-    MemFree(thread);
-    return OS_EOK;
+    NX_MemFree(thread);
+    return NX_EOK;
 }
 
-PUBLIC void ThreadReadyRunLocked(Thread *thread, int flags)
+NX_PUBLIC void NX_ThreadReadyRunLocked(NX_Thread *thread, int flags)
 {
-    thread->state = THREAD_READY;
+    thread->state = NX_THREAD_READY;
 
-    if (thread->onCore < NR_MULTI_CORES)
+    if (thread->onCore < NX_MULTI_CORES_NR)
     {
-        MultiCoreEnqueueThreadIrqDisabled(thread->onCore, thread, flags);
+        NX_MultiCoreEnqueueThreadIrqDisabled(thread->onCore, thread, flags);
     }
     else
     {
-        if (flags & SCHED_HEAD)
+        if (flags & NX_SCHED_HEAD)
         {
-            ListAdd(&thread->list, &ThreadManagerObject.pendingList);
+            NX_ListAdd(&thread->list, &NX_ThreadManagerObject.pendingList);
         }
         else
         {
-            ListAddTail(&thread->list, &ThreadManagerObject.pendingList);
+            NX_ListAddTail(&thread->list, &NX_ThreadManagerObject.pendingList);
         }
-        AtomicInc(&ThreadManagerObject.pendingThreadCount);
+        NX_AtomicInc(&NX_ThreadManagerObject.pendingThreadCount);
     }
 }
 
-PUBLIC void ThreadReadyRunUnlocked(Thread *thread, int flags)
+NX_PUBLIC void NX_ThreadReadyRunUnlocked(NX_Thread *thread, int flags)
 {
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    NX_UArch level;
+    NX_SpinLockIRQ(&NX_ThreadManagerObject.lock, &level);
 
-    ThreadReadyRunLocked(thread, flags);
+    NX_ThreadReadyRunLocked(thread, flags);
     
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    NX_SpinUnlockIRQ(&NX_ThreadManagerObject.lock, level);
 }
 
-INLINE void ThreadEnququeGlobalListUnlocked(Thread *thread)
+NX_INLINE void NX_ThreadEnququeGlobalListUnlocked(NX_Thread *thread)
 {
-    ListAdd(&thread->globalList, &ThreadManagerObject.globalList);    
-    AtomicInc(&ThreadManagerObject.activeThreadCount);
+    NX_ListAdd(&thread->globalList, &NX_ThreadManagerObject.globalList);    
+    NX_AtomicInc(&NX_ThreadManagerObject.activeThreadCount);
 }
 
-INLINE void ThreadDeququeGlobalListUnlocked(Thread *thread)
+NX_INLINE void NX_ThreadDeququeGlobalListUnlocked(NX_Thread *thread)
 {
-    ListDel(&thread->globalList);
-    AtomicDec(&ThreadManagerObject.activeThreadCount);
+    NX_ListDel(&thread->globalList);
+    NX_AtomicDec(&NX_ThreadManagerObject.activeThreadCount);
 }
 
-PUBLIC OS_Error ThreadRun(Thread *thread)
+NX_PUBLIC NX_Error NX_ThreadRun(NX_Thread *thread)
 {
-    if (thread == NULL)
+    if (thread == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    NX_UArch level;
+    NX_SpinLockIRQ(&NX_ThreadManagerObject.lock, &level);
 
-    ThreadEnququeGlobalListUnlocked(thread);
+    NX_ThreadEnququeGlobalListUnlocked(thread);
 
     /* add to ready list */
-    ThreadReadyRunLocked(thread, SCHED_TAIL);
+    NX_ThreadReadyRunLocked(thread, NX_SCHED_TAIL);
     
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
-    return OS_EOK;
+    NX_SpinUnlockIRQ(&NX_ThreadManagerObject.lock, level);
+    return NX_EOK;
 }
 
-PUBLIC void ThreadYield(void)
+NX_PUBLIC void NX_ThreadYield(void)
 {
-    SchedYield();
+    NX_SchedYield();
 }
 
-PUBLIC OS_Error ThreadTerminate(Thread *thread)
+NX_PUBLIC NX_Error NX_ThreadTerminate(NX_Thread *thread)
 {
-    if (thread == NULL)
+    if (thread == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    if (thread->state == THREAD_INIT || thread->state == THREAD_EXIT)
+    if (thread->state == NX_THREAD_INIT || thread->state == NX_THREAD_EXIT)
     {
-        return OS_EPERM;
+        return NX_EPERM;
     }
 
-    UArch level = INTR_SaveLevel();
+    NX_UArch level = NX_IRQ_SaveLevel();
     thread->isTerminated = 1;
-    ThreadWakeup(thread);
-    INTR_RestoreLevel(level);
-    return OS_EOK;
+    NX_ThreadWakeup(thread);
+    NX_IRQ_RestoreLevel(level);
+    return NX_EOK;
 }
 
 /**
  * release resource the thread hold.
  */
-PRIVATE void ThreadReleaseResouce(Thread *thread)
+NX_PRIVATE void ThreadReleaseResouce(NX_Thread *thread)
 {
     /* free tid */
-    ThreadIdFree(thread->tid);
+    NX_ThreadIdFree(thread->tid);
 
     /* NOTE: add other resource here. */
-    if (thread->resource.sleepTimer != NULL)
+    if (thread->resource.sleepTimer != NX_NULL)
     {
-        TimerStop(thread->resource.sleepTimer);
-        thread->resource.sleepTimer = NULL;
+        NX_TimerStop(thread->resource.sleepTimer);
+        thread->resource.sleepTimer = NX_NULL;
     }
 }
 
 /**
  * release resouce must for a thread run
  */
-PRIVATE void ThreadReleaseSelf(Thread *thread)
+NX_PRIVATE void ThreadReleaseSelf(NX_Thread *thread)
 {
     /* free stack */
-    MemFree(thread->stackBase);
+    NX_MemFree(thread->stackBase);
     /* free thread struct */
-    MemFree(thread);
+    NX_MemFree(thread);
 }
 
-PUBLIC void ThreadExit(void)
+NX_PUBLIC void NX_ThreadExit(void)
 {
     /* free thread resource */
-    Thread *thread = ThreadSelf();
+    NX_Thread *thread = NX_ThreadSelf();
 
     /* release the resource here that not the must for a thread! */
     ThreadReleaseResouce(thread);
 
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    NX_UArch level;
+    NX_SpinLockIRQ(&NX_ThreadManagerObject.lock, &level);
 
-    ThreadDeququeGlobalListUnlocked(thread);
+    NX_ThreadDeququeGlobalListUnlocked(thread);
 
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    NX_SpinUnlockIRQ(&NX_ThreadManagerObject.lock, level);
     
-    SchedExit();
-    PANIC("Thread Exit should never arrival here!");
+    NX_SchedExit();
+    NX_PANIC("Thread Exit should never arrival here!");
 }
 
-PUBLIC Thread *ThreadSelf(void)
+NX_PUBLIC NX_Thread *NX_ThreadSelf(void)
 {
-    Thread *cur = CLS_GetRunning();
-    ASSERT(cur != NULL);
+    NX_Thread *cur = CLS_GetRunning();
+    NX_ASSERT(cur != NX_NULL);
     return cur;
 }
 
 /**
  * must called when interrupt disabled
  */
-PRIVATE void ThreadBlockInterruptDisabled(ThreadState state, UArch irqLevel)
+NX_PRIVATE void ThreadBlockInterruptDisabled(NX_ThreadState state, NX_UArch irqLevel)
 {
-    ASSERT(state == THREAD_SLEEP || state == THREAD_DEEPSLEEP);
-    CurrentThread->state = state;
-    SchedWithInterruptDisabled(irqLevel);
+    NX_ASSERT(state == NX_THREAD_SLEEP || state == NX_THREAD_DEEPSLEEP);
+    NX_CurrentThread->state = state;
+    NX_SchedWithInterruptDisabled(irqLevel);
 }
 
 /**
  * must called when interrupt disabled
  * quickly: thread can be run quickly
  */
-PRIVATE void ThreadUnblockInterruptDisabled(Thread *thread)
+NX_PRIVATE void ThreadUnblockInterruptDisabled(NX_Thread *thread)
 {
-    ThreadReadyRunLocked(thread, SCHED_HEAD);
+    NX_ThreadReadyRunLocked(thread, NX_SCHED_HEAD);
 }
 
 /**
  * wakeup a thread, must called interrupt disabled
  */
-PUBLIC OS_Error ThreadWakeup(Thread *thread)
+NX_PUBLIC NX_Error NX_ThreadWakeup(NX_Thread *thread)
 {
-    if (thread == NULL)
+    if (thread == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     /* if thread in sleep, then wakeup it */
-    if (thread->state == THREAD_SLEEP)
+    if (thread->state == NX_THREAD_SLEEP)
     {
         ThreadUnblockInterruptDisabled(thread);
     }
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PRIVATE Bool TimerThreadSleepTimeout(Timer *timer, void *arg)
+NX_PRIVATE NX_Bool TimerThreadSleepTimeout(NX_Timer *timer, void *arg)
 {
-    Thread *thread = (Thread *)arg; /* the thread wait for timeout  */
+    NX_Thread *thread = (NX_Thread *)arg; /* the thread wait for timeout  */
 
-    ASSERT(thread->state == THREAD_SLEEP);
+    NX_ASSERT(thread->state == NX_THREAD_SLEEP);
 
-    thread->resource.sleepTimer = NULL; /* cleanup sleep timer */
+    thread->resource.sleepTimer = NX_NULL; /* cleanup sleep timer */
 
-    if (ThreadWakeup(thread) != OS_EOK)
+    if (NX_ThreadWakeup(thread) != NX_EOK)
     {
-        LOG_E("Wakeup thread:%s/%d failed!", thread->name, thread->tid);
+        NX_LOG_E("Wakeup thread:%s/%d failed!", thread->name, thread->tid);
     }
     else
     {
-        LOG_I("Wakeup thread:%s/%d success!", thread->name, thread->tid);
+        NX_LOG_I("Wakeup thread:%s/%d success!", thread->name, thread->tid);
     }
-    return TRUE;
+    return NX_True;
 }
 
 /* if thread sleep less equal than 2s, use delay instead */
 #define THREAD_SLEEP_TIMEOUT_THRESHOLD 2
 
-PUBLIC OS_Error ThreadSleep(UArch microseconds)
+NX_PUBLIC NX_Error NX_ThreadSleep(NX_UArch microseconds)
 {
     if (microseconds == 0)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     if (microseconds <= THREAD_SLEEP_TIMEOUT_THRESHOLD)
     {
-        return ClockTickDelayMillisecond(microseconds);
+        return NX_ClockTickDelayMillisecond(microseconds);
     }
 
-    Thread *self = ThreadSelf();
-    Timer sleepTimer;
-    OS_Error err;
-    err = TimerInit(&sleepTimer, microseconds, TimerThreadSleepTimeout, (void *)self, TIMER_ONESHOT);
-    if (err != OS_EOK)
+    NX_Thread *self = NX_ThreadSelf();
+    NX_Timer sleepTimer;
+    NX_Error err;
+    err = NX_TimerInit(&sleepTimer, microseconds, TimerThreadSleepTimeout, (void *)self, NX_TIMER_ONESHOT);
+    if (err != NX_EOK)
     {
         return err;
     }
 
-    UArch irqLevel = INTR_SaveLevel();
+    NX_UArch irqLevel = NX_IRQ_SaveLevel();
     /* lock thread */
     self->resource.sleepTimer = &sleepTimer;
 
-    TimerStart(&sleepTimer);
+    NX_TimerStart(&sleepTimer);
 
     /* set thread as sleep state */
-    ThreadBlockInterruptDisabled(THREAD_SLEEP, irqLevel);
+    ThreadBlockInterruptDisabled(NX_THREAD_SLEEP, irqLevel);
 
     /* if sleep timer always here, it means that the thread was interrupted! */
-    if (self->resource.sleepTimer != NULL)
+    if (self->resource.sleepTimer != NX_NULL)
     {
         /* thread was interrupted! */
-        TimerStop(self->resource.sleepTimer);
-        self->resource.sleepTimer = NULL;
-        return OS_EINTR;
+        NX_TimerStop(self->resource.sleepTimer);
+        self->resource.sleepTimer = NX_NULL;
+        return NX_EINTR;
     }
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PUBLIC OS_Error ThreadSetAffinity(Thread *thread, UArch coreId)
+NX_PUBLIC NX_Error NX_ThreadSetAffinity(NX_Thread *thread, NX_UArch coreId)
 {
-    if (thread == NULL || coreId >= NR_MULTI_CORES)
+    if (thread == NX_NULL || coreId >= NX_MULTI_CORES_NR)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    UArch level;
-    SpinLockIRQ(&thread->lock, &level);
+    NX_UArch level;
+    NX_SpinLockIRQ(&thread->lock, &level);
     thread->coreAffinity = coreId;
     thread->onCore = coreId;
-    SpinUnlockIRQ(&thread->lock, level);
-    return OS_EOK;
+    NX_SpinUnlockIRQ(&thread->lock, level);
+    return NX_EOK;
 }
 
-PUBLIC void ThreadEnqueuePendingList(Thread *thread)
+NX_PUBLIC void NX_ThreadEnqueuePendingList(NX_Thread *thread)
 {
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
-    ListAdd(&thread->list, &ThreadManagerObject.pendingList);
-    AtomicInc(&ThreadManagerObject.pendingThreadCount);
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    NX_UArch level;
+    NX_SpinLockIRQ(&NX_ThreadManagerObject.lock, &level);
+    NX_ListAdd(&thread->list, &NX_ThreadManagerObject.pendingList);
+    NX_AtomicInc(&NX_ThreadManagerObject.pendingThreadCount);
+    NX_SpinUnlockIRQ(&NX_ThreadManagerObject.lock, level);
 }
 
-PUBLIC Thread *ThreadDequeuePendingList(void)
+NX_PUBLIC NX_Thread *NX_ThreadDequeuePendingList(void)
 {
-    Thread *thread;
-    SpinLock(&ThreadManagerObject.lock, TRUE);
-    thread = ListFirstEntryOrNULL(&ThreadManagerObject.pendingList, Thread, list);
-    if (thread != NULL)
+    NX_Thread *thread;
+    NX_SpinLock(&NX_ThreadManagerObject.lock, NX_True);
+    thread = NX_ListFirstEntryOrNULL(&NX_ThreadManagerObject.pendingList, NX_Thread, list);
+    if (thread != NX_NULL)
     {
-        ListDel(&thread->list);
-        AtomicDec(&ThreadManagerObject.pendingThreadCount);
+        NX_ListDel(&thread->list);
+        NX_AtomicDec(&NX_ThreadManagerObject.pendingThreadCount);
     }
-    SpinUnlock(&ThreadManagerObject.lock);
+    NX_SpinUnlock(&NX_ThreadManagerObject.lock);
     return thread;
 }
 
-PUBLIC void ThreadEnququeExitList(Thread *thread)
+NX_PUBLIC void NX_ThreadEnququeExitList(NX_Thread *thread)
 {
-    UArch level;
-    SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
-    ListAdd(&thread->globalList, &ThreadManagerObject.exitList);
-    SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
+    NX_UArch level;
+    NX_SpinLockIRQ(&NX_ThreadManagerObject.exitLock, &level);
+    NX_ListAdd(&thread->globalList, &NX_ThreadManagerObject.exitList);
+    NX_SpinUnlockIRQ(&NX_ThreadManagerObject.exitLock, level);
 }
 
-PUBLIC Thread *ThreadFindById(U32 tid)
+NX_PUBLIC NX_Thread *NX_ThreadFindById(NX_U32 tid)
 {
-    Thread *thread = NULL, *find = NULL;
-    UArch level;
+    NX_Thread *thread = NX_NULL, *find = NX_NULL;
+    NX_UArch level;
 
-    SpinLockIRQ(&ThreadManagerObject.lock, &level);
+    NX_SpinLockIRQ(&NX_ThreadManagerObject.lock, &level);
 
-    ListForEachEntry (thread, &ThreadManagerObject.globalList, globalList)
+    NX_ListForEachEntry (thread, &NX_ThreadManagerObject.globalList, globalList)
     {
         if (thread->tid == tid)
         {
@@ -423,87 +423,87 @@ PUBLIC Thread *ThreadFindById(U32 tid)
         }
     }
 
-    SpinUnlockIRQ(&ThreadManagerObject.lock, level);
+    NX_SpinUnlockIRQ(&NX_ThreadManagerObject.lock, level);
     return find;
 }
 
 /**
  * system idle thread on per cpu.
  */
-PRIVATE void IdleThreadEntry(void *arg)
+NX_PRIVATE void IdleThreadEntry(void *arg)
 {
-    LOG_I("Idle thread: %s startting...", ThreadSelf()->name);
+    NX_LOG_I("Idle thread: %s startting...", NX_ThreadSelf()->name);
     int i = 0;
     while (1)
     {
         i++;
-        ThreadYield();
+        NX_ThreadYield();
     }
 }
 
 /**
  * system deamon thread for all cpus 
  */
-PRIVATE void DaemonThreadEntry(void *arg)
+NX_PRIVATE void DaemonThreadEntry(void *arg)
 {
-    LOG_I("Daemon thread started.\n");
-    Thread *thread, *safe;
-    UArch level;
+    NX_LOG_I("Daemon thread started.\n");
+    NX_Thread *thread, *safe;
+    NX_UArch level;
     while (1)
     {
-        SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
-        ListForEachEntrySafe (thread, safe, &ThreadManagerObject.exitList, globalList)
+        NX_SpinLockIRQ(&NX_ThreadManagerObject.exitLock, &level);
+        NX_ListForEachEntrySafe (thread, safe, &NX_ThreadManagerObject.exitList, globalList)
         {
-            LOG_D("---> daemon release thread: %s/%d", thread->name, thread->tid);
+            NX_LOG_D("---> daemon release thread: %s/%d", thread->name, thread->tid);
             /* del from exit list */
-            ListDel(&thread->globalList);
-            SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
+            NX_ListDel(&thread->globalList);
+            NX_SpinUnlockIRQ(&NX_ThreadManagerObject.exitLock, level);
             ThreadReleaseSelf(thread);
-            SpinLockIRQ(&ThreadManagerObject.exitLock, &level);
+            NX_SpinLockIRQ(&NX_ThreadManagerObject.exitLock, &level);
         }
-        SpinUnlockIRQ(&ThreadManagerObject.exitLock, level);
+        NX_SpinUnlockIRQ(&NX_ThreadManagerObject.exitLock, level);
 
         /* do delay or timeout, sleep 0.5s */
-        ThreadYield();
+        NX_ThreadYield();
     }
 }
 
-PUBLIC void ThreadManagerInit(void)
+NX_PUBLIC void NX_ThreadManagerInit(void)
 {
-    AtomicSet(&ThreadManagerObject.averageThreadThreshold, 0);
-    AtomicSet(&ThreadManagerObject.activeThreadCount, 0);
-    AtomicSet(&ThreadManagerObject.pendingThreadCount, 0);
-    ListInit(&ThreadManagerObject.exitList);
-    ListInit(&ThreadManagerObject.globalList);
-    ListInit(&ThreadManagerObject.pendingList);
+    NX_AtomicSet(&NX_ThreadManagerObject.averageThreadThreshold, 0);
+    NX_AtomicSet(&NX_ThreadManagerObject.activeThreadCount, 0);
+    NX_AtomicSet(&NX_ThreadManagerObject.pendingThreadCount, 0);
+    NX_ListInit(&NX_ThreadManagerObject.exitList);
+    NX_ListInit(&NX_ThreadManagerObject.globalList);
+    NX_ListInit(&NX_ThreadManagerObject.pendingList);
     
-    SpinInit(&ThreadManagerObject.lock);
-    SpinInit(&ThreadManagerObject.exitLock);
+    NX_SpinInit(&NX_ThreadManagerObject.lock);
+    NX_SpinInit(&NX_ThreadManagerObject.exitLock);
 }
 
-PUBLIC void ThreadsInit(void)
+NX_PUBLIC void NX_ThreadsInit(void)
 {
-    Thread *idleThread;
-    Thread *deamonThread;
+    NX_Thread *idleThread;
+    NX_Thread *deamonThread;
     int coreId;
     char name[8];
-    ThreadsInitID();
-    ThreadManagerInit();
+    NX_ThreadsInitID();
+    NX_ThreadManagerInit();
 
     /* init idle thread */
-    for (coreId = 0; coreId < NR_MULTI_CORES; coreId++)
+    for (coreId = 0; coreId < NX_MULTI_CORES_NR; coreId++)
     {
-        StrPrintfN(name, 8, "Idle%d", coreId);
-        idleThread = ThreadCreate(name, IdleThreadEntry, NULL);
-        ASSERT(idleThread != NULL);
+        NX_SNPrintf(name, 8, "Idle%d", coreId);
+        idleThread = NX_ThreadCreate(name, IdleThreadEntry, NX_NULL);
+        NX_ASSERT(idleThread != NX_NULL);
         /* bind idle on each core */
-        ThreadSetAffinity(idleThread, coreId);
+        NX_ThreadSetAffinity(idleThread, coreId);
 
-        ASSERT(ThreadRun(idleThread) == OS_EOK);
+        NX_ASSERT(NX_ThreadRun(idleThread) == NX_EOK);
     }
 
     /* init daemon thread */
-    deamonThread = ThreadCreate("daemon", DaemonThreadEntry, NULL);
-    ASSERT(deamonThread != NULL);
-    ASSERT(ThreadRun(deamonThread) == OS_EOK);
+    deamonThread = NX_ThreadCreate("daemon", DaemonThreadEntry, NX_NULL);
+    NX_ASSERT(deamonThread != NX_NULL);
+    NX_ASSERT(NX_ThreadRun(deamonThread) == NX_EOK);
 }

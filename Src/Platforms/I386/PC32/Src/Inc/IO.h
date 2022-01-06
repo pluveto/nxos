@@ -15,40 +15,40 @@
 #include <XBook/Types.h>
 #include <XBook/Defines.h>
 
-INLINE U8 IO_In8(U16 port)
+NX_INLINE NX_U8 IO_In8(NX_U16 port)
 {
-    U8 data;
-    CASM("inb %w1, %0" : "=a" (data) : "d" (port));
+    NX_U8 data;
+    NX_CASM("inb %w1, %0" : "=a" (data) : "d" (port));
     return data;
 }
 
-INLINE U16 IO_In16(U16 port)
+NX_INLINE NX_U16 IO_In16(NX_U16 port)
 {
-    U16 data;
-    CASM("inw %w1, %0" : "=a" (data) : "d" (port));
+    NX_U16 data;
+    NX_CASM("inw %w1, %0" : "=a" (data) : "d" (port));
     return data;
 }
 
-INLINE U32 IO_In32(U16 port)
+NX_INLINE NX_U32 IO_In32(NX_U16 port)
 {
-    U32 data;
-    CASM("inl %w1, %0" : "=a" (data) : "d" (port));
+    NX_U32 data;
+    NX_CASM("inl %w1, %0" : "=a" (data) : "d" (port));
     return data;
 }
 
-INLINE void IO_Out8(U16 port, U8 data)
+NX_INLINE void IO_Out8(NX_U16 port, NX_U8 data)
 {
-    CASM("outb %0, %w1" : : "a" (data), "d" (port));
+    NX_CASM("outb %0, %w1" : : "a" (data), "d" (port));
 }
 
-INLINE void IO_Out16(U16 port, U16 data)
+NX_INLINE void IO_Out16(NX_U16 port, NX_U16 data)
 {
-    CASM("outw %0, %w1" : : "a" (data), "d" (port));
+    NX_CASM("outw %0, %w1" : : "a" (data), "d" (port));
 }
 
-INLINE void IO_Out32(U16 port, U32 data)
+NX_INLINE void IO_Out32(NX_U16 port, NX_U32 data)
 {
-    CASM("outl %0, %w1" : : "a" (data), "d" (port));
+    NX_CASM("outl %0, %w1" : : "a" (data), "d" (port));
 }
 
 #endif  /* __PLATFORM_IO__ */

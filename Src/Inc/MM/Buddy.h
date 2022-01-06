@@ -16,40 +16,36 @@
 #include <Utils/List.h>
 #include <MM/Page.h>
 
-#define MAX_PAGE_ORDER 20
+#define NX_MAX_PAGE_ORDER 20
 
-#define PAGE_SHIFT_TO_MASK(s) ((1UL << s) - 1)
-#define PAGE_ORDER_MASK (PAGE_SHIFT_TO_MASK((MAX_PAGE_ORDER + PAGE_SHIFT)) - PAGE_MASK)
-#define PAGE_INVALID_ORDER (-1)
+#define NX_PAGE_SHIFT_TO_MASK(s) ((1UL << s) - 1)
+#define NX_PAGE_ORDER_MASK (NX_PAGE_SHIFT_TO_MASK((NX_MAX_PAGE_ORDER + NX_PAGE_SHIFT)) - NX_PAGE_MASK)
 
-/* page flags */
-#define PAGE_FLAG_IS_FREE  0x01
-
-struct Page
+struct NX_Page
 {
-    List list;
-    U32 flags;
-    I32 order;
-    USize sizeClass;         /* size class on this span */
-    USize maxObjectsOnSpan;  /* max memory objects on this span */
+    NX_List list;
+    NX_U32 flags;
+    NX_I32 order;
+    NX_USize sizeClass;         /* size class on this span */
+    NX_USize maxObjectsOnSpan;  /* max memory objects on this span */
 };
-typedef struct Page Page;
+typedef struct NX_Page NX_Page;
 
-struct BuddySystem
+struct NX_BuddySystem
 {
-    List pageBuddy[MAX_PAGE_ORDER + 1];
-    USize count[MAX_PAGE_ORDER + 1];
-    USize bitmap;    /* map order has free page */
+    NX_List pageBuddy[NX_MAX_PAGE_ORDER + 1];
+    NX_USize count[NX_MAX_PAGE_ORDER + 1];
+    NX_USize bitmap;    /* map order has free page */
     void *pageStart;    /* page start addr */
-    USize maxPFN;
-    Page map[0];    /* pages array */
+    NX_USize maxPFN;
+    NX_Page map[0];    /* pages array */
 };
-typedef struct BuddySystem BuddySystem;
+typedef struct NX_BuddySystem NX_BuddySystem;
 
-PUBLIC BuddySystem* BuddyCreate(void *mem, USize size);
-PUBLIC void *BuddyAllocPage(BuddySystem* system, USize count);
-PUBLIC void BuddyFreePage(BuddySystem* system, void *ptr);
+NX_PUBLIC NX_BuddySystem* NX_BuddyCreate(void *mem, NX_USize size);
+NX_PUBLIC void *NX_BuddyAllocPage(NX_BuddySystem* system, NX_USize count);
+NX_PUBLIC void NX_BuddyFreePage(NX_BuddySystem* system, void *ptr);
 
-PUBLIC Page* PageFromPtr(BuddySystem* system, void *ptr);
+NX_PUBLIC NX_Page* NX_PageFromPtr(NX_BuddySystem* system, void *ptr);
 
 #endif /* __MM_BUDDY__ */

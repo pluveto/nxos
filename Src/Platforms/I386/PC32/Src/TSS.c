@@ -14,21 +14,21 @@
 #include <Regs.h>
 #include <Utils/Memory.h>
 
-PRIVATE struct CPU_TSS tss;
+NX_PRIVATE struct CPU_TSS tss;
 
-PUBLIC struct CPU_TSS *CPU_GetTSS(void)
+NX_PUBLIC struct CPU_TSS *CPU_GetTSS(void)
 {
     return &tss;
 }
 
-PUBLIC void CPU_SetTssStack(UArch top)
+NX_PUBLIC void CPU_SetTssStack(NX_UArch top)
 {
     tss.esp0 = top; /* esp0 is kernel mode */
 }
 
 void CPU_InitTSS(void)
 {
-    Zero(&tss, sizeof(struct CPU_TSS));
+    NX_MemZero(&tss, sizeof(struct CPU_TSS));
     tss.esp0 = KERNEL_STACK_TOP;
     tss.ss0 = KERNEL_DATA_SEL;
     tss.iobase = sizeof(struct CPU_TSS);

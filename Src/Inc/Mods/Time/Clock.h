@@ -14,49 +14,49 @@
 
 #include <XBook.h>
 
-#ifdef CONFIG_TICKS_PER_SECOND
-#define TICKS_PER_SECOND CONFIG_TICKS_PER_SECOND
+#ifdef CONFIG_NX_TICKS_PER_SECOND
+#define NX_TICKS_PER_SECOND CONFIG_NX_TICKS_PER_SECOND
 #else
-#define TICKS_PER_SECOND 100
+#define NX_TICKS_PER_SECOND 100
 #endif
 
-#if (TICKS_PER_SECOND > 1000) || (TICKS_PER_SECOND == 0)
+#if (NX_TICKS_PER_SECOND > 1000) || (NX_TICKS_PER_SECOND == 0)
 #error "config ticks range in [1~1000]"
 #endif
 
-#define TICKS_PER_MILLISECOND (1000 / TICKS_PER_SECOND)
-#define MILLISECOND_TO_TICKS(msec) ((msec) / TICKS_PER_MILLISECOND)
-#define TICKS_TO_MILLISECOND(ticks) ((ticks) * TICKS_PER_MILLISECOND)
+#define NX_TICKS_PER_MILLISECOND (1000 / NX_TICKS_PER_SECOND)
+#define NX_MILLISECOND_TO_TICKS(msec) ((msec) / NX_TICKS_PER_MILLISECOND)
+#define NX_TICKS_TO_MILLISECOND(ticks) ((ticks) * NX_TICKS_PER_MILLISECOND)
 
-typedef UArch TimeVal;
-typedef UArch ClockTick;
+typedef NX_UArch NX_TimeVal;
+typedef NX_UArch NX_ClockTick;
 
-PUBLIC ClockTick ClockTickGet(void);
-PUBLIC void ClockTickSet(ClockTick tick);
-PUBLIC void ClockTickGo(void);
+NX_PUBLIC NX_ClockTick NX_ClockTickGet(void);
+NX_PUBLIC void NX_ClockTickSet(NX_ClockTick tick);
+NX_PUBLIC void NX_ClockTickGo(void);
 
-PUBLIC OS_Error ClockTickDelay(ClockTick ticks);
+NX_PUBLIC NX_Error NX_ClockTickDelay(NX_ClockTick ticks);
 
-INLINE TimeVal ClockTickToMillisecond(ClockTick tick)
+NX_INLINE NX_TimeVal NX_ClockTickToMillisecond(NX_ClockTick tick)
 {
-    return TICKS_TO_MILLISECOND(tick);
+    return NX_TICKS_TO_MILLISECOND(tick);
 }
 
-INLINE ClockTick MillisecondToClockTick(TimeVal milliseconds)
+NX_INLINE NX_ClockTick NX_MillisecondToClockTick(NX_TimeVal milliseconds)
 {
-    return MILLISECOND_TO_TICKS(milliseconds);
+    return NX_MILLISECOND_TO_TICKS(milliseconds);
 }
 
-INLINE TimeVal ClockTickGetMillisecond(void)
+NX_INLINE NX_TimeVal NX_ClockTickGetMillisecond(void)
 {
-    return ClockTickToMillisecond(ClockTickGet());
+    return NX_ClockTickToMillisecond(NX_ClockTickGet());
 }
 
-INLINE OS_Error ClockTickDelayMillisecond(TimeVal milliseconds)
+NX_INLINE NX_Error NX_ClockTickDelayMillisecond(NX_TimeVal milliseconds)
 {
-    return ClockTickDelay(MillisecondToClockTick(milliseconds));
+    return NX_ClockTickDelay(NX_MillisecondToClockTick(milliseconds));
 }
 
-PUBLIC OS_Error ClockInit(void);
+NX_PUBLIC NX_Error NX_ClockInit(void);
 
 #endif  /* __MODS_TIME_CLOCK__ */

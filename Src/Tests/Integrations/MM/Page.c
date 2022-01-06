@@ -11,13 +11,13 @@
 
 #include <Mods/Test/Integration.h>
 #include <MM/Page.h>
-#define LOG_NAME "Page"
+#define NX_LOG_NAME "Page"
 #include <Utils/Log.h>
 #include <Utils/Memory.h>
 
-#ifdef CONFIG_TEST_INTEGRATION_PAGE
+#ifdef CONFIG_NX_TEST_INTEGRATION_PAGE
 
-INTEGRATION_TEST(PageAlloc)
+NX_INTEGRATION_TEST(NX_PageAlloc)
 {
     /* alloc memory */
     void *bufs[16];
@@ -25,52 +25,52 @@ INTEGRATION_TEST(PageAlloc)
     int i;
     for (i = 0; i < 16; i++)
     {
-        void *buf = PageAlloc(i + 1);
-        Zero(buf, PAGE_SIZE);
-        LOG_D("Alloc: %x", buf);
+        void *buf = NX_PageAlloc(i + 1);
+        NX_MemZero(buf, NX_PAGE_SIZE);
+        NX_LOG_D("Alloc: %x", buf);
         bufs[i] = buf; 
     }
 
     for (i = 0; i < 16; i++)
     {
-        LOG_D("Free: %x", bufs[i]);
+        NX_LOG_D("Free: %x", bufs[i]);
         if (bufs[i])
         {
-            PageFree(bufs[i]);
+            NX_PageFree(bufs[i]);
         }
     }
     for (i = 0; i < 16; i++)
     {
-        void *buf = PageAlloc(i + 1);
-        Zero(buf, PAGE_SIZE);
-        LOG_D("Alloc: %x", buf);
+        void *buf = NX_PageAlloc(i + 1);
+        NX_MemZero(buf, NX_PAGE_SIZE);
+        NX_LOG_D("Alloc: %x", buf);
         bufs[i] = buf; 
     }
 
     for (i = 0; i < 16; i++)
     {
-        void *buf = PageAllocInZone(PZ_DMA, i + 1);
-        Zero(buf, PAGE_SIZE);
-        LOG_D("Alloc: %x", buf);
+        void *buf = NX_PageAllocInZone(NX_PAGE_ZONE_DMA, i + 1);
+        NX_MemZero(buf, NX_PAGE_SIZE);
+        NX_LOG_D("Alloc: %x", buf);
         bufs[i] = buf; 
     }
 
     for (i = 0; i < 16; i++)
     {
-        LOG_D("Free: %x", bufs[i]);
+        NX_LOG_D("Free: %x", bufs[i]);
         if (bufs[i])
         {
-            PageFreeInZone(PZ_DMA, bufs[i]);
+            NX_PageFreeInZone(NX_PAGE_ZONE_DMA, bufs[i]);
         }
     }
     for (i = 0; i < 16; i++)
     {
-        void *buf = PageAllocInZone(PZ_DMA, i + 1);
-        Zero(buf, PAGE_SIZE);
-        LOG_D("Alloc: %x", buf);
+        void *buf = NX_PageAllocInZone(NX_PAGE_ZONE_DMA, i + 1);
+        NX_MemZero(buf, NX_PAGE_SIZE);
+        NX_LOG_D("Alloc: %x", buf);
         bufs[i] = buf; 
     }
-    return OS_EOK;
+    return NX_EOK;
 }
 
 #endif

@@ -23,7 +23,7 @@
 
 #define IsDigit(c)	((c) >= '0' && (c) <= '9')
 
-PRIVATE int SkipAscii2Int(const char **s)
+NX_PRIVATE int SkipAscii2Int(const char **s)
 {
 	int i = 0;
 	while (IsDigit(**s))
@@ -33,14 +33,14 @@ PRIVATE int SkipAscii2Int(const char **s)
 	return i;
 }
 
-PRIVATE int _Div(unsigned long *num, char base) 
+NX_PRIVATE int _Div(unsigned long *num, char base) 
 {
     int ret = *num % base;
     *num = *num / base;
     return ret;
 }
 
-PRIVATE char *_Number(char * str, long num, int base, int size, int precision,	int type)
+NX_PRIVATE char *_Number(char * str, long num, int base, int size, int precision,	int type)
 {
 	char c, sign, tmp[50];
 	const char *digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -150,7 +150,7 @@ PRIVATE char *_Number(char * str, long num, int base, int size, int precision,	i
 	return str;
 }
 
-PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
+NX_PUBLIC int NX_VSNPrintf(char *buf, int bufLen, const char *fmt, NX_VarList args)
 {
 	char *str, *s;
 	int flags;
@@ -192,7 +192,7 @@ PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
         else if(*fmt == '*')
         {
             fmt++;
-            fieldWidth = VarArg(args, int);
+            fieldWidth = NX_VarArg(args, int);
             if(fieldWidth < 0)
             {
                 fieldWidth = -fieldWidth;
@@ -212,7 +212,7 @@ PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
             else if(*fmt == '*')
             {	
                 fmt++;
-                precision = VarArg(args, int);
+                precision = NX_VarArg(args, int);
             }
             if(precision < 0)
             {
@@ -237,19 +237,19 @@ PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
                     *str++ = ' ';
                 }
             }
-            *str++ = (unsigned char)VarArg(args, int);
+            *str++ = (unsigned char)NX_VarArg(args, int);
             while(--fieldWidth > 0)
             {
                 *str++ = ' ';
             }
             break;
         case 's':
-            s = VarArg(args,char *);
+            s = NX_VarArg(args,char *);
             if(!s)
             {
                 s = '\0';
             }
-            len = StrLen(s);
+            len = NX_StrLen(s);
             if(precision < 0)
             {
                 precision = len;
@@ -279,11 +279,11 @@ PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
         case 'o':
             if(qualifier == 'l')
             {
-                str = _Number(str, VarArg(args, unsigned long), 8, fieldWidth, precision, flags);
+                str = _Number(str, NX_VarArg(args, unsigned long), 8, fieldWidth, precision, flags);
             }
             else
             {
-                str = _Number(str, VarArg(args, unsigned int), 8, fieldWidth, precision, flags);
+                str = _Number(str, NX_VarArg(args, unsigned int), 8, fieldWidth, precision, flags);
             }
             break;
 
@@ -294,7 +294,7 @@ PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
                 flags |= ZEROPAD;
             }
 
-            str = _Number(str, (unsigned long)VarArg(args, void *), 16, fieldWidth, precision, flags);
+            str = _Number(str, (unsigned long)NX_VarArg(args, void *), 16, fieldWidth, precision, flags);
             break;
 
         case 'x':
@@ -303,11 +303,11 @@ PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
         case 'X':
             if(qualifier == 'l')
             {
-                str = _Number(str, VarArg(args, unsigned long), 16, fieldWidth, precision, flags);
+                str = _Number(str, NX_VarArg(args, unsigned long), 16, fieldWidth, precision, flags);
             }
             else
             {
-                str = _Number(str, VarArg(args, unsigned int), 16, fieldWidth, precision, flags);
+                str = _Number(str, NX_VarArg(args, unsigned int), 16, fieldWidth, precision, flags);
             }
             break;
 
@@ -317,23 +317,23 @@ PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
         case 'u':
             if(qualifier == 'l')
             {
-                str = _Number(str, VarArg(args, long), 10, fieldWidth, precision, flags);
+                str = _Number(str, NX_VarArg(args, long), 10, fieldWidth, precision, flags);
             }
             else
             {
-                str = _Number(str, VarArg(args, int), 10, fieldWidth, precision, flags);
+                str = _Number(str, NX_VarArg(args, int), 10, fieldWidth, precision, flags);
             }
             break;
 
         case 'n':
             if(qualifier == 'l')
             {
-                long *ip = VarArg(args, long *);
+                long *ip = NX_VarArg(args, long *);
                 *ip = (str - buf);
             }
             else
             {
-                int *ip = VarArg(args, int *);
+                int *ip = NX_VarArg(args, int *);
                 *ip = (str - buf);
             }
             break;
@@ -359,9 +359,9 @@ PUBLIC int VarStrPrintfN(char *buf, int bufLen, const char *fmt, VarList args)
 	return str - buf;
 }
 
-PUBLIC int StrPrintfN(char *buf, int buflen, const char *fmt, ...)
+NX_PUBLIC int NX_SNPrintf(char *buf, int buflen, const char *fmt, ...)
 {
-	VarList arg;
-	VarStart(arg, fmt);
-	return VarStrPrintfN(buf, buflen, fmt, arg);
+	NX_VarList arg;
+	NX_VarStart(arg, fmt);
+	return NX_VSNPrintf(buf, buflen, fmt, arg);
 }

@@ -18,52 +18,52 @@
 #include <Sched/Spin.h>
 #include <XBook/Atomic.h>
 
-struct CoreLocalStorage
+struct NX_CoreLocalStorage
 {
-    List threadReadyList;   /* list for thread ready to run */
-    Thread *threadRunning;  /* the thread running on core */
+    NX_List threadReadyList;   /* list for thread ready to run */
+    NX_Thread *threadRunning;  /* the thread running on core */
 
-    Spin lock;     /* lock for CLS */
-    Atomic threadCount;    /* ready thread count on this core */
+    NX_Spin lock;     /* lock for CLS */
+    NX_Atomic threadCount;    /* ready thread count on this core */
 };
-typedef struct CoreLocalStorage CoreLocalStorage;
+typedef struct NX_CoreLocalStorage NX_CoreLocalStorage;
 
-struct MultiCoreOps
+struct NX_MultiCoreOps
 {
-    UArch (*getId)(void);
-    OS_Error (*bootApp)(UArch bootCoreId);
-    OS_Error (*enterApp)(UArch appCoreId);
+    NX_UArch (*getId)(void);
+    NX_Error (*bootApp)(NX_UArch bootCoreId);
+    NX_Error (*enterApp)(NX_UArch appCoreId);
 };
 
-INTERFACE IMPORT struct MultiCoreOps MultiCoreOpsInterface; 
+NX_INTERFACE NX_IMPORT struct NX_MultiCoreOps NX_MultiCoreOpsInterface; 
 
-#define MultiCoreBootApp MultiCoreOpsInterface.bootApp
-#define MultiCoreEnterApp MultiCoreOpsInterface.enterApp
-#define MultiCoreGetId MultiCoreOpsInterface.getId
+#define NX_MultiCoreBootApp    NX_MultiCoreOpsInterface.bootApp
+#define NX_MultiCoreEnterApp   NX_MultiCoreOpsInterface.enterApp
+#define NX_MultiCoreGetId      NX_MultiCoreOpsInterface.getId
 
-PUBLIC void MultiCorePreload(UArch coreId);
-PUBLIC void MultiCoreInit(UArch coreId);
-PUBLIC void MultiCoreMain(UArch coreId);
-PUBLIC void MultiCoreStage2(UArch appCoreId);
+NX_PUBLIC void NX_MultiCorePreload(NX_UArch coreId);
+NX_PUBLIC void NX_MultiCoreInit(NX_UArch coreId);
+NX_PUBLIC void NX_MultiCoreMain(NX_UArch coreId);
+NX_PUBLIC void NX_MultiCoreStage2(NX_UArch appCoreId);
 
-PUBLIC UArch MultiCoreGetBootCore(void);
+NX_PUBLIC NX_UArch NX_MultiCoreGetBootCore(void);
 
-PUBLIC void MultiCoreEnqueueThreadIrqDisabled(UArch coreId, Thread *thread, int flags);
-PUBLIC Thread *MultiCoreDeququeThreadIrqDisabled(UArch coreId);
-PUBLIC OS_Error MultiCoreSetRunning(UArch coreId, Thread *thread);
+NX_PUBLIC void NX_MultiCoreEnqueueThreadIrqDisabled(NX_UArch coreId, NX_Thread *thread, int flags);
+NX_PUBLIC NX_Thread *NX_MultiCoreDeququeThreadIrqDisabled(NX_UArch coreId);
+NX_PUBLIC NX_Error NX_MultiCoreSetRunning(NX_UArch coreId, NX_Thread *thread);
 
-PUBLIC CoreLocalStorage *CLS_GetIndex(UArch coreId);
+NX_PUBLIC NX_CoreLocalStorage *CLS_GetIndex(NX_UArch coreId);
 
-PUBLIC Thread *MultiCoreDeququeNoAffinityThread(UArch coreId);
+NX_PUBLIC NX_Thread *NX_MultiCoreDeququeNoAffinityThread(NX_UArch coreId);
 
 /**
  * get CLS by core id
  */
-INLINE CoreLocalStorage *CLS_Get(void)
+NX_INLINE NX_CoreLocalStorage *CLS_Get(void)
 {
-    return CLS_GetIndex(MultiCoreGetId());
+    return CLS_GetIndex(NX_MultiCoreGetId());
 }
 
-PUBLIC Thread *CLS_GetRunning(void);
+NX_PUBLIC NX_Thread *CLS_GetRunning(void);
 
 #endif /* __SCHED_MULTI_CORE___ */

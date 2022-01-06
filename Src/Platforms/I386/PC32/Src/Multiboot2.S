@@ -12,15 +12,15 @@
 #define __ASSEMBLY__
 #include <Multiboot2.h>
 
-# the USize of bootStack is 16KB
+# the NX_USize of bootStack is 16KB
 #define BOOT_STACK_SIZE 0x4000
 
 .code32
 
 .section .text.start
 .globl Start, _start
-.extern OS_Main
-.extern BootSetting
+.extern NX_Main
+.extern HAL_BootSetting
 
 Start:
 _start:
@@ -39,7 +39,7 @@ MultibootHeader:
     .align 8
     .short MULTIBOOT_HEADER_TAG_END # type
     .short 0                        # flags
-    .long  8                        # USize
+    .long  8                        # NX_USize
 MultibootHeaderEnd:
 MultibootEntry:
     # initialize the bootStack pointer
@@ -54,14 +54,14 @@ MultibootEntry:
     # push the magic value
     pushl %eax
     
-    call BootSetting
+    call HAL_BootSetting
     cmpl $-1, %eax
     je BootSetupFail
 
     add $8, %esp
 
     # call os main
-    call OS_Main
+    call NX_Main
     jmp MultibootHlt
 
 BootSetupFail:

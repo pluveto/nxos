@@ -11,9 +11,9 @@
 .code32
 .text
 
-.extern InterruptDispatch
-.extern ReSchedCheck
-.extern IRQ_DelayQueueCheck
+.extern HAL_InterruptDispatch
+.extern NX_ReSchedCheck
+.extern NX_IRQ_DelayQueueCheck
 
 /* cpu no error code, need push by hand */
 .macro CPU_TrapEntryNoErrCode p1
@@ -35,10 +35,10 @@ CPU_TrapEntry\p1:
     pushl $\p1
 
     pushl %esp
-    call InterruptDispatch
+    call HAL_InterruptDispatch
     addl $4, %esp
 
-    jmp InterruptExit
+    jmp HAL_InterruptExit
 .endm
 
 /* cpu with error code */
@@ -60,10 +60,10 @@ CPU_TrapEntry\p1:
     pushl $\p1
     
     pushl %esp
-    call InterruptDispatch
+    call HAL_InterruptDispatch
     addl $4, %esp
 
-    jmp InterruptExit
+    jmp HAL_InterruptExit
 .endm
 
 CPU_TrapEntryNoErrCode 0x00
@@ -145,18 +145,18 @@ CPU_SyscallEntry:
 
     cli /* disable interrupt */
     
-    jmp InterruptExit
+    jmp HAL_InterruptExit
 
-.global SyscallExit
-SyscallExit:
-.global InterruptExit
-InterruptExit:
+.global HAL_SyscallExit
+HAL_SyscallExit:
+.global HAL_InterruptExit
+HAL_InterruptExit:
 
     /* do exit check */
-    call IRQ_DelayQueueCheck
+    call NX_IRQ_DelayQueueCheck
     
     /* check sched (Interrupt disabled) */
-    call ReSchedCheck
+    call NX_ReSchedCheck
 
     /* do interrupt stack restore  */
     addl $4, %esp               /* skip intr no */

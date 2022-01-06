@@ -11,9 +11,9 @@
 
 #include <Utils/Memory.h>
 
-PUBLIC void *Set(void *dst, U8 value, USize sz)
+NX_PUBLIC void *NX_MemSet(void *dst, NX_U8 value, NX_USize sz)
 {
-    U8 *dstPtr = (U8 *)dst;
+    NX_U8 *dstPtr = (NX_U8 *)dst;
 	while (sz > 0)
     {
 		*dstPtr++ = value;
@@ -22,36 +22,22 @@ PUBLIC void *Set(void *dst, U8 value, USize sz)
 	return dst;
 }
 
-/**
- * memset for compiler
- */
-PUBLIC void *memset(void *dst, U8 value, USize sz)
+NX_PUBLIC void NX_MemCopy(void *dst, void *src, NX_USize sz)
 {
-    U8 *dstPtr = (U8 *)dst;
-	while (sz > 0)
-    {
-		*dstPtr++ = value;
-		--sz;
-	}
-	return dst;
-}
-
-PUBLIC void Copy(void *dst, void *src, USize sz)
-{
-    U8 *dstPtr = (U8 *)dst;
-    U8 *srcPtr = (U8 *)src;
+    NX_U8 *dstPtr = (NX_U8 *)dst;
+    NX_U8 *srcPtr = (NX_U8 *)src;
     while (sz-- > 0)
     {
         *dstPtr++ = *srcPtr++;
     }
 }
 
-PUBLIC void *Zero(void *dst, USize sz)
+NX_PUBLIC void *NX_MemZero(void *dst, NX_USize sz)
 {
-    return Set(dst, 0, sz);
+    return NX_MemSet(dst, 0, sz);
 }
 
-PUBLIC int CompareN(const void *s1, const void *s2, USize nBytes)
+NX_PUBLIC int NX_CompareN(const void *s1, const void *s2, NX_USize nBytes)
 {
 	if ((s1 == 0) || (s2 == 0)) 
     {

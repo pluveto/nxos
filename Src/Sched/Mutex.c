@@ -16,65 +16,65 @@
 
 #define MUTEX_MAGIC 0x10000002
 
-PUBLIC OS_Error MutexInit(Mutex *mutex)
+NX_PUBLIC NX_Error NX_MutexInit(NX_Mutex *mutex)
 {
-    if (mutex == NULL)
+    if (mutex == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    if (SpinInit(&mutex->lock) != OS_EOK)
+    if (NX_SpinInit(&mutex->lock) != NX_EOK)
     {
-        return OS_EPERM;
+        return NX_EPERM;
     }
     mutex->magic = MUTEX_MAGIC;
-    return OS_EOK;
+    return NX_EOK;
 }
 
 /**
- * forever: if true lock mutex forever, or not return OS_ETIMEOUT if lock falied
+ * forever: if true lock mutex forever, or not return NX_ETIMEOUT if lock falied
  */
-PUBLIC OS_Error MutexLock(Mutex *mutex, Bool forever)
+NX_PUBLIC NX_Error NX_MutexLock(NX_Mutex *mutex, NX_Bool forever)
 {
-    if (mutex == NULL || mutex->magic != MUTEX_MAGIC)
+    if (mutex == NX_NULL || mutex->magic != MUTEX_MAGIC)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
 
     do
     {
         /* disable interrupt for locking per cpu */
-        UArch level = INTR_SaveLevel();
+        NX_UArch level = NX_IRQ_SaveLevel();
 
         /* spin lock for mutex */
-        if (SpinLock(&mutex->lock, FALSE) == OS_EOK)
+        if (NX_SpinLock(&mutex->lock, NX_False) == NX_EOK)
         {
-            INTR_RestoreLevel(level);
+            NX_IRQ_RestoreLevel(level);
             break;
         }
         else
         {
             /* restore interrupt for unlocking per cpu */
-            INTR_RestoreLevel(level);
+            NX_IRQ_RestoreLevel(level);
 
             /* checkout timeout */
-            if (forever == FALSE)
+            if (forever == NX_False)
             {
-                return OS_ETIMEOUT;
+                return NX_ETIMEOUT;
             }
             /* yield to other thread */
-            ThreadYield();
+            NX_ThreadYield();
         }
     } while (1);
 
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PUBLIC OS_Error MutexUnlock(Mutex *mutex)
+NX_PUBLIC NX_Error NX_MutexUnlock(NX_Mutex *mutex)
 {
-    if (mutex == NULL || mutex->magic != MUTEX_MAGIC)
+    if (mutex == NX_NULL || mutex->magic != MUTEX_MAGIC)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
-    SpinUnlock(&mutex->lock);
-    return OS_EOK;
+    NX_SpinUnlock(&mutex->lock);
+    return NX_EOK;
 }

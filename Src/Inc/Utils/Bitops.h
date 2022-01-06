@@ -14,7 +14,7 @@
 
 #include <XBook.h>
 
-INLINE int FLS(int x)
+NX_INLINE int NX_FLS(int x)
 {
     int r = 32;
 
@@ -43,6 +43,6 @@ INLINE int FLS(int x)
     return r;
 }
 
-#define FFS(x) ({ U32 __t = (x); FLS(__t & -__t); })
+#define NX_FFS(x) ({ NX_U32 __t = (x); NX_FLS(__t & -__t); })
 
 #endif  /* __UTILS_BITOPS__ */

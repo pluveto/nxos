@@ -15,60 +15,60 @@
 #include <PLIC.h>
 #include <Sched/MultiCore.h>
 
-PRIVATE OS_Error HAL_IrqUnmask(IRQ_Number irqno)
+NX_PRIVATE NX_Error HAL_IrqUnmask(NX_IRQ_Number irqno)
 {
-    if (irqno < 0 || irqno >= NR_IRQS)
+    if (irqno < 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
-    return PLIC_EnableIRQ(MultiCoreGetBootCore(), irqno);
+    return PLIC_EnableIRQ(NX_MultiCoreGetBootCore(), irqno);
 }
 
-PRIVATE OS_Error HAL_IrqMask(IRQ_Number irqno)
+NX_PRIVATE NX_Error HAL_IrqMask(NX_IRQ_Number irqno)
 {
-    if (irqno < 0 || irqno >= NR_IRQS)
+    if (irqno < 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
-    return PLIC_DisableIRQ(MultiCoreGetBootCore(), irqno);
+    return PLIC_DisableIRQ(NX_MultiCoreGetBootCore(), irqno);
 }
 
-PRIVATE OS_Error HAL_IrqAck(IRQ_Number irqno)
+NX_PRIVATE NX_Error HAL_IrqAck(NX_IRQ_Number irqno)
 {
-    if (irqno < 0 || irqno >= NR_IRQS)
+    if (irqno < 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     
-    return PLIC_Complete(MultiCoreGetBootCore(), irqno);
+    return PLIC_Complete(NX_MultiCoreGetBootCore(), irqno);
 }
 
-PRIVATE void HAL_IrqEnable(void)
+NX_PRIVATE void HAL_IrqEnable(void)
 {
     WriteCSR(sstatus, ReadCSR(sstatus) | SSTATUS_SIE);
 }
 
-PRIVATE void HAL_IrqDisable(void)
+NX_PRIVATE void HAL_IrqDisable(void)
 {
     WriteCSR(sstatus, ReadCSR(sstatus) & ~SSTATUS_SIE);
 }
 
-PRIVATE UArch HAL_IrqSaveLevel(void)
+NX_PRIVATE NX_UArch HAL_IrqSaveLevel(void)
 {
-    UArch level = 0;
+    NX_UArch level = 0;
     level = ReadCSR(sstatus);
     WriteCSR(sstatus, level & ~SSTATUS_SIE);
     return level & SSTATUS_SIE;
 }
 
-PRIVATE void HAL_IrqRestoreLevel(UArch level)
+NX_PRIVATE void HAL_IrqRestoreLevel(NX_UArch level)
 {
     WriteCSR(sstatus, ReadCSR(sstatus) | (level & SSTATUS_SIE));
 }
 
-INTERFACE IRQ_Controller IRQ_ControllerInterface = 
+NX_INTERFACE NX_IRQ_Controller NX_IRQ_ControllerInterface = 
 {
     .unmask = HAL_IrqUnmask,
     .mask = HAL_IrqMask,

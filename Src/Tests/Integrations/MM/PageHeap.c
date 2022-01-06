@@ -12,135 +12,135 @@
 #include <Mods/Test/Integration.h>
 #include <MM/PageHeap.h>
 #include <MM/Page.h>
-#define LOG_NAME "PageHeap"
+#define NX_LOG_NAME "PageHeap"
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 #include <Utils/Memory.h>
 
-#ifdef CONFIG_TEST_INTEGRATION_PAGE_HEAP
+#ifdef CONFIG_NX_TEST_INTEGRATION_PAGE_HEAP
 
-PRIVATE void PageHeapLarge(void)
+NX_PRIVATE void NX_PageHeapLarge(void)
 {
-    void *span = PageHeapAlloc(128);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
-    span = PageHeapAlloc(128);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
+    void *span = NX_PageHeapAlloc(128);
+    NX_LOG_D("span: %p", span);
+    NX_PageHeapFree(span);
+    span = NX_PageHeapAlloc(128);
+    NX_LOG_D("span: %p", span);
+    NX_PageHeapFree(span);
 
-    span = PageHeapAlloc(256);
-    LOG_D("span: %p", span);
-    PageHeapFree(span + PAGE_SIZE);
+    span = NX_PageHeapAlloc(256);
+    NX_LOG_D("span: %p", span);
+    NX_PageHeapFree(span + NX_PAGE_SIZE);
     
-    span = PageHeapAlloc(256);
-    LOG_D("span: %p", span);
-    PageHeapFree(span + PAGE_SIZE);
+    span = NX_PageHeapAlloc(256);
+    NX_LOG_D("span: %p", span);
+    NX_PageHeapFree(span + NX_PAGE_SIZE);
 
     void *table[100];
     
     int i;
     for (i = 0; i < 100; i++)
     {
-        table[i] = PageHeapAlloc(128 + i);
-        LOG_D("alloc span: %p", table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE * 128 + i);
+        table[i] = NX_PageHeapAlloc(128 + i);
+        NX_LOG_D("alloc span: %p", table[i]);
+        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE * 128 + i);
     }
 
     for (i = 0; i < 100; i++)
     {
-        LOG_D("free span: %p", table[i]);
-        PageHeapFree(table[i]);
+        NX_LOG_D("free span: %p", table[i]);
+        NX_PageHeapFree(table[i]);
     }
     
 }
 
-PRIVATE void PageHeapSmall(void)
+NX_PRIVATE void NX_PageHeapSmall(void)
 {
-    void *span = PageHeapAlloc(1);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
-    span = PageHeapAlloc(1);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
+    void *span = NX_PageHeapAlloc(1);
+    NX_LOG_D("span: %p", span);
+    NX_PageHeapFree(span);
+    span = NX_PageHeapAlloc(1);
+    NX_LOG_D("span: %p", span);
+    NX_PageHeapFree(span);
 
-    span = PageHeapAlloc(10);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
-    span = PageHeapAlloc(10);
-    LOG_D("span: %p", span);
-    PageHeapFree(span);
+    span = NX_PageHeapAlloc(10);
+    NX_LOG_D("span: %p", span);
+    NX_PageHeapFree(span);
+    span = NX_PageHeapAlloc(10);
+    NX_LOG_D("span: %p", span);
+    NX_PageHeapFree(span);
 
     void *table[128];
     
     int i;
     for (i = 0; i < 128; i++)
     {
-        table[i] = PageHeapAlloc(i + 1);
-        ASSERT(table[i] != NULL);
-        LOG_D("alloc span:%d-> %p", i, table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE * (i + 1));
+        table[i] = NX_PageHeapAlloc(i + 1);
+        NX_ASSERT(table[i] != NX_NULL);
+        NX_LOG_D("alloc span:%d-> %p", i, table[i]);
+        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE * (i + 1));
     }
 
     for (i = 0; i < 128; i++)
     {
-        LOG_D("free span:%d-> %p", i, table[i]);
-        PageHeapFree(table[i]);
+        NX_LOG_D("free span:%d-> %p", i, table[i]);
+        NX_PageHeapFree(table[i]);
     }
 
     for (i = 0; i < 128; i++)
     {
-        table[i] = PageHeapAlloc(i + 1);
-        ASSERT(table[i] != NULL);
-        LOG_D("alloc span:%d-> %p", i, table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE * (i + 1));
+        table[i] = NX_PageHeapAlloc(i + 1);
+        NX_ASSERT(table[i] != NX_NULL);
+        NX_LOG_D("alloc span:%d-> %p", i, table[i]);
+        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE * (i + 1));
     }
 
     for (i = 0; i < 128; i++)
     {
-        LOG_D("free span:%d-> %p", i, table[i]);
-        PageHeapFree(table[i]);
+        NX_LOG_D("free span:%d-> %p", i, table[i]);
+        NX_PageHeapFree(table[i]);
     }
 }
 
-PRIVATE void PageHeapOnePage(void)
+NX_PRIVATE void NX_PageHeapOnePage(void)
 {
     void *table[1024];
     int i;
     for (i = 0; i < 1024; i++)
     {
-        table[i] = PageHeapAlloc(1);
-        LOG_D("alloc span: %p", table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE);
+        table[i] = NX_PageHeapAlloc(1);
+        NX_LOG_D("alloc span: %p", table[i]);
+        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE);
     }
 
     for (i = 0; i < 1024; i++)
     {
-        LOG_D("free span: %p", table[i]);
-        PageHeapFree(table[i]);
+        NX_LOG_D("free span: %p", table[i]);
+        NX_PageHeapFree(table[i]);
     }
     for (i = 0; i < 1024; i++)
     {
-        table[i] = PageHeapAlloc(1);
-        LOG_D("alloc span: %p", table[i]);
-        Set(table[i], 0x5a, PAGE_SIZE);
+        table[i] = NX_PageHeapAlloc(1);
+        NX_LOG_D("alloc span: %p", table[i]);
+        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE);
     }
 
     for (i = 0; i < 1024; i++)
     {
-        LOG_D("free span: %p", table[i]);
-        PageHeapFree(table[i]);
+        NX_LOG_D("free span: %p", table[i]);
+        NX_PageHeapFree(table[i]);
     }
 }
 
-INTEGRATION_TEST(PageHeapTest)
+NX_INTEGRATION_TEST(NX_PageHeapTest)
 {
-    LOG_D("===>PageHeapLarge");
-    PageHeapLarge();
-    LOG_D("===>PageHeapSmall");
-    PageHeapSmall();
-    LOG_D("===>PageHeapOnePage");
-    PageHeapOnePage();
-    return OS_EOK;
+    NX_LOG_D("===>PageHeapLarge");
+    NX_PageHeapLarge();
+    NX_LOG_D("===>PageHeapSmall");
+    NX_PageHeapSmall();
+    NX_LOG_D("===>PageHeapOnePage");
+    NX_PageHeapOnePage();
+    return NX_EOK;
 }
 
 #endif

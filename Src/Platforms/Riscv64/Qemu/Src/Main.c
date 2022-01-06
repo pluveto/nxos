@@ -12,15 +12,15 @@
 #include <XBook.h>
 #include <Drivers/DirectUart.h>
 
-#define LOG_NAME "PlatformMain"
+#define NX_LOG_NAME "HAL_PlatformMain"
 #include <Utils/Log.h>
 
-INTERFACE void PlatformMain(void)
+NX_INTERFACE void HAL_PlatformMain(void)
 {
-    LOG_I("QEMU platform main running...\n");
+    NX_LOG_I("QEMU platform main running...\n");
 }
 
-PUBLIC void HAL_DirectUartGetcHandler(char data)
+NX_PUBLIC void HAL_DirectUartGetcHandler(char data)
 {
     switch (data)
     {

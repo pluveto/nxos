@@ -12,74 +12,74 @@
 #include <Sched/Spin.h>
 #include <IO/IRQ.h>
 
-PUBLIC OS_Error SpinInit(Spin *lock)
+NX_PUBLIC NX_Error NX_SpinInit(NX_Spin *lock)
 {
-    if (lock == NULL)
+    if (lock == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    if (lock->magic == SPIN_MAGIC)
+    if (lock->magic == NX_SPIN_MAGIC)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
 
-    AtomicSet(&lock->value, 0);
-    lock->magic = SPIN_MAGIC;
-    return OS_EOK;
+    NX_AtomicSet(&lock->value, 0);
+    lock->magic = NX_SPIN_MAGIC;
+    return NX_EOK;
 }
 
-PUBLIC OS_Error SpinLock(Spin *lock, Bool forever)
+NX_PUBLIC NX_Error NX_SpinLock(NX_Spin *lock, NX_Bool forever)
 {
-    if (lock == NULL || lock->magic != SPIN_MAGIC)
+    if (lock == NX_NULL || lock->magic != NX_SPIN_MAGIC)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
 
     do
     {
-        if (AtomicCAS(&lock->value, 0, SPIN_LOCK_VALUE) == 0)
+        if (NX_AtomicCAS(&lock->value, 0, NX_SPIN_LOCK_VALUE) == 0)
         {
             break;
         }
-        if (forever == FALSE)
+        if (forever == NX_False)
         {
-            return OS_ETIMEOUT;
+            return NX_ETIMEOUT;
         }
     } while (1);
 
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PUBLIC OS_Error SpinUnlock(Spin *lock)
+NX_PUBLIC NX_Error NX_SpinUnlock(NX_Spin *lock)
 {
-    if (lock == NULL || lock->magic != SPIN_MAGIC)
+    if (lock == NX_NULL || lock->magic != NX_SPIN_MAGIC)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
-    AtomicSet(&lock->value, 0);
-    return OS_EOK;
+    NX_AtomicSet(&lock->value, 0);
+    return NX_EOK;
 }
 
-PUBLIC OS_Error SpinLockIRQ(Spin *lock, UArch *level)
+NX_PUBLIC NX_Error NX_SpinLockIRQ(NX_Spin *lock, NX_UArch *level)
 {
-    if (lock == NULL || level == NULL)
+    if (lock == NX_NULL || level == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    *level = INTR_SaveLevel();
-    return SpinLock(lock, TRUE);
+    *level = NX_IRQ_SaveLevel();
+    return NX_SpinLock(lock, NX_True);
 }
 
-PUBLIC OS_Error SpinUnlockIRQ(Spin *lock, UArch level)
+NX_PUBLIC NX_Error NX_SpinUnlockIRQ(NX_Spin *lock, NX_UArch level)
 {
-    if (lock == NULL)
+    if (lock == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    if (SpinUnlock(lock) != OS_EOK)
+    if (NX_SpinUnlock(lock) != NX_EOK)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
-    INTR_RestoreLevel(level);
-    return OS_EOK;
+    NX_IRQ_RestoreLevel(level);
+    return NX_EOK;
 }

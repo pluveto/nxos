@@ -11,100 +11,83 @@
 
 #include <Mods/Test/Integration.h>
 #include <Mods/Time/Timer.h>
-#define LOG_NAME "Timer"
+#define NX_LOG_NAME "Timer"
 #include <Utils/Log.h>
 #include <Sched/Thread.h>
 
-#ifdef CONFIG_TEST_INTEGRATION_TIMER
+#ifdef CONFIG_NX_TEST_INTEGRATION_TIMER
 
-PRIVATE void TimerHandler1(Timer *timer, void *arg)
+NX_PRIVATE NX_Bool NX_TimerHandler1(NX_Timer *timer, void *arg)
 {
-    LOG_I("Timer#%s timeout\n", (char *)arg);
+    NX_LOG_I("Timer#%s timeout\n", (char *)arg);
+    return NX_True;
 }
 
-int timerCounter = 0;
-PRIVATE void TimerHandler2(Timer *timer, void *arg)
+NX_PRIVATE NX_VOLATILE int timerCounter = 0;
+NX_PRIVATE NX_Bool NX_TimerHandler2(NX_Timer *timer, void *arg)
 {
-    LOG_I("Timer#%s timeout\n", (char *)arg);
+    NX_LOG_I("Timer#%s timeout\n", (char *)arg);
     timerCounter++;
-    LOG_I("timerCounter:%d\n", timerCounter);
+    NX_LOG_I("timerCounter:%d\n", timerCounter);
+    if (timerCounter >= 4)
+    {
+        return NX_False;
+    }
+    return NX_True;
 }
 
-INTEGRATION_TEST(Timer)
+NX_INTEGRATION_TEST(NX_Timer)
 {
-    Timer *timer1 = TimerCreate(10000, TimerHandler1, "1", FALSE);
-    if (timer1 == NULL)
-    {
-        LOG_E("create timer 1 failed!");
-        return OS_ERROR;
-    }
-    if (TimerStart(timer1) != OS_EOK)
-    {
-        LOG_E("start timer 1 failed!");
-        return OS_ERROR;
-    }
-    LOG_I("start timer 1 OK!");
-    
-    Timer *timer2 = TimerCreate(1000, TimerHandler2, "2", TRUE);
-    if (timer2 == NULL)
-    {
-        LOG_E("create timer 2 failed!");
-        return OS_ERROR;
-    }
-    if (TimerStart(timer2) != OS_EOK)
-    {
-        LOG_E("start timer 2 failed!");
-        return OS_ERROR;
-    }
-    LOG_I("start timer 2 OK!");
-
-    Timer *timer3 = TimerCreate(1000, TimerHandler2, "2", TRUE);
-    if (timer3 == NULL)
-    {
-        LOG_E("create timer 2 failed!");
-        return OS_ERROR;
-    }
-    OS_Error err = TimerDestroy(timer3);
-    if (err != OS_EOK)
-    {
-        LOG_E("destroy timer 3 failed!");
-        return OS_ERROR;
-    }
-
-    int i = 0;
     timerCounter = 0;
+    NX_Timer *timer1 = NX_TimerCreate(10000, NX_TimerHandler1, "1", NX_TIMER_ONESHOT);
+    if (timer1 == NX_NULL)
+    {
+        NX_LOG_E("create timer 1 failed!");
+        return NX_ERROR;
+    }
+    if (NX_TimerStart(timer1) != NX_EOK)
+    {
+        NX_LOG_E("start timer 1 failed!");
+        return NX_ERROR;
+    }
+    NX_LOG_I("start timer 1 OK!");
+    
+    NX_Timer *timer2 = NX_TimerCreate(1000, NX_TimerHandler2, "2", NX_TIMER_PERIOD);
+    if (timer2 == NX_NULL)
+    {
+        NX_LOG_E("create timer 2 failed!");
+        return NX_ERROR;
+    }
+    if (NX_TimerStart(timer2) != NX_EOK)
+    {
+        NX_LOG_E("start timer 2 failed!");
+        return NX_ERROR;
+    }
+    NX_LOG_I("start timer 2 OK!");
+
+    NX_Timer *timer3 = NX_TimerCreate(1000, NX_TimerHandler2, "2", NX_TIMER_PERIOD);
+    if (timer3 == NX_NULL)
+    {
+        NX_LOG_E("create timer 2 failed!");
+        return NX_ERROR;
+    }
+    NX_Error err = NX_TimerDestroy(timer3);
+    if (err != NX_EOK)
+    {
+        NX_LOG_E("destroy timer 3 failed!");
+        return NX_ERROR;
+    }
+
     while (1)
     {
-        i++;
-        if (i % 0xf0000000 == 0)
-        {
-            LOG_I("???");
-        }
-#if 1
-        if (timerCounter != 3)
-        {
-            // LOG_I("!!!!!stop timer 2");       
-        }
-        else
-        {
-            LOG_I("!!!!!stop timer 2");       
-            timerCounter++;
-            if (timer2->state != TIMER_STOPPED)
-            {
-                //TimerStop(timer2);
-                //LOG_I("Timer Destroy:%d\n", TimerDestroy(timer2));
-            }
-        }
-#else
         if (timerCounter >= 4)
         {
-            LOG_I("timerCounter:%d break", timerCounter);
+            NX_LOG_I("timerCounter:%d break", timerCounter);
             break;
         }
-#endif
     }
-    LOG_I("timerCounter:%d", timerCounter);
-    return OS_EOK;
+    NX_LOG_I("timerCounter:%d", timerCounter);
+    return NX_EOK;
 }
 
 #endif

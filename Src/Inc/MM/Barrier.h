@@ -14,7 +14,7 @@
 
 #include <XBook.h>
 
-struct MemBarrierOps
+struct NX_MemBarrierOps
 {
     void (*barrier)(void);
     void (*barrierRead)(void);
@@ -22,11 +22,11 @@ struct MemBarrierOps
     void (*barrierInstruction)(void);
 };
 
-INTERFACE IMPORT struct MemBarrierOps MemBarrierOpsInterface;
+NX_INTERFACE NX_IMPORT struct NX_MemBarrierOps NX_MemBarrierOpsInterface;
 
-#define MemoryBarrier MemBarrierOpsInterface.barrier
-#define MemoryBarrierRead MemBarrierOpsInterface.barrierRead
-#define MemoryBarrierWrite MemBarrierOpsInterface.barrierWrite
-#define MemoryBarrierInstruction MemBarrierOpsInterface.barrierInstruction
+#define NX_MemoryBarrier            NX_MemBarrierOpsInterface.barrier
+#define NX_MemoryBarrierRead        NX_MemBarrierOpsInterface.barrierRead
+#define NX_MemoryBarrierWrite       NX_MemBarrierOpsInterface.barrierWrite
+#define NX_MemoryBarrierInstruction NX_MemBarrierOpsInterface.barrierInstruction
 
 #endif /* __MEMORY_BARRIER__ */

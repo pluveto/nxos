@@ -11,27 +11,27 @@
 
 #include <MM/Barrier.h>
 
-PRIVATE void HAL_MemBarrier(void)
+NX_PRIVATE void HAL_MemBarrier(void)
 {
-    CASM("": : :"memory");
+    NX_CASM("": : :"memory");
 }
 
-PRIVATE void HAL_MemBarrierRead(void)
+NX_PRIVATE void HAL_MemBarrierRead(void)
 {
-    CASM("lfence": : :"memory");
+    NX_CASM("lfence": : :"memory");
 }
 
-PRIVATE void HAL_MemBarrierWrite(void)
+NX_PRIVATE void HAL_MemBarrierWrite(void)
 {
-    CASM("sfence": : :"memory");
+    NX_CASM("sfence": : :"memory");
 }
 
-PRIVATE void HAL_MemBarrierInstruction(void)
+NX_PRIVATE void HAL_MemBarrierInstruction(void)
 {
-    CASM("": : :"memory");
+    NX_CASM("": : :"memory");
 }
 
-INTERFACE struct MemBarrierOps MemBarrierOpsInterface = 
+NX_INTERFACE struct NX_MemBarrierOps NX_MemBarrierOpsInterface = 
 {
     .barrier             = HAL_MemBarrier,
     .barrierRead         = HAL_MemBarrierRead,

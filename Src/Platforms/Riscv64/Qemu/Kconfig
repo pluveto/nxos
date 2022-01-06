@@ -1,8 +1,8 @@
-config PLATFROM_RISCV64_QEMU
+config NX_PLATFROM_RISCV64_QEMU
     bool
     default y
-    select CPU_64BITS
+    select NX_CPU_64BITS
 
-config UART0_FROM_SBI
+config NX_UART0_FROM_SBI
     bool "Uart0 get/set from SBI"
     default n

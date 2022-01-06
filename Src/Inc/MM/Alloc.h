@@ -14,8 +14,8 @@
 
 #include <MM/HeapCache.h>
 
-#define MemAlloc(size) HeapAlloc(size)
-#define MemFree(ptr) HeapFree(ptr)
-#define MemFreeSafety(ptr) HeapFreeSatety(ptr)
+#define NX_MemAlloc(size) NX_HeapAlloc(size)
+#define NX_MemFree(ptr) NX_HeapFree(ptr)
+#define NX_MemFreeSafety(ptr) NX_HeapFreeSatety(ptr)
 
 #endif /* __MM_ALLOC__ */

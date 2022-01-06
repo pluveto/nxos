@@ -9,7 +9,7 @@
  * 2021-10-3      JasonHu           Init
  */
 
-#define LOG_NAME "OS Main"
+#define NX_LOG_NAME "OS Main"
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 
@@ -23,79 +23,79 @@
 #include <Mods/Time/Timer.h>
 
 /* Platform init */
-INTERFACE OS_Error PlatformInit(UArch coreId);
+NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId);
 
 /**
  * stage2 means you can do:
- * 1. use MemAlloc/MemFree
+ * 1. use NX_MemAlloc/NX_MemFree
  * 2. use Bind IRQ
- * 3. use Thread
+ * 3. use NX_Thread
  * 4. use Timer
  */
-INTERFACE WEAK_SYM OS_Error PlatformStage2(void)
+NX_INTERFACE NX_WEAK_SYM NX_Error HAL_PlatformStage2(void)
 {
-    return OS_EOK;
+    return NX_EOK;
 }
 
-IMPORT Atomic ActivedCoreCount;
+NX_IMPORT NX_Atomic NX_ActivedCoreCount;
 
-PUBLIC int OS_Main(UArch coreId)
+NX_PUBLIC int NX_Main(NX_UArch coreId)
 {
-    if (AtomicGet(&ActivedCoreCount) == 0)
+    if (NX_AtomicGet(&NX_ActivedCoreCount) == 0)
     {
-        AtomicInc(&ActivedCoreCount);
+        NX_AtomicInc(&NX_ActivedCoreCount);
         /* init multi core before enter platform */
-        MultiCorePreload(coreId);
+        NX_MultiCorePreload(coreId);
         
         /* platfrom init */
-        if (PlatformInit(coreId) != OS_EOK)
+        if (HAL_PlatformInit(coreId) != NX_EOK)
         {
-            PANIC("Platfrom init failed!" Endln);
+            NX_PANIC("Platfrom init failed!");
         }
-        LOG_I("Hello, NXOS!");
+        NX_LOG_I("Hello, NXOS!");
 
         /* init irq */
-        IRQ_Init();
+        NX_IRQ_Init();
 
         /* init page heap */
-        PageHeapInit();
+        NX_PageHeapInit();
         
-        /* init heap cache for MemAlloc & MemFree */
-        HeapCacheInit();
+        /* init heap cache for NX_MemAlloc & NX_MemFree */
+        NX_HeapCacheInit();
         
         /* init timer */
-        TimersInit();
+        NX_TimersInit();
 
         /* init multi core */
-        MultiCoreInit(coreId);
+        NX_MultiCoreInit(coreId);
 
         /* init thread */
-        ThreadsInit();
+        NX_ThreadsInit();
         
-        if (ClockInit() != OS_EOK)
+        if (NX_ClockInit() != NX_EOK)
         {
-            PANIC("Clock init failed!" Endln);
+            NX_PANIC("Clock init failed!");
         }
         
         /* init auto calls */
-        CallsInit();
+        NX_CallsInit();
         
         /* platform stage2 call */
-        if (PlatformStage2() != OS_EOK)
+        if (HAL_PlatformStage2() != NX_EOK)
         {
-            PANIC("Platform stage2 failed!");
+            NX_PANIC("Platform stage2 failed!");
         }
         
-        MultiCoreMain(coreId);
+        NX_MultiCoreMain(coreId);
     }
     else
     {
-        AtomicInc(&ActivedCoreCount);
-        MultiCoreStage2(coreId);
+        NX_AtomicInc(&NX_ActivedCoreCount);
+        NX_MultiCoreStage2(coreId);
     }
     /* start sched */
-    SchedToFirstThread();
+    NX_SchedToFirstThread();
     /* should never be here */
-    PANIC("should never be here!");
+    NX_PANIC("should never be here!");
     return 0;
 }

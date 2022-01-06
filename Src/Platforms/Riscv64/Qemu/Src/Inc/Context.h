@@ -123,40 +123,40 @@
 
 struct HAL_Context
 {
-    UArch epc;   //sepc
-    UArch ra;    // Return address
-    UArch sp;    // Stack pointer
-    UArch gp;    // Global pointer
-    UArch tp;    // Thread pointer
-    UArch t0;    // Temporary
-    UArch t1;    // Temporary
-    UArch t2;    // Temporary
-    UArch s0;    // Saved register/frame pointer
-    UArch s1;    // Saved register
-    UArch a0;    // Function argument/return value
-    UArch a1;    // Function argument/return value
-    UArch a2;    // Function argument
-    UArch a3;    // Function argument
-    UArch a4;    // Function argument
-    UArch a5;    // Function argument
-    UArch a6;    // Function argument
-    UArch a7;    // Function argument
-    UArch s2;    // Saved register
-    UArch s3;    // Saved register
-    UArch s4;    // Saved register
-    UArch s5;    // Saved register
-    UArch s6;    // Saved register
-    UArch s7;    // Saved register
-    UArch s8;    // Saved register
-    UArch s9;    // Saved register
-    UArch s10;   // Saved register
-    UArch s11;   // Saved register
-    UArch t3;    // Temporary
-    UArch t4;    // Temporary
-    UArch t5;    // Temporary
-    UArch t6;    // Temporary
-    UArch sstatus;// sstatus
-} PACKED;
+    NX_UArch epc;   //sepc
+    NX_UArch ra;    // Return address
+    NX_UArch sp;    // Stack pointer
+    NX_UArch gp;    // Global pointer
+    NX_UArch tp;    // NX_Thread pointer
+    NX_UArch t0;    // Temporary
+    NX_UArch t1;    // Temporary
+    NX_UArch t2;    // Temporary
+    NX_UArch s0;    // Saved register/frame pointer
+    NX_UArch s1;    // Saved register
+    NX_UArch a0;    // Function argument/return value
+    NX_UArch a1;    // Function argument/return value
+    NX_UArch a2;    // Function argument
+    NX_UArch a3;    // Function argument
+    NX_UArch a4;    // Function argument
+    NX_UArch a5;    // Function argument
+    NX_UArch a6;    // Function argument
+    NX_UArch a7;    // Function argument
+    NX_UArch s2;    // Saved register
+    NX_UArch s3;    // Saved register
+    NX_UArch s4;    // Saved register
+    NX_UArch s5;    // Saved register
+    NX_UArch s6;    // Saved register
+    NX_UArch s7;    // Saved register
+    NX_UArch s8;    // Saved register
+    NX_UArch s9;    // Saved register
+    NX_UArch s10;   // Saved register
+    NX_UArch s11;   // Saved register
+    NX_UArch t3;    // Temporary
+    NX_UArch t4;    // Temporary
+    NX_UArch t5;    // Temporary
+    NX_UArch t6;    // Temporary
+    NX_UArch sstatus;// sstatus
+} NX_PACKED;
 typedef struct HAL_Context HAL_Context;
 #endif /* __ASSEMBLY__ */
 

@@ -12,39 +12,30 @@
 #ifndef __XBOOK_TYPES__
 #define __XBOOK_TYPES__
 
-typedef unsigned long long  Uint64;
-typedef signed long long    Int64;
-typedef unsigned int        Uint32;
-typedef signed int          Int32;
-typedef unsigned short      UInt16;
-typedef signed short        Int16;
-typedef unsigned char       UInt8;
-typedef signed char         Int8;
+typedef unsigned long long  NX_U64;
+typedef signed long long    NX_I64;
+typedef unsigned int        NX_U32;
+typedef signed int          NX_I32;
+typedef unsigned short      NX_U16;
+typedef signed short        NX_I16;
+typedef unsigned char       NX_U8;
+typedef signed char         NX_I8;
 
-typedef unsigned long long  U64;
-typedef signed long long    I64;
-typedef unsigned int        U32;
-typedef signed int          I32;
-typedef unsigned short      U16;
-typedef signed short        I16;
-typedef unsigned char       U8;
-typedef signed char         I8;
+typedef unsigned long       NX_UArch;
+typedef signed long         NX_IArch;
 
-typedef unsigned long       UArch;
-typedef signed long         IArch;
+typedef unsigned long       NX_Addr;
 
-typedef unsigned long       Addr;
+typedef unsigned long       NX_USize;
+typedef signed long         NX_ISize;
 
-typedef unsigned long       USize;
-typedef signed long         ISize;
+typedef long NX_PtrDiff;
 
-typedef long PtrDiff;
-
-enum Bool
+enum NX_Bool
 {
-    FALSE = 0,
-    TRUE,
+    NX_False = 0,
+    NX_True,
 };
-typedef enum Bool Bool;
+typedef enum NX_Bool NX_Bool;
 
 #endif  /* __XBOOK_TYPES__ */

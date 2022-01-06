@@ -16,7 +16,7 @@
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 
-#ifdef CONFIG_UART0_FROM_SBI
+#ifdef CONFIG_NX_UART0_FROM_SBI
 #include <SBI.h>
 #endif
 
@@ -42,9 +42,9 @@
 #define LSR_RX_READY (1 << 0)   // input is waiting to be read from RHR
 #define LSR_TX_IDLE (1 << 5)    // THR can accept another character to send
 
-PUBLIC void HAL_DirectUartPutc(char ch)
+NX_PUBLIC void HAL_DirectUartPutc(char ch)
 {
-#ifdef CONFIG_UART0_FROM_SBI
+#ifdef CONFIG_NX_UART0_FROM_SBI
     sbi_console_putchar(ch);
 #else
     if ((Read8(UART0_PHY_ADDR + LSR) & LSR_TX_IDLE) == 0)
@@ -56,9 +56,9 @@ PUBLIC void HAL_DirectUartPutc(char ch)
 #endif
 }
 
-PUBLIC int HAL_DirectUartGetc(void)
+NX_PUBLIC int HAL_DirectUartGetc(void)
 {
-#ifdef CONFIG_UART0_FROM_SBI
+#ifdef CONFIG_NX_UART0_FROM_SBI
     return sbi_console_getchar();
 #else
     if (Read8(UART0_PHY_ADDR + LSR) & 0x01)
@@ -73,12 +73,12 @@ PUBLIC int HAL_DirectUartGetc(void)
 #endif
 }
 
-INTERFACE void HAL_ConsoleOutChar(char ch)
+NX_INTERFACE void HAL_ConsoleOutChar(char ch)
 {
     HAL_DirectUartPutc(ch);
 }
 
-PUBLIC void HAL_DirectUartInit(void)
+NX_PUBLIC void HAL_DirectUartInit(void)
 {
     // disable interrupts.
     Write8(UART0_PHY_ADDR + IER, 0x00);
@@ -98,29 +98,29 @@ PUBLIC void HAL_DirectUartInit(void)
 /**
  * default handler
 */
-WEAK_SYM PUBLIC void HAL_DirectUartGetcHandler(char data)
+NX_WEAK_SYM NX_PUBLIC void HAL_DirectUartGetcHandler(char data)
 {
-    LOG_I("Deafult uart handler:%x/%c\n", data, data);
+    NX_LOG_I("Deafult uart handler:%x/%c\n", data, data);
 }
 
-PRIVATE OS_Error UartIrqHandler(IRQ_Number irqno, void *arg)
+NX_PRIVATE NX_Error UartIrqHandler(NX_IRQ_Number irqno, void *arg)
 {
     int data = HAL_DirectUartGetc();
     if (data != -1)
     {
-        if (HAL_DirectUartGetcHandler != NULL)
+        if (HAL_DirectUartGetcHandler != NX_NULL)
         {
             HAL_DirectUartGetcHandler(data);
         }
     }
-    return data != -1 ? OS_EOK : OS_EIO;
+    return data != -1 ? NX_EOK : NX_EIO;
 }
 
-PUBLIC void HAL_DirectUartStage2(void)
+NX_PUBLIC void HAL_DirectUartStage2(void)
 {
     /* enable receive interrupts. */
     Write8(UART0_PHY_ADDR + IER, IER_RX_ENABLE);
 
-    ASSERT(IRQ_Bind(UART0_IRQ, UartIrqHandler, NULL, "Uart", 0) == OS_EOK);
-    ASSERT(IRQ_Unmask(UART0_IRQ) == OS_EOK);
+    NX_ASSERT(NX_IRQ_Bind(UART0_IRQ, UartIrqHandler, NX_NULL, "Uart", 0) == NX_EOK);
+    NX_ASSERT(NX_IRQ_Unmask(UART0_IRQ) == NX_EOK);
 }

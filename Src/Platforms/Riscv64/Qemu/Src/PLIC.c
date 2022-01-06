@@ -15,101 +15,101 @@
 #include <IO/IRQ.h>
 #include <Utils/Log.h>
 
-PRIVATE OS_Error PLIC_SetPriority(IRQ_Number irqno, U32 priority)
+NX_PRIVATE NX_Error PLIC_SetPriority(NX_IRQ_Number irqno, NX_U32 priority)
 {
-    if (irqno <= 0 || irqno >= NR_IRQS)
+    if (irqno <= 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
     /* irq priority must be larger than 0 */
-    U32 *priorityReg = (U32 *) PLIC_PRIORITY;
+    NX_U32 *priorityReg = (NX_U32 *) PLIC_PRIORITY;
     priorityReg += irqno;
     Write32(priorityReg, priority);
 
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PUBLIC OS_Error PLIC_EnableIRQ(U32 hart, IRQ_Number irqno)
+NX_PUBLIC NX_Error PLIC_EnableIRQ(NX_U32 hart, NX_IRQ_Number irqno)
 {
-    if (hart >= NR_MULTI_CORES || irqno <= 0 || irqno >= NR_IRQS)
+    if (hart >= NX_MULTI_CORES_NR || irqno <= 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     
     /* enable irq */
-    U32 *enableReg;
-    enableReg = (U32 *)PLIC_SENABLE(hart);
+    NX_U32 *enableReg;
+    enableReg = (NX_U32 *)PLIC_SENABLE(hart);
     enableReg += irqno / 32;
-    U8 off = irqno % 32;
+    NX_U8 off = irqno % 32;
     Write32(enableReg, Read32(enableReg) | (1 << off));
 
     PLIC_SetPriority(irqno, 1);
 
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PUBLIC OS_Error PLIC_DisableIRQ(U32 hart, IRQ_Number irqno)
+NX_PUBLIC NX_Error PLIC_DisableIRQ(NX_U32 hart, NX_IRQ_Number irqno)
 {
-    if (hart >= NR_MULTI_CORES || irqno <= 0 || irqno >= NR_IRQS)
+    if (hart >= NX_MULTI_CORES_NR || irqno <= 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     
     /* disable irq */
-    U32 *enableReg;
-    enableReg = (U32 *)PLIC_SENABLE(hart);
+    NX_U32 *enableReg;
+    enableReg = (NX_U32 *)PLIC_SENABLE(hart);
     enableReg += irqno / 32;
-    U8 off = irqno % 32;
+    NX_U8 off = irqno % 32;
     Write32(enableReg, Read32(enableReg) & ~(1 << off)); 
 
     PLIC_SetPriority(irqno, 0);
 
-    return OS_EOK;
+    return NX_EOK;
 }
 
 /**
  * ask the PLIC what interrupt we should serve.
  */
-PUBLIC IRQ_Number PLIC_Claim(U32 hart)
+NX_PUBLIC NX_IRQ_Number PLIC_Claim(NX_U32 hart)
 {
-    if (hart >= NR_MULTI_CORES)
+    if (hart >= NX_MULTI_CORES_NR)
     {
         return 0;
     }
 
-    IRQ_Number irq = *(U32 *)PLIC_SCLAIM(hart);
+    NX_IRQ_Number irq = *(NX_U32 *)PLIC_SCLAIM(hart);
     return irq;
 }
 
 /**
  * tell the PLIC we've served this IRQ.
  */
-PUBLIC OS_Error PLIC_Complete(U32 hart, int irqno)
+NX_PUBLIC NX_Error PLIC_Complete(NX_U32 hart, int irqno)
 {
-    if (hart >= NR_MULTI_CORES || irqno <= 0 || irqno >= NR_IRQS)
+    if (hart >= NX_MULTI_CORES_NR || irqno <= 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     
-    *(U32 *)PLIC_SCLAIM(hart) = irqno;
+    *(NX_U32 *)PLIC_SCLAIM(hart) = irqno;
     
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PUBLIC void PLIC_Init(Bool bootCore)
+NX_PUBLIC void PLIC_Init(NX_Bool bootCore)
 {
-    if (bootCore == TRUE)
+    if (bootCore == NX_True)
     {
         int hart;
-        for (hart = 0; hart < NR_MULTI_CORES; hart++)
+        for (hart = 0; hart < NX_MULTI_CORES_NR; hart++)
         {
             /* priority must be > threshold to trigger an interrupt */
             Write32(PLIC_STHRESHOLD(hart), 0);
             
             /* set all interrupt priority */
             int irqno;
-            for (irqno = 1; irqno < NR_IRQS; irqno++)
+            for (irqno = 1; irqno < NX_NR_IRQS; irqno++)
             {
                 PLIC_SetPriority(irqno, 0);
             }

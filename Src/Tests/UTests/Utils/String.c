@@ -7,54 +7,54 @@
  * Change Logs:
  * Date           Author            Notes
  * 2021-11-2      JasonHu           Init
- * 2021-11-5      JasonHu           Add StrCopy,StrLen test
+ * 2021-11-5      JasonHu           Add NX_StrCopy,NX_StrLen test
  */
 
 #include <Utils/String.h>
 #include <Mods/Test/UTest.h>
 
-#ifdef CONFIG_UTEST_UTILS_STRING
+#ifdef CONFIG_NX_UTEST_UTILS_STRING
 
-TEST(StrCmp)
+NX_TEST(NX_StrCmp)
 {
     const char *str = "abc";
-    EXPECT_EQ(StrCmp(NULL, NULL), 0);
-    EXPECT_EQ(StrCmp(str, NULL), 0);
-    EXPECT_EQ(StrCmp(NULL, str), 0);
+    NX_EXPECT_EQ(NX_StrCmp(NX_NULL, NX_NULL), 0);
+    NX_EXPECT_EQ(NX_StrCmp(str, NX_NULL), 0);
+    NX_EXPECT_EQ(NX_StrCmp(NX_NULL, str), 0);
     
-    EXPECT_EQ(StrCmp(str, "abc"), 0);
-    EXPECT_NE(StrCmp(str, "cba"), 0);
+    NX_EXPECT_EQ(NX_StrCmp(str, "abc"), 0);
+    NX_EXPECT_NE(NX_StrCmp(str, "cba"), 0);
     
-    EXPECT_EQ(StrCmp(str, "abd"), -1);
-    EXPECT_EQ(StrCmp(str, "abb"), 1);
+    NX_EXPECT_EQ(NX_StrCmp(str, "abd"), -1);
+    NX_EXPECT_EQ(NX_StrCmp(str, "abb"), 1);
 }
 
-TEST(StrCopy)
+NX_TEST(NX_StrCopy)
 {
     const char *str = "hello!";
-    EXPECT_NULL(StrCopy(NULL, NULL));
-    EXPECT_NULL(StrCopy(str, NULL));
-    EXPECT_NULL(StrCopy(NULL, str));
+    NX_EXPECT_NULL(NX_StrCopy(NX_NULL, NX_NULL));
+    NX_EXPECT_NULL(NX_StrCopy(str, NX_NULL));
+    NX_EXPECT_NULL(NX_StrCopy(NX_NULL, str));
     char buf[10] = {0};
-    EXPECT_NOT_NULL(StrCopy(buf, str));
-    EXPECT_STREQ(buf, str);
+    NX_EXPECT_NOT_NULL(NX_StrCopy(buf, str));
+    NX_EXPECT_STREQ(buf, str);
 }
 
-TEST(StrLen)
+NX_TEST(NX_StrLen)
 {
     const char *str = "hello!";
-    EXPECT_EQ(StrLen(NULL), 0);
-    EXPECT_NE(StrLen(str), 0);
-    EXPECT_EQ(StrLen(str), 6);
+    NX_EXPECT_EQ(NX_StrLen(NX_NULL), 0);
+    NX_EXPECT_NE(NX_StrLen(str), 0);
+    NX_EXPECT_EQ(NX_StrLen(str), 6);
 }
 
-TEST_TABLE(String)
+NX_TEST_TABLE(String)
 {
-    TEST_UNIT(StrCmp),
-    TEST_UNIT(StrCopy),
-    TEST_UNIT(StrLen),
+    NX_TEST_UNIT(NX_StrCmp),
+    NX_TEST_UNIT(NX_StrCopy),
+    NX_TEST_UNIT(NX_StrLen),
 };
 
-TEST_CASE(String);
+NX_TEST_CASE(String);
 
 #endif

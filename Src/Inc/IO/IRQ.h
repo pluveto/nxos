@@ -16,76 +16,76 @@
 #include <Utils/List.h>
 #include <XBook/Atomic.h>
 
-#ifdef CONFIG_IRQ_NAME_LEN
-#define IRQ_NAME_LEN CONFIG_IRQ_NAME_LEN
+#ifdef CONFIG_NX_IRQ_NAME_LEN
+#define NX_IRQ_NAME_LEN CONFIG_NX_IRQ_NAME_LEN
 #else
-#define IRQ_NAME_LEN 48
+#define NX_IRQ_NAME_LEN 48
 #endif
 
-#ifndef CONFIG_NR_IRQS
-#error "Please config NR_IRQS"
+#ifndef CONFIG_NX_NR_IRQS
+#error "Please config NX_NR_IRQS"
 #else
-#define NR_IRQS CONFIG_NR_IRQS
+#define NX_NR_IRQS CONFIG_NX_NR_IRQS
 #endif
 
-#define IRQ_FLAG_REENTER    0x01    /* handle irq allow reenter */
-#define IRQ_FLAG_SHARED     0x02    /* irq was shared by more device */
+#define NX_IRQ_FLAG_REENTER    0x01    /* handle irq allow reenter */
+#define NX_IRQ_FLAG_SHARED     0x02    /* irq was shared by more device */
 
-typedef U32 IRQ_Number;
-typedef OS_Error (*IRQ_Handler)(IRQ_Number, void *);
+typedef NX_U32 NX_IRQ_Number;
+typedef NX_Error (*NX_IRQ_Handler)(NX_IRQ_Number, void *);
 
-struct IRQ_Controller
+struct NX_IRQ_Controller
 {
-    OS_Error (*unmask)(IRQ_Number irqno);
-    OS_Error (*mask)(IRQ_Number irqno);
-    OS_Error (*ack)(IRQ_Number irqno);
+    NX_Error (*unmask)(NX_IRQ_Number irqno);
+    NX_Error (*mask)(NX_IRQ_Number irqno);
+    NX_Error (*ack)(NX_IRQ_Number irqno);
     
     void (*enable)(void);
     void (*disable)(void);
-    UArch (*saveLevel)(void);
-    void (*restoreLevel)(UArch level);
+    NX_UArch (*saveLevel)(void);
+    void (*restoreLevel)(NX_UArch level);
 };
-typedef struct IRQ_Controller IRQ_Controller;
+typedef struct NX_IRQ_Controller NX_IRQ_Controller;
 
-struct IRQ_Action
+struct NX_IRQ_Action
 {
-    List list;
-    IRQ_Handler handler;
+    NX_List list;
+    NX_IRQ_Handler handler;
     void *data;
-    U32 flags;
-    char name[IRQ_NAME_LEN];
+    NX_U32 flags;
+    char name[NX_IRQ_NAME_LEN];
 };
-typedef struct IRQ_Action IRQ_Action;
+typedef struct NX_IRQ_Action NX_IRQ_Action;
 
-struct IRQ_Node
+struct NX_IRQ_Node
 {
-    IRQ_Controller *controller;
-    List actionList;
-    U32 flags;
-    Atomic reference;   /* irq reference */
+    NX_IRQ_Controller *controller;
+    NX_List actionList;
+    NX_U32 flags;
+    NX_Atomic reference;   /* irq reference */
 };
-typedef struct IRQ_Node IRQ_Node;
+typedef struct NX_IRQ_Node NX_IRQ_Node;
 
-INTERFACE IMPORT IRQ_Controller IRQ_ControllerInterface;
+NX_INTERFACE NX_IMPORT NX_IRQ_Controller NX_IRQ_ControllerInterface;
 
-PUBLIC OS_Error IRQ_Bind(IRQ_Number irqno,
-                         IRQ_Handler handler,
+NX_PUBLIC NX_Error NX_IRQ_Bind(NX_IRQ_Number irqno,
+                         NX_IRQ_Handler handler,
                          void *data,
                          char *name,
-                         U32 flags);
+                         NX_U32 flags);
                          
-PUBLIC OS_Error IRQ_Unbind(IRQ_Number irqno, void *data);
+NX_PUBLIC NX_Error NX_IRQ_Unbind(NX_IRQ_Number irqno, void *data);
 
-PUBLIC OS_Error IRQ_Unmask(IRQ_Number irqno);
-PUBLIC OS_Error IRQ_Mask(IRQ_Number irqno);
+NX_PUBLIC NX_Error NX_IRQ_Unmask(NX_IRQ_Number irqno);
+NX_PUBLIC NX_Error NX_IRQ_Mask(NX_IRQ_Number irqno);
 
-PUBLIC OS_Error IRQ_Handle(IRQ_Number irqno);
+NX_PUBLIC NX_Error NX_IRQ_Handle(NX_IRQ_Number irqno);
 
-#define INTR_Enable()            IRQ_ControllerInterface.enable()
-#define INTR_Disable()           IRQ_ControllerInterface.disable()
-#define INTR_SaveLevel()         IRQ_ControllerInterface.saveLevel()
-#define INTR_RestoreLevel(level) IRQ_ControllerInterface.restoreLevel(level)
+#define NX_IRQ_Enable()            NX_IRQ_ControllerInterface.enable()
+#define NX_IRQ_Disable()           NX_IRQ_ControllerInterface.disable()
+#define NX_IRQ_SaveLevel()         NX_IRQ_ControllerInterface.saveLevel()
+#define NX_IRQ_RestoreLevel(level) NX_IRQ_ControllerInterface.restoreLevel(level)
 
-PUBLIC void IRQ_Init(void);
+NX_PUBLIC void NX_IRQ_Init(void);
 
 #endif  /* __IO_IRQ__ */

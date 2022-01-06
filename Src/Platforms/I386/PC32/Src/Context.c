@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Thread context 
+ * Contains: NX_Thread context 
  * 
  * Change Logs:
  * Date           Author            Notes
@@ -15,27 +15,27 @@
 #include <XBook/Debug.h>
 #include <IO/IRQ.h>
 
-IMPORT void HAL_ContextSwitchNext(Addr nextSP);
-IMPORT void HAL_ContextSwitchPrevNext(Addr prevSP, Addr nextSP);
+NX_IMPORT void HAL_ContextSwitchNext(NX_Addr nextSP);
+NX_IMPORT void HAL_ContextSwitchPrevNext(NX_Addr prevSP, NX_Addr nextSP);
 
 /**
  * any thread will come here when first start
  */
-PRIVATE void ThreadEntry(HAL_ThreadHandler handler, void *arg, void (*texit)())
+NX_PRIVATE void ThreadEntry(HAL_ThreadHandler handler, void *arg, void (*texit)())
 {
-    INTR_Enable();
+    NX_IRQ_Enable();
     handler(arg);
     if (texit)
         texit();
-    PANIC("Thread execute done, should never be here!");
+    NX_PANIC("Thread execute done, should never be here!");
 }
 
-PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void *stackTop)
+NX_PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void *stackTop)
 {
-    U8 *stack = NULL;
+    NX_U8 *stack = NX_NULL;
 
-    stack = stackTop + sizeof(UArch);
-    stack = (U8 *)ALIGN_DOWN((UArch)stack, sizeof(UArch));
+    stack = stackTop + sizeof(NX_UArch);
+    stack = (NX_U8 *)NX_ALIGN_DOWN((NX_UArch)stack, sizeof(NX_UArch));
     stack -= sizeof(HAL_TrapFrame);
     stack -= sizeof(HAL_Context);
 
@@ -48,7 +48,7 @@ PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void
     return stack;
 }
 
-INTERFACE struct ContextOps ContextOpsInterface = 
+NX_INTERFACE struct NX_ContextOps NX_ContextOpsInterface = 
 {
     .init           = HAL_ContextInit,
     .switchNext     = HAL_ContextSwitchNext,

@@ -12,66 +12,66 @@
 #include <Sched/Mutex.h>
 #include <Mods/Test/UTest.h>
 
-#ifdef CONFIG_UTEST_SCHED_MUTEX
+#ifdef CONFIG_NX_UTEST_SCHED_MUTEX
 
-TEST(MutexInit)
+NX_TEST(NX_MutexInit)
 {
-    Mutex lock;
-    EXPECT_NE(MutexInit(NULL), OS_EOK);
-    EXPECT_EQ(MutexInit(&lock), OS_EOK);
-    EXPECT_NE(MutexInit(&lock), OS_EOK);
+    NX_Mutex lock;
+    NX_EXPECT_NE(NX_MutexInit(NX_NULL), NX_EOK);
+    NX_EXPECT_EQ(NX_MutexInit(&lock), NX_EOK);
+    NX_EXPECT_NE(NX_MutexInit(&lock), NX_EOK);
 }
 
-TEST(MutexLock)
+NX_TEST(NX_MutexLock)
 {
-    Mutex lock;
-    Mutex lockNoInit;
+    NX_Mutex lock;
+    NX_Mutex lockNoInit;
 
-    EXPECT_EQ(MutexInit(&lock), OS_EOK);
+    NX_EXPECT_EQ(NX_MutexInit(&lock), NX_EOK);
 
-    EXPECT_NE(MutexLock(NULL, TRUE), OS_EOK);
-    EXPECT_NE(MutexLock(&lockNoInit, TRUE), OS_EOK);
+    NX_EXPECT_NE(NX_MutexLock(NX_NULL, NX_True), NX_EOK);
+    NX_EXPECT_NE(NX_MutexLock(&lockNoInit, NX_True), NX_EOK);
 
-    EXPECT_EQ(MutexLock(&lock, TRUE), OS_EOK);
-    EXPECT_NE(MutexLock(&lock, FALSE), OS_EOK);
+    NX_EXPECT_EQ(NX_MutexLock(&lock, NX_True), NX_EOK);
+    NX_EXPECT_NE(NX_MutexLock(&lock, NX_False), NX_EOK);
 }
 
-TEST(MutexUnlock)
+NX_TEST(NX_MutexUnlock)
 {
-    Mutex lock;
-    Mutex lockNoInit;
+    NX_Mutex lock;
+    NX_Mutex lockNoInit;
     
-    EXPECT_EQ(MutexInit(&lock), OS_EOK);
+    NX_EXPECT_EQ(NX_MutexInit(&lock), NX_EOK);
 
-    EXPECT_NE(MutexUnlock(NULL), OS_EOK);
-    EXPECT_NE(MutexUnlock(&lockNoInit), OS_EOK);
+    NX_EXPECT_NE(NX_MutexUnlock(NX_NULL), NX_EOK);
+    NX_EXPECT_NE(NX_MutexUnlock(&lockNoInit), NX_EOK);
 
-    EXPECT_EQ(MutexLock(&lock, TRUE), OS_EOK);
-    EXPECT_EQ(MutexUnlock(&lock), OS_EOK);
+    NX_EXPECT_EQ(NX_MutexLock(&lock, NX_True), NX_EOK);
+    NX_EXPECT_EQ(NX_MutexUnlock(&lock), NX_EOK);
 }
 
-TEST(MutexLockAndUnlock)
+NX_TEST(NX_MutexLockAndUnlock)
 {
-    Mutex lock;
+    NX_Mutex lock;
     
-    EXPECT_EQ(MutexInit(&lock), OS_EOK);
+    NX_EXPECT_EQ(NX_MutexInit(&lock), NX_EOK);
 
     int i;
     for (i = 0; i < 12; i++)
     {
-        EXPECT_EQ(MutexLock(&lock, TRUE), OS_EOK);
-        EXPECT_EQ(MutexUnlock(&lock), OS_EOK);
+        NX_EXPECT_EQ(NX_MutexLock(&lock, NX_True), NX_EOK);
+        NX_EXPECT_EQ(NX_MutexUnlock(&lock), NX_EOK);
     }
 }
 
-TEST_TABLE(Mutex)
+NX_TEST_TABLE(NX_Mutex)
 {
-    TEST_UNIT(MutexInit),
-    TEST_UNIT(MutexLock),
-    TEST_UNIT(MutexUnlock),
-    TEST_UNIT(MutexLockAndUnlock),
+    NX_TEST_UNIT(NX_MutexInit),
+    NX_TEST_UNIT(NX_MutexLock),
+    NX_TEST_UNIT(NX_MutexUnlock),
+    NX_TEST_UNIT(NX_MutexLockAndUnlock),
 };
 
-TEST_CASE(Mutex);
+NX_TEST_CASE(NX_Mutex);
 
 #endif

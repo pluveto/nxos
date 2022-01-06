@@ -29,10 +29,10 @@
 /* supervisor claim for each hart */
 #define PLIC_SCLAIM(hart)       (PLIC_PHY_ADDR + 0x201004 + (hart) * 0x2000)
 
-PUBLIC OS_Error PLIC_EnableIRQ(U32 hart, IRQ_Number irqno);
-PUBLIC OS_Error PLIC_DisableIRQ(U32 hart, IRQ_Number irqno);
-PUBLIC IRQ_Number PLIC_Claim(U32 hart);
-PUBLIC OS_Error PLIC_Complete(U32 hart, int irqno);
-PUBLIC void PLIC_Init(Bool bootCore);
+NX_PUBLIC NX_Error PLIC_EnableIRQ(NX_U32 hart, NX_IRQ_Number irqno);
+NX_PUBLIC NX_Error PLIC_DisableIRQ(NX_U32 hart, NX_IRQ_Number irqno);
+NX_PUBLIC NX_IRQ_Number PLIC_Claim(NX_U32 hart);
+NX_PUBLIC NX_Error PLIC_Complete(NX_U32 hart, int irqno);
+NX_PUBLIC void PLIC_Init(NX_Bool bootCore);
 
 #endif  /* __RISCV_PLIC__ */

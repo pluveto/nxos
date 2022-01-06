@@ -14,44 +14,44 @@
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 
-PRIVATE BuddySystem *BuddySystemArray[PZ_NR]; 
+NX_PRIVATE NX_BuddySystem *BuddySystemArray[NX_PAGE_ZONE_NR]; 
 
 /**
  * Init buddy memory allocator
  */
-PUBLIC void PageInitZone(PageZone zone, void *mem, USize size)
+NX_PUBLIC void NX_PageInitZone(NX_PageZone zone, void *mem, NX_USize size)
 {
-    ASSERT(zone >= PZ_NORMAL && zone < PZ_NR && size > 0);
-    BuddySystemArray[zone] = BuddyCreate(mem, size);
-    ASSERT(BuddySystemArray[zone] != NULL);
+    NX_ASSERT(zone >= NX_PAGE_ZONE_NORMAL && zone < NX_PAGE_ZONE_NR && size > 0);
+    BuddySystemArray[zone] = NX_BuddyCreate(mem, size);
+    NX_ASSERT(BuddySystemArray[zone] != NX_NULL);
 }
 
-PUBLIC void *PageAllocInZone(PageZone zone, USize count)
+NX_PUBLIC void *NX_PageAllocInZone(NX_PageZone zone, NX_USize count)
 {
-    ASSERT(zone >= PZ_NORMAL && zone < PZ_NR && count > 0);
-    return BuddyAllocPage(BuddySystemArray[zone], count);
+    NX_ASSERT(zone >= NX_PAGE_ZONE_NORMAL && zone < NX_PAGE_ZONE_NR && count > 0);
+    return NX_BuddyAllocPage(BuddySystemArray[zone], count);
 }
 
-PUBLIC void PageFreeInZone(PageZone zone, void *ptr)
+NX_PUBLIC void NX_PageFreeInZone(NX_PageZone zone, void *ptr)
 {
-    ASSERT(zone >= PZ_NORMAL && zone < PZ_NR && ptr != NULL);
-    BuddyFreePage(BuddySystemArray[zone], ptr);
+    NX_ASSERT(zone >= NX_PAGE_ZONE_NORMAL && zone < NX_PAGE_ZONE_NR && ptr != NX_NULL);
+    NX_BuddyFreePage(BuddySystemArray[zone], ptr);
 }
 
-PUBLIC void *PageZoneGetBase(PageZone zone)
+NX_PUBLIC void *NX_PageZoneGetBase(NX_PageZone zone)
 {
-    ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
+    NX_ASSERT(zone >= NX_PAGE_ZONE_NORMAL && zone < NX_PAGE_ZONE_NR);
     return BuddySystemArray[zone]->pageStart;
 }
 
-PUBLIC USize PageZoneGetPages(PageZone zone)
+NX_PUBLIC NX_USize NX_PageZoneGetPages(NX_PageZone zone)
 {
-    ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
+    NX_ASSERT(zone >= NX_PAGE_ZONE_NORMAL && zone < NX_PAGE_ZONE_NR);
     return (BuddySystemArray[zone]->maxPFN + 1);
 }
 
-PUBLIC void *PageZoneGetBuddySystem(PageZone zone)
+NX_PUBLIC void *NX_PageZoneGetBuddySystem(NX_PageZone zone)
 {
-    ASSERT(zone >= PZ_NORMAL && zone < PZ_NR);
+    NX_ASSERT(zone >= NX_PAGE_ZONE_NORMAL && zone < NX_PAGE_ZONE_NR);
     return BuddySystemArray[zone];
 }

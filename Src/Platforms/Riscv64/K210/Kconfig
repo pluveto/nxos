@@ -1,9 +1,9 @@
-config PLATFROM_NAME
+config NX_PLATFROM_NAME
     string "Platform name"
     default "riscv64-k210"
 
 config PLATFROM_RISCV64_k210
     bool
     default y
-    select CPU_64BITS
+    select NX_CPU_64BITS
     

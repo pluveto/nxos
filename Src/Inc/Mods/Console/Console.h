@@ -14,13 +14,13 @@
 
 #include <XBook.h>
 
-#define CON_NEWLINE "\n"
+#define NX_CON_NEWLINE "\n"
 
-#define Endln CON_NEWLINE
+#define NX_Endln NX_CON_NEWLINE
 
-PUBLIC void ConsoleOutChar(char ch);
-PUBLIC void ConsoleOutStr(const char *str);
+NX_PUBLIC void NX_ConsoleOutChar(char ch);
+NX_PUBLIC void NX_ConsoleOutStr(const char *str);
 
-void Printf(const char *fmt, ...);
+NX_PUBLIC void NX_Printf(const char *fmt, ...);
 
 #endif  /* __MODS_CONSOLE_HEADER__ */

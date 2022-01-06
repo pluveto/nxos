@@ -14,23 +14,23 @@
 
 #include <XBook.h>
 
-enum OS_Error
+enum NX_Error
 {
-    OS_EOK = 0, /* ok */
-    OS_ERROR,   /* error */
-    OS_EPERM,   /* no perimisson */
-    OS_EINVAL,  /* invalid arg */
-    OS_ETIMEOUT,/* timeout */
-    OS_EFAULT,  /* execute fault */
-    OS_ENORES,  /* no resource */
-    OS_EAGAIN,  /* try again later */
-    OS_EINTR,   /* interrupt */
-    OS_ENOMEM,  /* no memory */
-    OS_ENOFUNC, /* no function */
-    OS_ENOSRCH, /* no search/found */
-    OS_EIO,     /* mmio/portio */
-    OS_ERROR_NR
+    NX_EOK = 0, /* ok */
+    NX_ERROR,   /* error */
+    NX_EPERM,   /* no perimisson */
+    NX_EINVAL,  /* invalid arg */
+    NX_ETIMEOUT,/* timeout */
+    NX_EFAULT,  /* execute fault */
+    NX_ENORES,  /* no resource */
+    NX_EAGAIN,  /* try again later */
+    NX_EINTR,   /* interrupt */
+    NX_ENOMEM,  /* no memory */
+    NX_ENOFUNC, /* no function */
+    NX_ENOSRCH, /* no search/found */
+    NX_EIO,     /* mmio/portio */
+    NX_ERROR_NR
 };
-typedef enum OS_Error OS_Error;
+typedef enum NX_Error NX_Error;
 
 #endif  /* __XBOOK_ERROR__ */

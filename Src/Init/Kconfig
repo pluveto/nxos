@@ -1,31 +1,31 @@
 menu "Debug"
-config DEBUG
+config NX_DEBUG
     bool "Debug NXOS before release"
     default y
 
-if DEBUG
-    config LOG_LEVEL
+if NX_DEBUG
+    config NX_LOG_LEVEL
         int "Log level(0: ERROR, 1: WARNING, 2: INFO, 3: DBG)"
         default 3
 
-    config DEBUG_COLOR
+    config NX_DEBUG_COLOR
         bool "Log output with color"
         default y
 
-    config DEBUG_TIMELINE
+    config NX_DEBUG_TIMELINE
         bool "Log output with timeline"
         default y
 
 endif
 endmenu
 
-config PLATFROM_NAME
+config NX_PLATFROM_NAME
     string "Platform name"
     default "Unknown"
 
 #
 # CPU numbers
 #
-config NR_MULTI_CORES
+config NX_MULTI_CORES_NR
     int "platform CPU core numbers"
     default 1

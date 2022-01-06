@@ -15,42 +15,91 @@
 #include <Utils/Memory.h>
 #include <Sched/Mutex.h>
 
-#define LOG_LEVEL LOG_INFO
-#define LOG_NAME "PageHeap"
+#define NX_LOG_LEVEL NX_LOG_INFO
+#define NX_LOG_NAME "PageHeap"
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 
-PRIVATE PageHeap PageHeapObject;
-PRIVATE SpanMark *SpanMarkMap;
-PRIVATE void *SpanBaseAddr;
-PRIVATE Mutex PageHeapLock;
+/**
+ * Maximum number of pages in small span
+ */
+#define SMALL_SPAN_PAGES_MAX  128
 
-PRIVATE void *PageAllocVirtual(USize count)
+/**
+ * max allowed pages to allocate by system.
+ */
+#define NX_PAGE_HEAP_MAX_PAGES  2048
+
+/**
+ * max threshold for free large span.
+ * if free large list span count beyond thresold,
+ * free span will directly free to buddy system.
+ */
+#define LARGE_SPAN_FREE_THRESHOLD_MAX  32
+
+/**
+ * max threshold for free small span.
+ * if free small list span count beyond thresold,
+ * free span will directly free to buddy system.
+ */
+#define SMALL_SPAN_FREE_THRESHOLD_MAX  64
+
+/**
+ * max threshold for free one page span.
+ * one page span will used more 
+ */
+#define ONE_PAGE_SPAN_FREE_THRESHOLD_MAX  1024
+
+/**
+ * span mark use to covert page to span
+ */
+struct SpanMark
 {
-    void *ptr = PageAlloc(count);
-    if (ptr == NULL)
+    NX_U16 count;  /* span page count */
+    NX_U16 idx;    /* page idx int span */
+};
+typedef struct SpanMark SpanMark;
+
+struct PageHeap
+{
+    NX_List spanFreeList[SMALL_SPAN_PAGES_MAX];  /* list head for span list */
+    NX_List largeSpanFreeList;     /* list for large span page */
+    NX_Atomic spanFreeCount[SMALL_SPAN_PAGES_MAX];
+    NX_Atomic largeSpanFreeCount;
+};
+typedef struct PageHeap PageHeap;
+
+NX_PRIVATE PageHeap PageHeapObject;
+NX_PRIVATE SpanMark *SpanMarkMap;
+NX_PRIVATE void *SpanBaseAddr;
+NX_PRIVATE NX_Mutex PageHeapLock;
+
+NX_PRIVATE void *PageAllocVirtual(NX_USize count)
+{
+    void *ptr = NX_PageAlloc(count);
+    if (ptr == NX_NULL)
     {
-        return NULL;
+        return NX_NULL;
     }
-    return P2V(ptr);
+    return NX_Phy2Virt(ptr);
 }
 
-PRIVATE void PageFreeVirtual(void *ptr)
+NX_PRIVATE void PageFreeVirtual(void *ptr)
 {
-    if (ptr == NULL)
+    if (ptr == NX_NULL)
     {
         return;
     }
-    PageFree(V2P(ptr));
+    NX_PageFree(NX_Virt2Phy(ptr));
 }
 
 /**
  * mark span with count
  */
-PRIVATE void MarkSpan(void *span, USize count)
+NX_PRIVATE void MarkSpan(void *span, NX_USize count)
 {
-    Addr dis = (Addr)span - (Addr)SpanBaseAddr;
-    USize idx = dis >> PAGE_SHIFT;
+    NX_Addr dis = (NX_Addr)span - (NX_Addr)SpanBaseAddr;
+    NX_USize idx = dis >> NX_PAGE_SHIFT;
 
     SpanMark *mark = SpanMarkMap + idx;
     int i;
@@ -65,10 +114,10 @@ PRIVATE void MarkSpan(void *span, USize count)
 /**
  * clear span with count
  */
-PRIVATE void ClearSpan(void *span, USize count)
+NX_PRIVATE void ClearSpan(void *span, NX_USize count)
 {
-    Addr dis = (Addr)span - (Addr)SpanBaseAddr;
-    USize idx = dis >> PAGE_SHIFT;
+    NX_Addr dis = (NX_Addr)span - (NX_Addr)SpanBaseAddr;
+    NX_USize idx = dis >> NX_PAGE_SHIFT;
 
     SpanMark *mark = SpanMarkMap + idx;
 
@@ -81,31 +130,31 @@ PRIVATE void ClearSpan(void *span, USize count)
     }
 }
 
-PUBLIC void *PageToSpan(void *page)
+NX_PUBLIC void *NX_PageToSpan(void *page)
 {
-    USize dis = (Addr)page - (Addr)SpanBaseAddr;
-    USize idx = dis >> PAGE_SHIFT;
+    NX_USize dis = (NX_Addr)page - (NX_Addr)SpanBaseAddr;
+    NX_USize idx = dis >> NX_PAGE_SHIFT;
 
     SpanMark *mark = SpanMarkMap + idx;
-    return (void *)((Addr)page - mark->idx * PAGE_SIZE);
+    return (void *)((NX_Addr)page - mark->idx * NX_PAGE_SIZE);
 }
 
-PUBLIC USize PageToSpanCount(void *span)
+NX_PUBLIC NX_USize NX_PageToSpanCount(void *span)
 {
-    USize dis = (Addr)span - (Addr)SpanBaseAddr;
-    USize idx = dis >> PAGE_SHIFT;
+    NX_USize dis = (NX_Addr)span - (NX_Addr)SpanBaseAddr;
+    NX_USize idx = dis >> NX_PAGE_SHIFT;
 
     SpanMark *mark = SpanMarkMap + idx;
     return mark->count;
 }
 
-PRIVATE void *DoPageHeapAlloc(USize count)
+NX_PRIVATE void *DoPageHeapAlloc(NX_USize count)
 {
     int isLargeSpan = 0;
-    List *listHead;
-    Span *spanNode = NULL;
-    Span *spanNodeBest = NULL;
-    Atomic *freeCount = NULL;
+    NX_List *listHead;
+    NX_PageSpan *spanNode = NX_NULL;
+    NX_PageSpan *spanNodeBest = NX_NULL;
+    NX_Atomic *freeCount = NX_NULL;
 
     if (count >= SMALL_SPAN_PAGES_MAX)    /* alloc from large list */
     {
@@ -119,14 +168,14 @@ PRIVATE void *DoPageHeapAlloc(USize count)
         freeCount = &PageHeapObject.spanFreeCount[count];
     }
 
-    if (ListEmpty(listHead))
+    if (NX_ListEmpty(listHead))
     {
         /* alloc from buddy system */
         void *span = PageAllocVirtual(count);
-        if (span == NULL)
+        if (span == NX_NULL)
         {
-            LOG_E("no enough memroy to allocate for %d pages!", count);
-            return NULL;
+            NX_LOG_E("no enough memroy to allocate for %d pages!", count);
+            return NX_NULL;
         }
         MarkSpan(span, count);
         return span;
@@ -135,9 +184,9 @@ PRIVATE void *DoPageHeapAlloc(USize count)
     if (isLargeSpan)
     {
         /* use best fit to alloc a span */
-        ListForEachEntry (spanNode, &PageHeapObject.largeSpanFreeList, list)
+        NX_ListForEachEntry (spanNode, &PageHeapObject.largeSpanFreeList, list)
         {
-            if (spanNodeBest == NULL)
+            if (spanNodeBest == NX_NULL)
             {
                 spanNodeBest = spanNode;
             }
@@ -150,11 +199,11 @@ PRIVATE void *DoPageHeapAlloc(USize count)
     else
     {
         /* use first fit to alloc a span */
-        spanNodeBest = ListFirstEntry(&PageHeapObject.spanFreeList[count], Span, list);
+        spanNodeBest = NX_ListFirstEntry(&PageHeapObject.spanFreeList[count], NX_PageSpan, list);
     }
     /* del span node from list */
-    ListDelInit(&spanNodeBest->list);
-    AtomicDec(freeCount);
+    NX_ListDelInit(&spanNodeBest->list);
+    NX_AtomicDec(freeCount);
 
     /* return base addr as spin */
     return (void *)spanNodeBest;
@@ -163,39 +212,39 @@ PRIVATE void *DoPageHeapAlloc(USize count)
 /**
  * alloc span from heap, if no free page, alloc from buddy system
  */
-PUBLIC void *PageHeapAlloc(USize count)
+NX_PUBLIC void *NX_PageHeapAlloc(NX_USize count)
 {
     if (!count)
     {
-        LOG_E("alloc page count is 0!");
-        return NULL;
+        NX_LOG_E("alloc page count is 0!");
+        return NX_NULL;
     }
-    else if (count > PAGE_HEAP_MAX_PAGES)
+    else if (count > NX_PAGE_HEAP_MAX_PAGES)
     {
-        LOG_E("alloc page count beyond %d", PAGE_HEAP_MAX_PAGES);
-        return NULL;
+        NX_LOG_E("alloc page count beyond %d", NX_PAGE_HEAP_MAX_PAGES);
+        return NX_NULL;
     }
     
-    MutexLock(&PageHeapLock, TRUE);
+    NX_MutexLock(&PageHeapLock, NX_True);
     void *ptr = DoPageHeapAlloc(count);
-    MutexUnlock(&PageHeapLock);
+    NX_MutexUnlock(&PageHeapLock);
     return ptr;
 }
 
-PRIVATE OS_Error DoPageHeapFree(void *page)
+NX_PRIVATE NX_Error DoPageHeapFree(void *page)
 {
-    void *span = PageToSpan(page);
-    USize count = PageToSpanCount(page);
-    Atomic *freeCount = NULL;
+    void *span = NX_PageToSpan(page);
+    NX_USize count = NX_PageToSpanCount(page);
+    NX_Atomic *freeCount = NX_NULL;
 
     if (!count)
     {
-        LOG_E("span count is 0!");
-        return OS_EPERM;
+        NX_LOG_E("span count is 0!");
+        return NX_EPERM;
     }
 
-    List *listHead;
-    USize maxThresold = 0;
+    NX_List *listHead;
+    NX_USize maxThresold = 0;
 
     if (count >= SMALL_SPAN_PAGES_MAX)    /* free to large list */
     {
@@ -217,60 +266,60 @@ PRIVATE OS_Error DoPageHeapFree(void *page)
         freeCount = &PageHeapObject.spanFreeCount[count];
     }
 
-    if (AtomicGet(freeCount) >= maxThresold)    /* directly free */
+    if (NX_AtomicGet(freeCount) >= maxThresold)    /* directly free */
     {
         ClearSpan(span, count);
         PageFreeVirtual(span);
     }
     else    /* add to list for cache */
     {
-        Span *spanNode = (Span *)span;
+        NX_PageSpan *spanNode = (NX_PageSpan *)span;
         spanNode->pageCount = count;
-        ListAdd(&spanNode->list, listHead);
-        AtomicInc(freeCount);
+        NX_ListAdd(&spanNode->list, listHead);
+        NX_AtomicInc(freeCount);
     }
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PUBLIC OS_Error PageHeapFree(void *page)
+NX_PUBLIC NX_Error NX_PageHeapFree(void *page)
 {
-    if (page == NULL)
+    if (page == NX_NULL)
     {
-        LOG_E("free NULL page!");
-        return OS_EINVAL;
+        NX_LOG_E("free NX_NULL page!");
+        return NX_EINVAL;
     }
     
-    MutexLock(&PageHeapLock, TRUE);
-    OS_Error err = DoPageHeapFree(page);
-    MutexUnlock(&PageHeapLock);
+    NX_MutexLock(&PageHeapLock, NX_True);
+    NX_Error err = DoPageHeapFree(page);
+    NX_MutexUnlock(&PageHeapLock);
     return err;
 }
 
-PUBLIC void PageHeapInit(void)
+NX_PUBLIC void NX_PageHeapInit(void)
 {
     int i;
     for (i = 0; i < sizeof(PageHeapObject.spanFreeList) / sizeof(PageHeapObject.spanFreeList[0]); i++)
     {
-        ListInit(&PageHeapObject.spanFreeList[i]);
-        AtomicSet(&PageHeapObject.spanFreeCount[i], 0);
+        NX_ListInit(&PageHeapObject.spanFreeList[i]);
+        NX_AtomicSet(&PageHeapObject.spanFreeCount[i], 0);
     }
-    ListInit(&PageHeapObject.largeSpanFreeList);
-    AtomicSet(&PageHeapObject.largeSpanFreeCount, 0);
+    NX_ListInit(&PageHeapObject.largeSpanFreeList);
+    NX_AtomicSet(&PageHeapObject.largeSpanFreeCount, 0);
 
-    SpanBaseAddr = PageZoneGetBase(PZ_NORMAL);
-    LOG_I("span base addr: %p", SpanBaseAddr);
+    SpanBaseAddr = NX_PageZoneGetBase(NX_PAGE_ZONE_NORMAL);
+    NX_LOG_I("span base addr: %p", SpanBaseAddr);
 
-    USize pages = PageZoneGetPages(PZ_NORMAL);
+    NX_USize pages = NX_PageZoneGetPages(NX_PAGE_ZONE_NORMAL);
     /* alloc span mark array */
-    USize spanMarkPages = DIV_ROUND_UP(pages * sizeof(SpanMark), PAGE_SIZE);
-    LOG_I("span mark used page: %d", spanMarkPages);
+    NX_USize spanMarkPages = NX_DIV_ROUND_UP(pages * sizeof(SpanMark), NX_PAGE_SIZE);
+    NX_LOG_I("span mark used page: %d", spanMarkPages);
 
     SpanMarkMap = PageAllocVirtual(spanMarkPages);
-    if (SpanMarkMap == NULL)
+    if (SpanMarkMap == NX_NULL)
     {
-        PANIC("alloc page for span mark failed!");
+        NX_PANIC("alloc page for span mark failed!");
     }
-    Zero(SpanMarkMap, spanMarkPages * PAGE_SIZE);
+    NX_MemZero(SpanMarkMap, spanMarkPages * NX_PAGE_SIZE);
 
-    MutexInit(&PageHeapLock);
+    NX_MutexInit(&PageHeapLock);
 }

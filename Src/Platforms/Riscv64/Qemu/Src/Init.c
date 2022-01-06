@@ -12,7 +12,7 @@
 #include <XBook.h>
 #include <Trap.h>
 #include <Clock.h>
-#include <Page.h>
+#include <PageZone.h>
 #include <Platform.h>
 #include <PLIC.h>
 #include <SBI.h>
@@ -21,15 +21,15 @@
 #include <Sched/MultiCore.h>
 #include <Utils/Log.h>
 
-#define LOG_LEVEL LOG_INFO
-#define LOG_NAME "INIT"
+#define NX_LOG_LEVEL NX_LOG_INFO
+#define NX_LOG_NAME "INIT"
 #include <XBook/Debug.h>
 
-PUBLIC void ClearBSS(void);
+NX_PUBLIC void HAL_ClearBSS(void);
 
-INTERFACE OS_Error PlatformInit(UArch coreId)
+NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
 {
-    ClearBSS();
+    HAL_ClearBSS();
 
     /* NOTE: after inited trap, you can use core id func */
     CPU_InitTrap(coreId);
@@ -39,21 +39,21 @@ INTERFACE OS_Error PlatformInit(UArch coreId)
     sbi_init();
     sbi_print_version();
 
-    LOG_I("Hello, QEMU Riscv64!");
+    NX_LOG_I("Hello, QEMU Riscv64!");
     
     HAL_InitClock();
-    PLIC_Init(TRUE);
+    PLIC_Init(NX_True);
     
-    PageInit();
+    NX_PageZoneInit();
     
-    return OS_EOK;
+    return NX_EOK;
 }
 
-INTERFACE OS_Error PlatformStage2(void)
+NX_INTERFACE NX_Error HAL_PlatformStage2(void)
 {
-    LOG_I("stage2!");
+    NX_LOG_I("stage2!");
     HAL_DirectUartStage2();
-    // INTR_Enable();
+    // NX_IRQ_Enable();
     // while (1);
-    return OS_EOK;
+    return NX_EOK;
 }

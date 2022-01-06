@@ -30,32 +30,32 @@
 /* cr0 bit 31 is page enable bit, 1: enable MMU, 0: disable MMU */
 #define CR0_PG  (1 << 31)
 
-INLINE void CPU_LoadTR(U32 selector)
+NX_INLINE void CPU_LoadTR(NX_U32 selector)
 {
-    CASM("ltr %w0" : : "q" (selector));
+    NX_CASM("ltr %w0" : : "q" (selector));
 }
 
-INLINE void CPU_WriteCR3(U32 val)
+NX_INLINE void CPU_WriteCR3(NX_U32 val)
 {
-    CASM("movl %0, %%cr3" : : "a" (val));
+    NX_CASM("movl %0, %%cr3" : : "a" (val));
 }
 
-INLINE U32 CPU_ReadCR0(void)
+NX_INLINE NX_U32 CPU_ReadCR0(void)
 {
-    U32 val;
-    CASM("movl %%cr0, %0\n\t": "=a" (val));
+    NX_U32 val;
+    NX_CASM("movl %%cr0, %0\n\t": "=a" (val));
     return val;
 }
 
-INLINE void CPU_WriteCR0(U32 val)
+NX_INLINE void CPU_WriteCR0(NX_U32 val)
 {
-    CASM("movl %0, %%cr0\n\t": :"a" (val));
+    NX_CASM("movl %0, %%cr0\n\t": :"a" (val));
 }
 
-INLINE U32 CPU_ReadESP(void)
+NX_INLINE NX_U32 CPU_ReadESP(void)
 {
-    U32 sp;
-    CASM("movl %%esp, %0\n\t": "=a" (sp));
+    NX_U32 sp;
+    NX_CASM("movl %%esp, %0\n\t": "=a" (sp));
     return sp;
 }
 

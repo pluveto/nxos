@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Thread context 
+ * Contains: NX_Thread context 
  * 
  * Change Logs:
  * Date           Author            Notes
@@ -13,7 +13,7 @@
 .text
 
 /**
- * void HAL_ContextSwitchNext(Addr nextSP);
+ * void HAL_ContextSwitchNext(NX_Addr nextSP);
  */
 .globl HAL_ContextSwitchNext
 HAL_ContextSwitchNext:
@@ -27,7 +27,7 @@ HAL_ContextSwitchNext:
     ret
 
 /**
- * void HAL_ContextSwitchPrevNext(Addr prevSP, Addr nextSP);
+ * void HAL_ContextSwitchPrevNext(NX_Addr prevSP, NX_Addr nextSP);
  */
 .globl HAL_ContextSwitchPrevNext
 HAL_ContextSwitchPrevNext:

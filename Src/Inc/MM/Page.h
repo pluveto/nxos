@@ -13,35 +13,35 @@
 #define __MM_PAGE__
 
 #include <XBook.h>
-#include <Page.h>   /* Platfrom page */
+#include <PageZone.h>   /* Platfrom page */
 
-#ifdef CONFIG_PAGE_SHIFT
-#define PAGE_SHIFT CONFIG_PAGE_SHIFT
+#ifdef CONFIG_NX_PAGE_SHIFT
+#define NX_PAGE_SHIFT CONFIG_NX_PAGE_SHIFT
 #else
-#define PAGE_SHIFT 12
+#define NX_PAGE_SHIFT 12
 #endif
 
-#define PAGE_SIZE   (1U << PAGE_SHIFT)
-#define PAGE_MASK   (PAGE_SIZE - 1UL)
+#define NX_PAGE_SIZE   (1U << NX_PAGE_SHIFT)
+#define NX_PAGE_MASK   (NX_PAGE_SIZE - 1UL)
 
-#define PAGE_UMASK  (~PAGE_MASK)
-#define PAGE_ADDR_MASK PAGE_UMASK
+#define NX_PAGE_UMASK  (~NX_PAGE_MASK)
+#define NX_PAGE_ADDR_MASK NX_PAGE_UMASK
 
-#define PAGE_ALIGNUP(value) (((value) + PAGE_MASK) & PAGE_UMASK)
-#define PAGE_ALIGNDOWN(value) ((value) & PAGE_UMASK)
+#define NX_PAGE_ALIGNUP(value) (((value) + NX_PAGE_MASK) & NX_PAGE_UMASK)
+#define NX_PAGE_ALIGNDOWN(value) ((value) & NX_PAGE_UMASK)
 
-PUBLIC void PageInitZone(PageZone zone, void *mem, USize size);
-PUBLIC void *PageAllocInZone(PageZone zone, USize count);
-PUBLIC void PageFreeInZone(PageZone zone, void *ptr);
-PUBLIC void *PageZoneGetBase(PageZone zone);
-PUBLIC USize PageZoneGetPages(PageZone zone);
+NX_PUBLIC void NX_PageInitZone(NX_PageZone zone, void *mem, NX_USize size);
+NX_PUBLIC void *NX_PageAllocInZone(NX_PageZone zone, NX_USize count);
+NX_PUBLIC void NX_PageFreeInZone(NX_PageZone zone, void *ptr);
+NX_PUBLIC void *NX_PageZoneGetBase(NX_PageZone zone);
+NX_PUBLIC NX_USize NX_PageZoneGetPages(NX_PageZone zone);
 
-PUBLIC void *PageZoneGetBuddySystem(PageZone zone);
+NX_PUBLIC void *NX_PageZoneGetBuddySystem(NX_PageZone zone);
 
-#define PageAlloc(size) PageAllocInZone(PZ_NORMAL, size)
-#define PageFree(ptr) PageFreeInZone(PZ_NORMAL, ptr)
+#define NX_PageAlloc(size) NX_PageAllocInZone(NX_PAGE_ZONE_NORMAL, size)
+#define NX_PageFree(ptr) NX_PageFreeInZone(NX_PAGE_ZONE_NORMAL, ptr)
 
-#define P2V(addr) ((addr) + KVADDR_OFFSET)
-#define V2P(addr) ((addr) - KVADDR_OFFSET)
+#define NX_Phy2Virt(addr) ((addr) + NX_KVADDR_OFFSET)
+#define NX_Virt2Phy(addr) ((addr) - NX_KVADDR_OFFSET)
 
 #endif /* __MM_PAGE__ */

@@ -10,26 +10,26 @@
  */
 
 #include <Sched/MultiCore.h>
-#define LOG_NAME "Multi Core"
+#define NX_LOG_NAME "Multi Core"
 #include <Utils/Log.h>
 
-PUBLIC UArch HAL_CoreGetId(void)
+NX_PUBLIC NX_UArch HAL_CoreGetId(void)
 {
     return 0;
 }
 
-PUBLIC OS_Error HAL_CoreBootApp(UArch bootCoreId)
+NX_PUBLIC NX_Error HAL_CoreBootApp(NX_UArch bootCoreId)
 {
-    LOG_I("boot core is:%d", bootCoreId);
-    return OS_ENORES;
+    NX_LOG_I("boot core is:%d", bootCoreId);
+    return NX_ENORES;
 }
 
-PUBLIC OS_Error HAL_CoreEnterApp(UArch appCoreId)
+NX_PUBLIC NX_Error HAL_CoreEnterApp(NX_UArch appCoreId)
 {
-    return OS_ENORES;
+    return NX_ENORES;
 }
 
-INTERFACE struct MultiCoreOps MultiCoreOpsInterface = 
+NX_INTERFACE struct NX_MultiCoreOps NX_MultiCoreOpsInterface = 
 {
     .getId = HAL_CoreGetId,
     .bootApp = HAL_CoreBootApp,

@@ -48,9 +48,9 @@ unsigned long sbi_spec_version;
 unsigned long sbi_impl_id;
 unsigned long sbi_impl_version;
 
-static Bool has_time_extension = FALSE;
-static Bool has_ipi_extension = FALSE;
-static Bool has_rfnc_extension = FALSE;
+static NX_Bool has_time_extension = NX_False;
+static NX_Bool has_ipi_extension = NX_False;
+static NX_Bool has_rfnc_extension = NX_False;
 
 static struct sbi_ret
 sbi_get_spec_version(void)
@@ -73,52 +73,52 @@ sbi_get_impl_version(void)
 void
 sbi_print_version(void)
 {
-    U32 major;
-    U32 minor;
+    NX_U32 major;
+    NX_U32 minor;
 
     /* For legacy SBI implementations. */
     if (sbi_spec_version == 0)
     {
-        LOG_RAW("SBI: Unknown (Legacy) Implementation\n");
-        LOG_RAW("SBI Specification Version: 0.1\n");
+        NX_LOG_RAW("SBI: Unknown (Legacy) Implementation\n");
+        NX_LOG_RAW("SBI Specification Version: 0.1\n");
         return;
     }
 
     switch (sbi_impl_id)
     {
     case (SBI_IMPL_ID_BBL):
-        LOG_RAW("SBI: Berkely Boot Loader %lu\n", sbi_impl_version);
+        NX_LOG_RAW("SBI: Berkely Boot Loader %lu\n", sbi_impl_version);
         break;
     case (SBI_IMPL_ID_XVISOR):
-        LOG_RAW("SBI: eXtensible Versatile hypervISOR %lu\n", sbi_impl_version);
+        NX_LOG_RAW("SBI: eXtensible Versatile hypervISOR %lu\n", sbi_impl_version);
         break;
     case (SBI_IMPL_ID_KVM):
-        LOG_RAW("SBI: Kernel-based Virtual Machine %lu\n", sbi_impl_version);
+        NX_LOG_RAW("SBI: Kernel-based Virtual Machine %lu\n", sbi_impl_version);
         break;
     case (SBI_IMPL_ID_RUSTSBI):
-        LOG_RAW("SBI: RustSBI %lu\n", sbi_impl_version);
+        NX_LOG_RAW("SBI: RustSBI %lu\n", sbi_impl_version);
         break;
     case (SBI_IMPL_ID_DIOSIX):
-        LOG_RAW("SBI: Diosix %lu\n", sbi_impl_version);
+        NX_LOG_RAW("SBI: Diosix %lu\n", sbi_impl_version);
         break;
     case (SBI_IMPL_ID_OPENSBI):
         major = sbi_impl_version >> OPENSBI_VERSION_MAJOR_OFFSET;
         minor = sbi_impl_version & OPENSBI_VERSION_MINOR_MASK;
-        LOG_RAW("SBI: OpenSBI v%u.%u\n", major, minor);
+        NX_LOG_RAW("SBI: OpenSBI v%u.%u\n", major, minor);
         break;
     default:
-        LOG_RAW("SBI: Unrecognized Implementation: %lu\n", sbi_impl_id);
+        NX_LOG_RAW("SBI: Unrecognized Implementation: %lu\n", sbi_impl_id);
         break;
     }
 
     major = (sbi_spec_version & SBI_SPEC_VERS_MAJOR_MASK) >>
             SBI_SPEC_VERS_MAJOR_OFFSET;
     minor = (sbi_spec_version & SBI_SPEC_VERS_MINOR_MASK);
-    LOG_RAW("SBI Specification Version: %u.%u\n", major, minor);
+    NX_LOG_RAW("SBI Specification Version: %u.%u\n", major, minor);
 }
 
 void
-sbi_set_timer(U64 val)
+sbi_set_timer(NX_U64 val)
 {
     struct sbi_ret ret;
 
@@ -126,7 +126,7 @@ sbi_set_timer(U64 val)
     if (has_time_extension)
     {
         ret = SBI_CALL1(SBI_EXT_ID_TIME, SBI_TIME_SET_TIMER, val);
-        ASSERT(ret.error == SBI_SUCCESS);
+        NX_ASSERT(ret.error == SBI_SUCCESS);
     }
     else
     {
@@ -144,11 +144,11 @@ sbi_send_ipi(const unsigned long *hart_mask)
     {
         ret = SBI_CALL2(SBI_EXT_ID_IPI, SBI_IPI_SEND_IPI,
                         *hart_mask, 0);
-        ASSERT(ret.error == SBI_SUCCESS);
+        NX_ASSERT(ret.error == SBI_SUCCESS);
     }
     else
     {
-        (void)SBI_CALL1(SBI_SEND_IPI, 0, (U64)hart_mask);
+        (void)SBI_CALL1(SBI_SEND_IPI, 0, (NX_U64)hart_mask);
     }
 }
 
@@ -162,11 +162,11 @@ sbi_remote_fence_i(const unsigned long *hart_mask)
     {
         ret = SBI_CALL2(SBI_EXT_ID_RFNC, SBI_RFNC_REMOTE_FENCE_I,
                         *hart_mask, 0);
-        ASSERT(ret.error == SBI_SUCCESS);
+        NX_ASSERT(ret.error == SBI_SUCCESS);
     }
     else
     {
-        (void)SBI_CALL1(SBI_REMOTE_FENCE_I, 0, (U64)hart_mask);
+        (void)SBI_CALL1(SBI_REMOTE_FENCE_I, 0, (NX_U64)hart_mask);
     }
 }
 
@@ -180,11 +180,11 @@ sbi_remote_sfence_vma(const unsigned long *hart_mask, unsigned long start, unsig
     {
         ret = SBI_CALL4(SBI_EXT_ID_RFNC, SBI_RFNC_REMOTE_SFENCE_VMA,
                         *hart_mask, 0, start, size);
-        ASSERT(ret.error == SBI_SUCCESS);
+        NX_ASSERT(ret.error == SBI_SUCCESS);
     }
     else
     {
-        (void)SBI_CALL3(SBI_REMOTE_SFENCE_VMA, 0, (U64)hart_mask,
+        (void)SBI_CALL3(SBI_REMOTE_SFENCE_VMA, 0, (NX_U64)hart_mask,
                         start, size);
     }
 }
@@ -200,12 +200,12 @@ sbi_remote_sfence_vma_asid(const unsigned long *hart_mask, unsigned long start, 
     {
         ret = SBI_CALL5(SBI_EXT_ID_RFNC, SBI_RFNC_REMOTE_SFENCE_VMA_ASID,
                         *hart_mask, 0, start, size, asid);
-        ASSERT(ret.error == SBI_SUCCESS);
+        NX_ASSERT(ret.error == SBI_SUCCESS);
     }
     else
     {
         (void)SBI_CALL4(SBI_REMOTE_SFENCE_VMA_ASID, 0,
-                        (U64)hart_mask, start, size, asid);
+                        (NX_U64)hart_mask, start, size, asid);
     }
 }
 
@@ -258,9 +258,9 @@ sbi_init(void)
 
     /* Probe for legacy replacement extensions. */
     if (sbi_probe_extension(SBI_EXT_ID_TIME) != 0)
-        has_time_extension = TRUE;
+        has_time_extension = NX_True;
     if (sbi_probe_extension(SBI_EXT_ID_IPI) != 0)
-        has_ipi_extension = TRUE;
+        has_ipi_extension = NX_True;
     if (sbi_probe_extension(SBI_EXT_ID_RFNC) != 0)
-        has_rfnc_extension = TRUE;
+        has_rfnc_extension = NX_True;
 }

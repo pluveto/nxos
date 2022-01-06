@@ -13,10 +13,10 @@
 #include <Boot.h>
 #include <Utils/String.h>
 
-INLINE void BootModInit(struct multiboot_tag *tag);
-INLINE void BootMemModInit(struct multiboot_tag *tag);
+NX_INLINE void BootModInit(struct multiboot_tag *tag);
+NX_INLINE void BootMemModInit(struct multiboot_tag *tag);
 
-PUBLIC int BootSetting(unsigned long magic, unsigned long addr)
+NX_PUBLIC int HAL_BootSetting(unsigned long magic, unsigned long addr)
 {
     // whether a multiboot
     if (magic != MULTIBOOT2_BOOTLOADER_MAGIC || addr & 7)
@@ -43,9 +43,9 @@ PUBLIC int BootSetting(unsigned long magic, unsigned long addr)
     return 0;
 }
 
-#define CmdlineIs(cmd) (!StrCmp(((struct multiboot_tag_module *)tag)->cmdline, cmd))
+#define CmdlineIs(cmd) (!NX_StrCmp(((struct multiboot_tag_module *)tag)->cmdline, cmd))
 
-INLINE void BootModInit(struct multiboot_tag *tag) {
+NX_INLINE void BootModInit(struct multiboot_tag *tag) {
     struct BootModInfo *modInfo = (struct BootModInfo *)BOOT_INFO_ADDR;
     int index = modInfo->modNum;
 
@@ -74,7 +74,7 @@ INLINE void BootModInit(struct multiboot_tag *tag) {
 
 #undef CmdlineIs
 
-INLINE void BootMemModInit(struct multiboot_tag *tag)
+NX_INLINE void BootMemModInit(struct multiboot_tag *tag)
 {
     unsigned long memUpper = ((struct multiboot_tag_basic_meminfo *)tag)->mem_upper;
     unsigned long memLower = ((struct multiboot_tag_basic_meminfo *)tag)->mem_lower;

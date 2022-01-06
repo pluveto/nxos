@@ -14,6 +14,6 @@
 
 #include <XBook.h>
 
-PUBLIC OS_Error HAL_InitClock(void);
+NX_PUBLIC NX_Error HAL_InitClock(void);
 
 #endif /* __PLATFROM_CLOCK__ */

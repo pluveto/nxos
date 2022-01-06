@@ -17,28 +17,28 @@
 #include <Regs.h>
 #include <SBI.h>
 
-#define LOG_NAME "Clock"
+#define NX_LOG_NAME "Clock"
 #include <Utils/Log.h>
 
-#define TIMER_CLK_FREQ 10000000  /* qemu has 10MHZ clock frequency */
+#define NX_TIMER_CLK_FREQ 10000000  /* qemu has 10MHZ clock frequency */
 
-PRIVATE U64 TickDelta = TIMER_CLK_FREQ / TICKS_PER_SECOND;
+NX_PRIVATE NX_U64 TickDelta = NX_TIMER_CLK_FREQ / NX_TICKS_PER_SECOND;
 
-PRIVATE U64 GetTimerCounter()
+NX_PRIVATE NX_U64 GetTimerCounter()
 {
-    U64 ret;
-    CASM ("rdtime %0" : "=r"(ret));
+    NX_U64 ret;
+    NX_CASM ("rdtime %0" : "=r"(ret));
     return ret;
 }
 
-PUBLIC void HAL_ClockHandler(void)
+NX_PUBLIC void HAL_ClockHandler(void)
 {
-    ClockTickGo();
+    NX_ClockTickGo();
     /* update timer */
     sbi_set_timer(GetTimerCounter() + TickDelta);
 }
 
-PUBLIC void HAL_InitClock(void)
+NX_PUBLIC void HAL_InitClock(void)
 {
     /* Clear the Supervisor-Timer bit in SIE */
     ClearCSR(sie, SIE_STIE);

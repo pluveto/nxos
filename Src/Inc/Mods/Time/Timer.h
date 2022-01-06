@@ -17,48 +17,48 @@
 #include <Mods/Time/Clock.h>
 
 /* 24 days */
-#define MAX_TIMER_TIMEOUT (24 * 24 * 60 * 60 * 1000)
+#define NX_MAX_TIMER_TIMEOUT (24 * 24 * 60 * 60 * 1000)
 
-#define TIMER_ONESHOT   0x01    /* timer type is one shot */
-#define TIMER_PERIOD    0x02    /* timer type is period */
-#define TIMER_DYNAMIC   0x08    /* timer create from memory heap */
+#define NX_TIMER_ONESHOT   0x01    /* timer type is one shot */
+#define NX_TIMER_PERIOD    0x02    /* timer type is period */
+#define NX_TIMER_DYNAMIC   0x08    /* timer create from memory heap */
 
-enum TimerState
+enum NX_TimerState
 {
-    TIMER_INITED = 1,   /* init, not run */
-    TIMER_WAITING,      /* waiting for timeout */
-    TIMER_PROCESSING,   /* timer processing */
-    TIMER_STOPPED,      /* timer stopped */
+    NX_TIMER_INITED = 1,   /* init, not run */
+    NX_TIMER_WAITING,      /* waiting for timeout */
+    NX_TIMER_PROCESSING,   /* timer processing */
+    NX_TIMER_STOPPED,      /* timer stopped */
 };
-typedef enum TimerState TimerState;
+typedef enum NX_TimerState NX_TimerState;
 
-struct Timer
+struct NX_Timer
 {
-    List list;
-    TimerState state;   /* timer state */
-    ClockTick timeout;  /* timeout ticks */ 
-    ClockTick timeTicks;
+    NX_List list;
+    NX_TimerState state;   /* timer state */
+    NX_ClockTick timeout;  /* timeout ticks */ 
+    NX_ClockTick timeTicks;
     int flags;
-    Bool (*handler)(struct Timer *, void *arg);
+    NX_Bool (*handler)(struct NX_Timer *, void *arg);
     void *arg;
 };
-typedef struct Timer Timer;
+typedef struct NX_Timer NX_Timer;
 
-PUBLIC OS_Error TimerInit(Timer *timer, UArch milliseconds, 
-                          Bool (*handler)(struct Timer *, void *arg), void *arg, 
+NX_PUBLIC NX_Error NX_TimerInit(NX_Timer *timer, NX_UArch milliseconds, 
+                          NX_Bool (*handler)(struct NX_Timer *, void *arg), void *arg, 
                           int flags);
-                          
-PUBLIC Timer *TimerCreate(UArch milliseconds, 
-                          Bool (*handler)(struct Timer *, void *arg), void *arg, 
+                         
+NX_PUBLIC NX_Timer *NX_TimerCreate(NX_UArch milliseconds, 
+                          NX_Bool (*handler)(struct NX_Timer *, void *arg), void *arg, 
                           int flags);
-                          
-PUBLIC OS_Error TimerStart(Timer *timer);
-PUBLIC OS_Error TimerStop(Timer *timer);
-PUBLIC OS_Error TimerDestroy(Timer *timer);
+                           
+NX_PUBLIC NX_Error NX_TimerStart(NX_Timer *timer);
+NX_PUBLIC NX_Error NX_TimerStop(NX_Timer *timer);
+NX_PUBLIC NX_Error NX_TimerDestroy(NX_Timer *timer);
 
-PUBLIC void TimerDump(Timer *timer);
+NX_PUBLIC void NX_TimerDump(NX_Timer *timer);
 
-PUBLIC void TimersInit(void);
-PUBLIC void TimerGo(void);
+NX_PUBLIC void NX_TimersInit(void);
+NX_PUBLIC void NX_TimerGo(void);
 
 #endif  /* __MODS_TIME_TIMER__ */

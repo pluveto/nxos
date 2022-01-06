@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: HAL Atomic  
+ * Contains: HAL NX_Atomic  
  * 
  * Change Logs:
  * Date           Author            Notes
@@ -11,58 +11,58 @@
 
 #include <XBook/Atomic.h>
 
-PRIVATE void HAL_AtomicSet(Atomic *atomic, long value)
+NX_PRIVATE void HAL_AtomicSet(NX_Atomic *atomic, long value)
 {
     atomic->value = value;
 }
 
-PRIVATE long HAL_AtomicGet(Atomic *atomic)
+NX_PRIVATE long HAL_AtomicGet(NX_Atomic *atomic)
 {
     return atomic->value;
 }
 
-PRIVATE void HAL_AtomicAdd(Atomic *atomic, long value)
+NX_PRIVATE void HAL_AtomicAdd(NX_Atomic *atomic, long value)
 {
     /* gcc build-in functions */
     __sync_fetch_and_add(&atomic->value, value);
 }
 
-PRIVATE void HAL_AtomicSub(Atomic *atomic, long value)
+NX_PRIVATE void HAL_AtomicSub(NX_Atomic *atomic, long value)
 {
     __sync_fetch_and_sub(&atomic->value, value);
 }
 
-PRIVATE void HAL_AtomicInc(Atomic *atomic)
+NX_PRIVATE void HAL_AtomicInc(NX_Atomic *atomic)
 {
     __sync_fetch_and_add(&atomic->value, 1);
 }
 
-PRIVATE void HAL_AtomicDec(Atomic *atomic)
+NX_PRIVATE void HAL_AtomicDec(NX_Atomic *atomic)
 {
     __sync_fetch_and_sub(&atomic->value, 1);
 }
 
-PRIVATE void HAL_AtomicSetMask(Atomic *atomic, long mask)
+NX_PRIVATE void HAL_AtomicSetMask(NX_Atomic *atomic, long mask)
 {
     __sync_fetch_and_or(&atomic->value, mask);
 }
 
-PRIVATE void HAL_AtomicClearMask(Atomic *atomic, long mask)
+NX_PRIVATE void HAL_AtomicClearMask(NX_Atomic *atomic, long mask)
 {    
     __sync_fetch_and_and(&atomic->value, ~mask);
 }
 
-PRIVATE long HAL_AtomicSwap(Atomic *atomic, long newValue)
+NX_PRIVATE long HAL_AtomicSwap(NX_Atomic *atomic, long newValue)
 {
     return __sync_lock_test_and_set(&((atomic)->value), newValue);
 }
 
-PRIVATE long HAL_AtomicCAS(Atomic *atomic, long old, long newValue)
+NX_PRIVATE long HAL_AtomicCAS(NX_Atomic *atomic, long old, long newValue)
 {
     return __sync_val_compare_and_swap(&atomic->value, old, newValue);
 }
 
-INTERFACE struct AtomicOps AtomicOpsInterface = 
+NX_INTERFACE struct NX_AtomicOps NX_AtomicOpsInterface = 
 {
     .set        = HAL_AtomicSet,
     .get        = HAL_AtomicGet,

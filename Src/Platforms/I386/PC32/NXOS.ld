@@ -22,7 +22,7 @@ SECTIONS {
 
     /* code segment */
     . = ALIGN(4);
-    __OS_TextStart = .;
+    __NX_TextStart = .;
     .text : 
     {
         *(.text.start)
@@ -31,38 +31,38 @@ SECTIONS {
 		*(.exit.text)
         
         . = ALIGN(4);
-        PROVIDE(__InitCallStart = .);
+        PROVIDE(__NX_InitCallStart = .);
         KEEP(*(.initCall0.text))
         KEEP(*(.initCall1.text))
         KEEP(*(.initCall2.text))
         KEEP(*(.initCall9.text))
-        PROVIDE(__InitCallEnd = .);
+        PROVIDE(__NX_InitCallEnd = .);
 
         . = ALIGN(4);
-        PROVIDE(__ExitCallStart = .);
+        PROVIDE(__NX_ExitCallStart = .);
         KEEP(*(.exitcall0.text))
         KEEP(*(.exitcall1.text))
         KEEP(*(.exitcall2.text))
-        PROVIDE(__ExitCallEnd = .);
+        PROVIDE(__NX_ExitCallEnd = .);
     
         /* section information for utest */
         . = ALIGN(4);
-        PROVIDE(__UTestCaseTableStart = .);
+        PROVIDE(__NX_UTestCaseTableStart = .);
         KEEP(*(UTestCaseTable))
-        PROVIDE(__UTestCaseTableEnd = .);
+        PROVIDE(__NX_UTestCaseTableEnd = .);
         
         /* section information for integration */
         . = ALIGN(4);
-        PROVIDE(__IntegrationTableStart = .);
+        PROVIDE(__NX_IntegrationTableStart = .);
         KEEP(*(IntegrationTable))
-        PROVIDE(__IntegrationTableEnd = .);
+        PROVIDE(__NX_IntegrationTableEnd = .);
     }
-    __OS_TextEnd = .;
+    __NX_TextEnd = .;
 
 
     /* data segment */
     . = ALIGN(4);
-    __OS_DataStart = .;
+    __NX_DataStart = .;
     .data :
     {
         *(.data)
@@ -70,12 +70,12 @@ SECTIONS {
         *(.rodata)
         *(.rodata.*)
     }
-    __OS_DataEnd = .;
+    __NX_DataEnd = .;
     
     /* bss segement */
     
     . = ALIGN(4);
-    __OS_BssStart = .;
+    __NX_BssStart = .;
     .bss       :
     {
         *(.bss)
@@ -83,6 +83,6 @@ SECTIONS {
         *(COMMON)
     }
     . = ALIGN(4);
-    __OS_BssEnd = .;
+    __NX_BssEnd = .;
 
 }

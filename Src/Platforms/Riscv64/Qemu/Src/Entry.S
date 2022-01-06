@@ -10,7 +10,7 @@
  */
 
     .section .text.start
-    .extern OS_Main
+    .extern NX_Main
 
     .globl CPU_StackTop0
     .globl CPU_StackTop1
@@ -47,7 +47,7 @@ _SetSP3:
 _EnterMain:
     csrw sscratch, sp /* first set sscrach as cpu stack here */
     csrc sstatus, 0x2 /* disable interrupt */
-    call OS_Main
+    call NX_Main
 
 loop:
     j loop

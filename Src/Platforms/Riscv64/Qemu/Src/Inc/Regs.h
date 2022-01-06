@@ -48,66 +48,66 @@
 
 #ifndef __ASSEMBLY__
 /* csr registers read/write */
-#define ReadCSR(reg) ({ U64 __tmp; \
-    CASM ("csrr %0, " #reg : "=r"(__tmp)); \
+#define ReadCSR(reg) ({ NX_U64 __tmp; \
+    NX_CASM ("csrr %0, " #reg : "=r"(__tmp)); \
     __tmp; })
 
 #define WriteCSR(reg, val) ({ \
-    if (__builtin_constant_p(val) && (U64)(val) < 32) \
-        CASM ("csrw " #reg ", %0" :: "i"(val)); \
+    if (__builtin_constant_p(val) && (NX_U64)(val) < 32) \
+        NX_CASM ("csrw " #reg ", %0" :: "i"(val)); \
     else \
-        CASM ("csrw " #reg ", %0" :: "r"(val)); })
+        NX_CASM ("csrw " #reg ", %0" :: "r"(val)); })
 
-#define SwapCSR(reg, val) ({ U64 __tmp; \
-    if (__builtin_constant_p(val) && (U64)(val) < 32) \
-        CASM ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "i"(val)); \
+#define SwapCSR(reg, val) ({ NX_U64 __tmp; \
+    if (__builtin_constant_p(val) && (NX_U64)(val) < 32) \
+        NX_CASM ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "i"(val)); \
     else \
-        CASM ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "r"(val)); \
+        NX_CASM ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "r"(val)); \
     __tmp; })
 
-#define SetCSR(reg, bit) ({ U64 __tmp; \
-    if (__builtin_constant_p(bit) && (U64)(bit) < 32) \
-        CASM ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "i"(bit)); \
+#define SetCSR(reg, bit) ({ NX_U64 __tmp; \
+    if (__builtin_constant_p(bit) && (NX_U64)(bit) < 32) \
+        NX_CASM ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "i"(bit)); \
     else \
-        CASM ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
+        NX_CASM ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
     __tmp; })
 
-#define ClearCSR(reg, bit) ({ U64 __tmp; \
-    if (__builtin_constant_p(bit) && (U64)(bit) < 32) \
-        CASM ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "i"(bit)); \
+#define ClearCSR(reg, bit) ({ NX_U64 __tmp; \
+    if (__builtin_constant_p(bit) && (NX_U64)(bit) < 32) \
+        NX_CASM ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "i"(bit)); \
     else \
-        CASM ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
+        NX_CASM ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
     __tmp; })
 
 /* read/write memory */
-#define Read8(addr) (*(VOLATILE U8 *)(addr))
-#define Read16(addr) (*(VOLATILE U16 *)(addr))
-#define Read32(addr) (*(VOLATILE U32 *)(addr))
-#define Read64(addr) (*(VOLATILE U64 *)(addr))
+#define Read8(addr) (*(NX_VOLATILE NX_U8 *)(addr))
+#define Read16(addr) (*(NX_VOLATILE NX_U16 *)(addr))
+#define Read32(addr) (*(NX_VOLATILE NX_U32 *)(addr))
+#define Read64(addr) (*(NX_VOLATILE NX_U64 *)(addr))
 
 #define Write8(addr, value)                      \
     {                                        \
-        (*(VOLATILE U8 *)(addr)) = (value); \
+        (*(NX_VOLATILE NX_U8 *)(addr)) = (value); \
     }
 #define Write16(addr, value)                       \
     {                                         \
-        (*(VOLATILE U16 *)(addr)) = (value); \
+        (*(NX_VOLATILE NX_U16 *)(addr)) = (value); \
     }
 #define Write32(addr, value)                       \
     {                                         \
-        (*(VOLATILE U32 *)(addr)) = (value); \
+        (*(NX_VOLATILE NX_U32 *)(addr)) = (value); \
     }
 #define Write64(addr, value)                       \
     {                                         \
-        (*(VOLATILE U64 *)(addr)) = (value); \
+        (*(NX_VOLATILE NX_U64 *)(addr)) = (value); \
     }
 
-#define ReadReg(reg) ({ U64 __tmp; \
-    CASM ("mv %0, " #reg : "=r"(__tmp)); \
+#define ReadReg(reg) ({ NX_U64 __tmp; \
+    NX_CASM ("mv %0, " #reg : "=r"(__tmp)); \
     __tmp; })
 
 #define WriteReg(reg, val) ({ \
-        CASM ("mv " #reg ", %0" :: "r"(val)); })
+        NX_CASM ("mv " #reg ", %0" :: "r"(val)); })
 
 #endif /* !__ASSEMBLY__ */
 

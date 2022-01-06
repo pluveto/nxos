@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: List utils
+ * Contains: NX_List utils
  * 
  * Change Logs:
  * Date            Author             Notes
@@ -14,25 +14,25 @@
 
 #include <XBook.h>
 
-struct List
+struct NX_List
 {
-    struct List *prev;
-    struct List *next;
+    struct NX_List *prev;
+    struct NX_List *next;
 };
-typedef struct List List;
+typedef struct NX_List NX_List;
 
-#define LIST_HEAD_INIT(name) { &(name), &(name) }
+#define NX_LIST_HEAD_INIT(name) { &(name), &(name) }
 
-#define LIST_HEAD(name) \
-        List name = LIST_HEAD_INIT(name)
+#define NX_LIST_HEAD(name) \
+        NX_List name = NX_LIST_HEAD_INIT(name)
 
-INLINE void ListInit(List *list)
+NX_INLINE void NX_ListInit(NX_List *list)
 {
     list->next = list;
     list->prev = list;  
 }
 
-INLINE void __ListAdd(List *list, List *prev, List *next)
+NX_INLINE void __ListAdd(NX_List *list, NX_List *prev, NX_List *next)
 {
     next->prev = list; 
     list->next = next; 
@@ -40,12 +40,12 @@ INLINE void __ListAdd(List *list, List *prev, List *next)
     prev->next = list; 
 }
 
-INLINE void ListAdd(List *list, List *head)
+NX_INLINE void NX_ListAdd(NX_List *list, NX_List *head)
 {
     __ListAdd(list, head, head->next);
 }
 
-INLINE void ListAddBefore(List *list, List *node)
+NX_INLINE void NX_ListAddBefore(NX_List *list, NX_List *node)
 {
     node->prev->next = list;
 
@@ -55,7 +55,7 @@ INLINE void ListAddBefore(List *list, List *node)
     node->prev = list;
 }
 
-INLINE void ListAddAfter(List *list, List *node)
+NX_INLINE void NX_ListAddAfter(NX_List *list, NX_List *node)
 {
     node->next->prev = list;
 
@@ -65,36 +65,36 @@ INLINE void ListAddAfter(List *list, List *node)
     node->next = list;
 }
 
-INLINE void ListAddTail(List *list, List *head)
+NX_INLINE void NX_ListAddTail(NX_List *list, NX_List *head)
 {
     __ListAdd(list, head->prev, head);
 }
 
-INLINE void __ListDel(List *prev, List *next)
+NX_INLINE void __ListDel(NX_List *prev, NX_List *next)
 {
     next->prev = prev;
     prev->next = next;
 }
 
-INLINE void __ListDelNode(List *node)
+NX_INLINE void __ListDelNode(NX_List *node)
 {
     __ListDel(node->prev, node->next);
 }
 
-INLINE void ListDel(List *node)
+NX_INLINE void NX_ListDel(NX_List *node)
 {
     __ListDelNode(node);
-    node->prev = (List *)NULL;
-    node->next = (List *)NULL;
+    node->prev = (NX_List *)NX_NULL;
+    node->next = (NX_List *)NX_NULL;
 }
 
-INLINE void ListDelInit(List *node)
+NX_INLINE void NX_ListDelInit(NX_List *node)
 {
     __ListDelNode(node);
-    ListInit(node);
+    NX_ListInit(node);
 }
 
-INLINE void ListReplace(List *old, List *list)
+NX_INLINE void NX_ListReplace(NX_List *old, NX_List *list)
 {
     list->next = old->next;
     list->next->prev = list;
@@ -102,71 +102,71 @@ INLINE void ListReplace(List *old, List *list)
     list->prev->next = list;
 }
 
-INLINE void ListReplaceInit(List *old, List *list)
+NX_INLINE void NX_ListReplaceInit(NX_List *old, NX_List *list)
 {
-    ListReplace(old, list);
-    ListInit(old);
+    NX_ListReplace(old, list);
+    NX_ListInit(old);
 }
 
-INLINE void ListMove(List *node, List *head)
-{
-    __ListDelNode(node);
-    ListAdd(node, head);    
-}
-
-INLINE void ListMoveTail(List *node, List *head)
+NX_INLINE void NX_ListMove(NX_List *node, NX_List *head)
 {
     __ListDelNode(node);
-    ListAddTail(node, head);    
+    NX_ListAdd(node, head);    
 }
 
-INLINE int ListIsFirst(const List *node, const List *head)
+NX_INLINE void NX_ListMoveTail(NX_List *node, NX_List *head)
+{
+    __ListDelNode(node);
+    NX_ListAddTail(node, head);    
+}
+
+NX_INLINE int NX_ListIsFirst(const NX_List *node, const NX_List *head)
 {
     return (node->prev == head);
 }
 
-INLINE int ListIsLast(const List *node, const List *head)
+NX_INLINE int NX_ListIsLast(const NX_List *node, const NX_List *head)
 {
     return (node->next == head);
 }
 
-INLINE int ListEmpty(const List *head)
+NX_INLINE int NX_ListEmpty(const NX_List *head)
 {
     return (head->next == head);
 }
 
-#define ListEntry(ptr, type, member) PtrOfStruct(ptr, type, member)
+#define NX_ListEntry(ptr, type, member) NX_PTR_OF_STRUCT(ptr, type, member)
 
-#define ListFirstEntry(head, type, member) ListEntry((head)->next, type, member)
+#define NX_ListFirstEntry(head, type, member) NX_ListEntry((head)->next, type, member)
 
-#define ListLastEntry(head, type, member) ListEntry((head)->prev, type, member)
+#define NX_ListLastEntry(head, type, member) NX_ListEntry((head)->prev, type, member)
 
-#define ListFirstEntryOrNULL(head, type, member) ({ \
-        List *__head = (head); \
-        List *__pos = (__head->next); \
-        __pos != __head ? ListEntry(__pos, type, member) : NULL; \
+#define NX_ListFirstEntryOrNULL(head, type, member) ({ \
+        NX_List *__head = (head); \
+        NX_List *__pos = (__head->next); \
+        __pos != __head ? NX_ListEntry(__pos, type, member) : NX_NULL; \
 })
 
-#define ListLastEntryOrNULL(head, type, member) ({ \
-        List *__head = (head); \
-        List *__pos = (__head->prev); \
-        __pos != __head ? ListEntry(__pos, type, member) : NULL; \
+#define NX_ListLastEntryOrNULL(head, type, member) ({ \
+        NX_List *__head = (head); \
+        NX_List *__pos = (__head->prev); \
+        __pos != __head ? NX_ListEntry(__pos, type, member) : NX_NULL; \
 })
 
-#define ListNextEntry(pos, member) \
-       ListEntry((pos)->member.next, typeof(*(pos)), member)
+#define NX_ListNextEntry(pos, member) \
+       NX_ListEntry((pos)->member.next, typeof(*(pos)), member)
 
-#define ListPrevOnwer(pos, member) \
-       ListEntry((pos)->member.prev, typeof(*(pos)), member)
+#define NX_ListPrevOnwer(pos, member) \
+       NX_ListEntry((pos)->member.prev, typeof(*(pos)), member)
 
-#define ListForEach(pos, head) \
+#define NX_ListForEach(pos, head) \
        for (pos = (head)->next; pos != (head); pos = pos->next)
 
-INLINE int ListLength(List *head)
+NX_INLINE int NX_ListLength(NX_List *head)
 {
-    List *list;
+    NX_List *list;
     int n = 0;
-    ListForEach(list, head)
+    NX_ListForEach(list, head)
     {
         if (list == head)
         {
@@ -177,10 +177,10 @@ INLINE int ListLength(List *head)
     return n;
 }
 
-INLINE int ListFind(List *list, List *head)
+NX_INLINE int NX_ListFind(NX_List *list, NX_List *head)
 {
-    List *node;
-    ListForEach(node, head)
+    NX_List *node;
+    NX_ListForEach(node, head)
     {
         if (node == list)
         {
@@ -190,37 +190,37 @@ INLINE int ListFind(List *list, List *head)
     return 0;
 }
 
-#define ListForEachPrev(pos, head) \
+#define NX_ListForEachPrev(pos, head) \
        for (pos = (head)->prev; pos != (head); pos = pos->prev)
 
-#define ListForEachSafe(pos, _next, head) \
+#define NX_ListForEachSafe(pos, _next, head) \
         for (pos = (head)->next, _next = pos->next; pos != (head); \
             pos = _next, _next = pos->next)
 
-#define ListForEachPrevSafe(pos, _prev, head) \
+#define NX_ListForEachPrevSafe(pos, _prev, head) \
         for (pos = (head)->prev, _prev = pos->prev; pos != (head); \
             pos = _prev, _prev = pos->prev)
 
-#define ListForEachEntry(pos, head, member)                     \
-        for (pos = ListFirstEntry(head, typeof(*pos), member);  \
+#define NX_ListForEachEntry(pos, head, member)                     \
+        for (pos = NX_ListFirstEntry(head, typeof(*pos), member);  \
             &pos->member != (head);                             \
-            pos = ListNextEntry(pos, member))
+            pos = NX_ListNextEntry(pos, member))
 
-#define ListForEachEntryReverse(pos, head, member)              \
-        for (pos = ListLastEntry(head, typeof(*pos), member);   \
+#define NX_ListForEachEntryReverse(pos, head, member)              \
+        for (pos = NX_ListLastEntry(head, typeof(*pos), member);   \
             &pos->member != (head);                             \
-            pos = ListPrevOnwer(pos, member))
+            pos = NX_ListPrevOnwer(pos, member))
 
-#define ListForEachEntrySafe(pos, next, head, member)           \
-        for (pos = ListFirstEntry(head, typeof(*pos), member),  \
-            next = ListNextEntry(pos, member);                  \
+#define NX_ListForEachEntrySafe(pos, next, head, member)           \
+        for (pos = NX_ListFirstEntry(head, typeof(*pos), member),  \
+            next = NX_ListNextEntry(pos, member);                  \
             &pos->member != (head);                             \
-            pos = next, next = ListNextEntry(next, member))
+            pos = next, next = NX_ListNextEntry(next, member))
 
-#define ListForEachEntryReverseSafe(pos, prev, head, member)    \
-        for (pos = ListLastEntry(head, typeof(*pos), member),   \
-            prev = ListPrevOnwer(pos, member);                  \
+#define NX_ListForEachEntryReverseSafe(pos, prev, head, member)    \
+        for (pos = NX_ListLastEntry(head, typeof(*pos), member),   \
+            prev = NX_ListPrevOnwer(pos, member);                  \
             &pos->member != (head);                             \
-            pos = prev, prev = ListPrevOnwer(prev, member))
+            pos = prev, prev = NX_ListPrevOnwer(prev, member))
 
 #endif  /* __UTILS_LIST__ */

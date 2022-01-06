@@ -9,34 +9,34 @@
  * 2021-10-17     JasonHu           Update code style
  */
 
-#define LOG_LEVEL LOG_INFO
-#define LOG_NAME "Buddy"
+#define NX_LOG_LEVEL NX_LOG_INFO
+#define NX_LOG_NAME "Buddy"
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 #include <Utils/Bitops.h>
 #include <XBook.h>
 
-#define BUDDY_ASSERT(x, msg) ASSERT((x) && (msg))
+#define BUDDY_ASSERT(x, msg) NX_ASSERT((x) && (msg))
 
 /**
  * find first bit set
  */
-INLINE int BuddyFFS(U32 word)
+NX_INLINE int BuddyFFS(NX_U32 word)
 {
-    return FFS(word) - 1;
+    return NX_FFS(word) - 1;
 }
 
 /**
  * find last bit set
  */
-INLINE int BuddyFLS(U32 word)
+NX_INLINE int BuddyFLS(NX_U32 word)
 {
-    return FLS(word) - 1;
+    return NX_FLS(word) - 1;
 }
 
 /* Possibly 64-bit version of BuddyFLS. */
-#if defined(CONFIG_CPU_64BITS)
-PRIVATE int BuddyFlsSizet(USize size)
+#if defined(CONFIG_NX_CPU_64BITS)
+NX_PRIVATE int BuddyFlsSizet(NX_USize size)
 {
     int high = (int)(size >> 32);
     int bits = 0;
@@ -51,7 +51,7 @@ PRIVATE int BuddyFlsSizet(USize size)
     return bits;
 }
 
-PRIVATE int BuddyFfsSizet(USize size)
+NX_PRIVATE int BuddyFfsSizet(NX_USize size)
 {
     int low = (int)(size);
     int bits = 0;
@@ -70,24 +70,24 @@ PRIVATE int BuddyFfsSizet(USize size)
 #define BuddyFfsSizet BuddyFFS
 #endif
 
-PRIVATE USize BuddyAlignUp(USize x, USize align)
+NX_PRIVATE NX_USize BuddyAlignUp(NX_USize x, NX_USize align)
 {
     BUDDY_ASSERT(0 == (align & (align - 1)), "must align to a power of two");
     return (x + (align - 1)) & ~(align - 1);
 }
 
-USED PRIVATE USize BuddyAlignDown(USize x, USize align)
+NX_USED NX_PRIVATE NX_USize BuddyAlignDown(NX_USize x, NX_USize align)
 {
     BUDDY_ASSERT(0 == (align & (align - 1)), "must align to a power of two");
     return x - (x & (align - 1));
 }
 
-PRIVATE void *BuddyAlignPtr(const void *ptr, USize align)
+NX_PRIVATE void *BuddyAlignPtr(const void *ptr, NX_USize align)
 {
-    ASSERT(ptr && align);
+    NX_ASSERT(ptr && align);
 
-    const PtrDiff aligned =
-        (TypeCast(PtrDiff, ptr) + (align - 1)) & ~(align - 1);
+    const NX_PtrDiff aligned =
+        (NX_TYPE_CAST(NX_PtrDiff, ptr) + (align - 1)) & ~(align - 1);
     BUDDY_ASSERT(0 == (align & (align - 1)), "must align to a power of two");
-    return TypeCast(void*, aligned);
+    return NX_TYPE_CAST(void*, aligned);
 }

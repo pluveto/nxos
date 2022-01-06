@@ -14,8 +14,8 @@
 
 #include <XBook.h>
 
-#ifdef CONFIG_DEMO_HAL_CONTEXT
-PUBLIC void Demo_HAL_Context(void);
+#ifdef CONFIG_NX_DEMO_HAL_CONTEXT
+NX_PUBLIC void Demo_HAL_Context(void);
 #endif
 
 #endif  /* __UTILS_DEMO__ */

@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Thread context 
+ * Contains: NX_Thread context 
  * 
  * Change Logs:
  * Date           Author            Notes
@@ -16,26 +16,26 @@
 #include <Context.h>
 #include <Regs.h>
 
-IMPORT void HAL_ContextSwitchNext(Addr nextSP);
-IMPORT void HAL_ContextSwitchPrevNext(Addr prevSP, Addr nextSP);
+NX_IMPORT void HAL_NX_ContextSwitchNext(NX_Addr nextSP);
+NX_IMPORT void HAL_NX_ContextSwitchPrevNext(NX_Addr prevSP, NX_Addr nextSP);
 
-PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void *stackTop)
+NX_PRIVATE void *HAL_NX_ContextInit(void *startEntry, void *exitEntry, void *arg, void *stackTop)
 {
-    U8 *stack = NULL;
-    HAL_Context *context = NULL;
+    NX_U8 *stack = NX_NULL;
+    HAL_Context *context = NX_NULL;
 
-    stack = (U8 *)stackTop;
-    stack = (U8 *)ALIGN_DOWN((UArch)stack, sizeof(UArch));
+    stack = (NX_U8 *)stackTop;
+    stack = (NX_U8 *)NX_ALIGN_DOWN((NX_UArch)stack, sizeof(NX_UArch));
 
     stack -= sizeof(HAL_Context);
     context = (HAL_Context *)stack;
     
-    Zero(context, sizeof(HAL_Context));
+    NX_MemZero(context, sizeof(HAL_Context));
 
-    context->a0 = (UArch)arg;
-    context->epc = (UArch)startEntry;
-    context->sp = (UArch)(((UArch)stack) + sizeof(HAL_Context));
-    context->ra = (UArch)exitEntry;
+    context->a0 = (NX_UArch)arg;
+    context->epc = (NX_UArch)startEntry;
+    context->sp = (NX_UArch)(((NX_UArch)stack) + sizeof(HAL_Context));
+    context->ra = (NX_UArch)exitEntry;
     
     /**
      * allow to access user space memory,
@@ -47,9 +47,9 @@ PRIVATE void *HAL_ContextInit(void *startEntry, void *exitEntry, void *arg, void
     return (void *)stack;
 }
 
-INTERFACE struct ContextOps ContextOpsInterface = 
+NX_INTERFACE struct NX_ContextOps NX_ContextOpsInterface = 
 {
-    .init           = HAL_ContextInit,
-    .switchNext     = HAL_ContextSwitchNext,
-    .switchPrevNext = HAL_ContextSwitchPrevNext,
+    .init           = HAL_NX_ContextInit,
+    .switchNext     = HAL_NX_ContextSwitchNext,
+    .switchPrevNext = HAL_NX_ContextSwitchPrevNext,
 };

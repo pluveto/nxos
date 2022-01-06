@@ -12,134 +12,134 @@
 #include <XBook/Atomic.h>
 #include <Mods/Test/UTest.h>
 
-#ifdef CONFIG_UTEST_XBOOK_ATOMIC
+#ifdef CONFIG_NX_UTEST_XBOOK_ATOMIC
 
-TEST(AtomicSetAndGet)
+NX_TEST(NX_AtomicSetAndGet)
 {
-    Atomic val;
-    AtomicSet(&val, 0);
-    EXPECT_EQ(AtomicGet(&val), 0);
+    NX_Atomic val;
+    NX_AtomicSet(&val, 0);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0);
     
-    AtomicSet(&val, 1);
-    EXPECT_EQ(AtomicGet(&val), 1);
+    NX_AtomicSet(&val, 1);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 1);
 }
 
-TEST(AtomicAdd)
+NX_TEST(NX_AtomicAdd)
 {
-    Atomic val;
-    AtomicSet(&val, 0);
-    AtomicAdd(&val, 1);
-    EXPECT_EQ(AtomicGet(&val), 1);
-    AtomicAdd(&val, 3);
-    EXPECT_EQ(AtomicGet(&val), 4);
-    AtomicAdd(&val, 100);
-    EXPECT_EQ(AtomicGet(&val), 104);
+    NX_Atomic val;
+    NX_AtomicSet(&val, 0);
+    NX_AtomicAdd(&val, 1);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 1);
+    NX_AtomicAdd(&val, 3);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 4);
+    NX_AtomicAdd(&val, 100);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 104);
 }
 
-TEST(AtomicSub)
+NX_TEST(NX_AtomicSub)
 {
-    Atomic val;
-    AtomicSet(&val, 0);
-    AtomicSub(&val, 1);
-    EXPECT_EQ(AtomicGet(&val), -1);
-    AtomicSub(&val, 3);
-    EXPECT_EQ(AtomicGet(&val), -4);
-    AtomicSub(&val, 100);
-    EXPECT_EQ(AtomicGet(&val), -104);
+    NX_Atomic val;
+    NX_AtomicSet(&val, 0);
+    NX_AtomicSub(&val, 1);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), -1);
+    NX_AtomicSub(&val, 3);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), -4);
+    NX_AtomicSub(&val, 100);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), -104);
 }
 
-TEST(AtomicInc)
+NX_TEST(NX_AtomicInc)
 {
-    Atomic val;
-    AtomicSet(&val, 0);
-    AtomicInc(&val);
-    EXPECT_EQ(AtomicGet(&val), 1);
-    AtomicInc(&val);
-    EXPECT_EQ(AtomicGet(&val), 2);
-    AtomicInc(&val);
-    EXPECT_EQ(AtomicGet(&val), 3);
+    NX_Atomic val;
+    NX_AtomicSet(&val, 0);
+    NX_AtomicInc(&val);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 1);
+    NX_AtomicInc(&val);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 2);
+    NX_AtomicInc(&val);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 3);
 }
 
-TEST(AtomicDec)
+NX_TEST(NX_AtomicDec)
 {
-    Atomic val;
-    AtomicSet(&val, 0);
-    AtomicDec(&val);
-    EXPECT_EQ(AtomicGet(&val), -1);
-    AtomicDec(&val);
-    EXPECT_EQ(AtomicGet(&val), -2);
-    AtomicDec(&val);
-    EXPECT_EQ(AtomicGet(&val), -3);
+    NX_Atomic val;
+    NX_AtomicSet(&val, 0);
+    NX_AtomicDec(&val);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), -1);
+    NX_AtomicDec(&val);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), -2);
+    NX_AtomicDec(&val);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), -3);
 }
 
-TEST(AtomicSetMask)
+NX_TEST(NX_AtomicSetMask)
 {
-    Atomic val;
-    AtomicSet(&val, 0);
-    AtomicSetMask(&val, 0x01);
-    EXPECT_EQ(AtomicGet(&val), 0x01);
-    AtomicSetMask(&val, 0x02);
-    EXPECT_EQ(AtomicGet(&val), 0x03);
-    AtomicSetMask(&val, 0x10);
-    EXPECT_EQ(AtomicGet(&val), 0x13);
+    NX_Atomic val;
+    NX_AtomicSet(&val, 0);
+    NX_AtomicSetMask(&val, 0x01);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0x01);
+    NX_AtomicSetMask(&val, 0x02);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0x03);
+    NX_AtomicSetMask(&val, 0x10);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0x13);
 }
 
-TEST(AtomicClearMask)
+NX_TEST(NX_AtomicClearMask)
 {
-    Atomic val;
-    AtomicSet(&val, 0xffffff);
-    AtomicClearMask(&val, 0x01);
-    EXPECT_EQ(AtomicGet(&val), 0xfffffe);
-    AtomicClearMask(&val, 0x02);
-    EXPECT_EQ(AtomicGet(&val), 0xfffffc);
-    AtomicClearMask(&val, 0x10);
-    EXPECT_EQ(AtomicGet(&val), 0xffffec);
+    NX_Atomic val;
+    NX_AtomicSet(&val, 0xffffff);
+    NX_AtomicClearMask(&val, 0x01);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0xfffffe);
+    NX_AtomicClearMask(&val, 0x02);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0xfffffc);
+    NX_AtomicClearMask(&val, 0x10);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0xffffec);
 }
 
-TEST(AtomicSwap)
+NX_TEST(NX_AtomicSwap)
 {
-    Atomic val;
-    AtomicSet(&val, 0);
-    EXPECT_EQ(AtomicSwap(&val, 1), 0);
-    EXPECT_EQ(AtomicGet(&val), 1);
+    NX_Atomic val;
+    NX_AtomicSet(&val, 0);
+    NX_EXPECT_EQ(NX_AtomicSwap(&val, 1), 0);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 1);
 
-    EXPECT_EQ(AtomicSwap(&val, 0x5a5a5a5a), 1);
-    EXPECT_EQ(AtomicGet(&val), 0x5a5a5a5a);
+    NX_EXPECT_EQ(NX_AtomicSwap(&val, 0x5a5a5a5a), 1);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0x5a5a5a5a);
 }
 
-TEST(AtomicCAS)
+NX_TEST(NX_AtomicCAS)
 {
-    Atomic val;
-    AtomicSet(&val, 0);
-    EXPECT_EQ(AtomicCAS(&val, 0, 1), 0);
-    EXPECT_EQ(AtomicGet(&val), 1);
+    NX_Atomic val;
+    NX_AtomicSet(&val, 0);
+    NX_EXPECT_EQ(NX_AtomicCAS(&val, 0, 1), 0);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 1);
 
-    EXPECT_EQ(AtomicCAS(&val, 1, 0x5a5a5a5a), 1);
-    EXPECT_EQ(AtomicGet(&val), 0x5a5a5a5a);
+    NX_EXPECT_EQ(NX_AtomicCAS(&val, 1, 0x5a5a5a5a), 1);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0x5a5a5a5a);
 
-    EXPECT_EQ(AtomicCAS(&val, 1, 0xfafafa), 0x5a5a5a5a);
-    EXPECT_NE(AtomicGet(&val), 0xfafafa);
+    NX_EXPECT_EQ(NX_AtomicCAS(&val, 1, 0xfafafa), 0x5a5a5a5a);
+    NX_EXPECT_NE(NX_AtomicGet(&val), 0xfafafa);
 
-    EXPECT_EQ(AtomicCAS(&val, 0x5a5a5a5a, 0xfafafa), 0x5a5a5a5a);
-    EXPECT_EQ(AtomicGet(&val), 0xfafafa);
+    NX_EXPECT_EQ(NX_AtomicCAS(&val, 0x5a5a5a5a, 0xfafafa), 0x5a5a5a5a);
+    NX_EXPECT_EQ(NX_AtomicGet(&val), 0xfafafa);
     
-    EXPECT_NE(AtomicCAS(&val, 0, 1), 0);
-    EXPECT_NE(AtomicGet(&val), 0);
+    NX_EXPECT_NE(NX_AtomicCAS(&val, 0, 1), 0);
+    NX_EXPECT_NE(NX_AtomicGet(&val), 0);
 }
 
-TEST_TABLE(Atomic)
+NX_TEST_TABLE(NX_Atomic)
 {
-    TEST_UNIT(AtomicSetAndGet),
-    TEST_UNIT(AtomicAdd),
-    TEST_UNIT(AtomicSub),
-    TEST_UNIT(AtomicInc),
-    TEST_UNIT(AtomicDec),
-    TEST_UNIT(AtomicSetMask),
-    TEST_UNIT(AtomicClearMask),
-    TEST_UNIT(AtomicSwap),
-    TEST_UNIT(AtomicCAS),
+    NX_TEST_UNIT(NX_AtomicSetAndGet),
+    NX_TEST_UNIT(NX_AtomicAdd),
+    NX_TEST_UNIT(NX_AtomicSub),
+    NX_TEST_UNIT(NX_AtomicInc),
+    NX_TEST_UNIT(NX_AtomicDec),
+    NX_TEST_UNIT(NX_AtomicSetMask),
+    NX_TEST_UNIT(NX_AtomicClearMask),
+    NX_TEST_UNIT(NX_AtomicSwap),
+    NX_TEST_UNIT(NX_AtomicCAS),
 };
 
-TEST_CASE(Atomic);
+NX_TEST_CASE(NX_Atomic);
 
 #endif

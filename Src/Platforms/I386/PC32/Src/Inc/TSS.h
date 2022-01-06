@@ -15,41 +15,41 @@
 #include <XBook.h>
 
 #define KERNEL_STACK_TOP_PHY 0x9f000
-#define KERNEL_STACK_TOP (KVADDR_OFFSET + KERNEL_STACK_TOP_PHY)
+#define KERNEL_STACK_TOP (NX_KVADDR_OFFSET + KERNEL_STACK_TOP_PHY)
 
 struct CPU_TSS
 {
-    U32 backlink;
-    U32 esp0;
-    U32 ss0;
-    U32 esp1;
-    U32 ss1;
-    U32 esp2;
-    U32 ss2;
-    U32 cr3;
-    U32 eip;
-    U32 eflags;
-    U32 eax;
-    U32 ecx;
-    U32 edx;
-    U32 ebx;
-    U32 esp;
-    U32 ebp;
-    U32 esi;
-    U32 edi;
-    U32 es;
-    U32 cs;
-    U32 ss;
-    U32 ds;
-    U32 fs;
-    U32 gs;
-    U32 ldtr;
-    U32 trap;
-    U32 iobase;
+    NX_U32 backlink;
+    NX_U32 esp0;
+    NX_U32 ss0;
+    NX_U32 esp1;
+    NX_U32 ss1;
+    NX_U32 esp2;
+    NX_U32 ss2;
+    NX_U32 cr3;
+    NX_U32 eip;
+    NX_U32 eflags;
+    NX_U32 eax;
+    NX_U32 ecx;
+    NX_U32 edx;
+    NX_U32 ebx;
+    NX_U32 esp;
+    NX_U32 ebp;
+    NX_U32 esi;
+    NX_U32 edi;
+    NX_U32 es;
+    NX_U32 cs;
+    NX_U32 ss;
+    NX_U32 ds;
+    NX_U32 fs;
+    NX_U32 gs;
+    NX_U32 ldtr;
+    NX_U32 trap;
+    NX_U32 iobase;
 };
 
 void CPU_InitTSS(void);
 struct CPU_TSS *CPU_GetTSS(void);
-void CPU_SetTssStack(UArch top);
+void CPU_SetTssStack(NX_UArch top);
 
 #endif  /* __I386_TSS__ */

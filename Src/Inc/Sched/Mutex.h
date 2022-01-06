@@ -15,15 +15,15 @@
 #include <XBook.h>
 #include <Sched/Spin.h>
 
-struct Mutex
+struct NX_Mutex
 {
-    Spin lock;  /* lock for mutex value */
-    U32 magic;  /* magic for mutex init */  
+    NX_Spin lock;  /* lock for mutex value */
+    NX_U32 magic;  /* magic for mutex init */  
 };
-typedef struct Mutex Mutex;
+typedef struct NX_Mutex NX_Mutex;
 
-PUBLIC OS_Error MutexInit(Mutex *mutex);
-PUBLIC OS_Error MutexLock(Mutex *mutex, Bool forever);
-PUBLIC OS_Error MutexUnlock(Mutex *mutex);
+NX_PUBLIC NX_Error NX_MutexInit(NX_Mutex *mutex);
+NX_PUBLIC NX_Error NX_MutexLock(NX_Mutex *mutex, NX_Bool forever);
+NX_PUBLIC NX_Error NX_MutexUnlock(NX_Mutex *mutex);
 
 #endif /* __SCHED_MUTEX___ */

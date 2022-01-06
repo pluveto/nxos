@@ -14,19 +14,19 @@
 
 #include <XBook.h>
 
-#define DRAM_SIZE_DEFAULT (128 * SZ_MB)
+#define DRAM_SIZE_DEFAULT (128 * NX_MB)
 
 #define MEM_SBI_BASE    0x80000000
-#define MEM_SBI_SZ      (2 * SZ_MB)
+#define MEM_SBI_SZ      (2 * NX_MB)
 
 #define MEM_KERNEL_BASE (MEM_SBI_BASE + MEM_SBI_SZ)
-#define MEM_KERNEL_SZ   (30 * SZ_MB)
+#define MEM_KERNEL_SZ   (30 * NX_MB)
 
 #define MEM_NORMAL_BASE (MEM_KERNEL_BASE + MEM_KERNEL_SZ)
 
-#define MEM_MIN_SIZE    (128 * SZ_MB)
+#define MEM_MIN_SIZE    (128 * NX_MB)
 
-#define MEM_KERNEL_SPACE_SZ  (128 * SZ_MB)
+#define MEM_KERNEL_SPACE_SZ  (128 * NX_MB)
 
 #define MEM_KERNEL_TOP  (MEM_SBI_BASE + MEM_KERNEL_SPACE_SZ)
 

@@ -14,7 +14,7 @@
 #include <Interrupt.h>
 #include <IO/IRQ.h>
 
-PUBLIC void PIC_Init(void)
+NX_PUBLIC void PIC_Init(void)
 {
     /* mask all interrupts */
 	IO_Out8(PIC_MASTER_CTLMASK,  0xff);
@@ -35,7 +35,7 @@ PUBLIC void PIC_Init(void)
 	IO_Out8(PIC_SLAVE_CTLMASK,   0xff);
 }
 
-PUBLIC void PIC_Enable(U32 irq)
+NX_PUBLIC void PIC_Enable(NX_U32 irq)
 {
     if(irq < 8){    /* clear master */
         IO_Out8(PIC_MASTER_CTLMASK, IO_In8(PIC_MASTER_CTLMASK) & ~(1 << irq));
@@ -46,7 +46,7 @@ PUBLIC void PIC_Enable(U32 irq)
     }
 }
 
-PUBLIC void PIC_Disable(U32 irq)   
+NX_PUBLIC void PIC_Disable(NX_U32 irq)   
 {
 	if(irq < 8){    /* set master */ 
         IO_Out8(PIC_MASTER_CTLMASK, IO_In8(PIC_MASTER_CTLMASK) | (1 << irq));
@@ -56,7 +56,7 @@ PUBLIC void PIC_Disable(U32 irq)
     }
 }
 
-PUBLIC void PIC_Ack(U32 irq)
+NX_PUBLIC void PIC_Ack(NX_U32 irq)
 {
 	if (irq >= 8) { /* slaver */
 		IO_Out8(PIC_SLAVE_CTL, PIC_EIO);

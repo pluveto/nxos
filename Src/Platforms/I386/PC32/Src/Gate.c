@@ -15,71 +15,71 @@
 
 struct CPU_Gate
 {
-    U16 offsetLow, selector;
-    U8 datacount;
-    U8 attributes;      /* P(1) DPL(2) DT(1) TYPE(4) */
-    U16 offsetHigh;
+    NX_U16 offsetLow, selector;
+    NX_U8 datacount;
+    NX_U8 attributes;      /* P(1) DPL(2) DT(1) TYPE(4) */
+    NX_U16 offsetHigh;
 };
 
 typedef void (*TrapHandler)(void);
 
-PUBLIC void CPU_TrapEntry0x00(void);
-PUBLIC void CPU_TrapEntry0x01(void);
-PUBLIC void CPU_TrapEntry0x02(void);
-PUBLIC void CPU_TrapEntry0x03(void);
-PUBLIC void CPU_TrapEntry0x04(void);
-PUBLIC void CPU_TrapEntry0x05(void);
-PUBLIC void CPU_TrapEntry0x06(void);
-PUBLIC void CPU_TrapEntry0x07(void);
-PUBLIC void CPU_TrapEntry0x08(void);
-PUBLIC void CPU_TrapEntry0x09(void);
-PUBLIC void CPU_TrapEntry0x0a(void);
-PUBLIC void CPU_TrapEntry0x0b(void);
-PUBLIC void CPU_TrapEntry0x0c(void);
-PUBLIC void CPU_TrapEntry0x0d(void);
-PUBLIC void CPU_TrapEntry0x0e(void);
-PUBLIC void CPU_TrapEntry0x0f(void);
-PUBLIC void CPU_TrapEntry0x10(void);
-PUBLIC void CPU_TrapEntry0x11(void);
-PUBLIC void CPU_TrapEntry0x12(void);
-PUBLIC void CPU_TrapEntry0x13(void);
-PUBLIC void CPU_TrapEntry0x14(void);
-PUBLIC void CPU_TrapEntry0x15(void);
-PUBLIC void CPU_TrapEntry0x16(void);
-PUBLIC void CPU_TrapEntry0x17(void);
-PUBLIC void CPU_TrapEntry0x18(void);
-PUBLIC void CPU_TrapEntry0x19(void);
-PUBLIC void CPU_TrapEntry0x1a(void);
-PUBLIC void CPU_TrapEntry0x1b(void);
-PUBLIC void CPU_TrapEntry0x1c(void);
-PUBLIC void CPU_TrapEntry0x1d(void);
-PUBLIC void CPU_TrapEntry0x1e(void);
-PUBLIC void CPU_TrapEntry0x1f(void);
+NX_PUBLIC void CPU_TrapEntry0x00(void);
+NX_PUBLIC void CPU_TrapEntry0x01(void);
+NX_PUBLIC void CPU_TrapEntry0x02(void);
+NX_PUBLIC void CPU_TrapEntry0x03(void);
+NX_PUBLIC void CPU_TrapEntry0x04(void);
+NX_PUBLIC void CPU_TrapEntry0x05(void);
+NX_PUBLIC void CPU_TrapEntry0x06(void);
+NX_PUBLIC void CPU_TrapEntry0x07(void);
+NX_PUBLIC void CPU_TrapEntry0x08(void);
+NX_PUBLIC void CPU_TrapEntry0x09(void);
+NX_PUBLIC void CPU_TrapEntry0x0a(void);
+NX_PUBLIC void CPU_TrapEntry0x0b(void);
+NX_PUBLIC void CPU_TrapEntry0x0c(void);
+NX_PUBLIC void CPU_TrapEntry0x0d(void);
+NX_PUBLIC void CPU_TrapEntry0x0e(void);
+NX_PUBLIC void CPU_TrapEntry0x0f(void);
+NX_PUBLIC void CPU_TrapEntry0x10(void);
+NX_PUBLIC void CPU_TrapEntry0x11(void);
+NX_PUBLIC void CPU_TrapEntry0x12(void);
+NX_PUBLIC void CPU_TrapEntry0x13(void);
+NX_PUBLIC void CPU_TrapEntry0x14(void);
+NX_PUBLIC void CPU_TrapEntry0x15(void);
+NX_PUBLIC void CPU_TrapEntry0x16(void);
+NX_PUBLIC void CPU_TrapEntry0x17(void);
+NX_PUBLIC void CPU_TrapEntry0x18(void);
+NX_PUBLIC void CPU_TrapEntry0x19(void);
+NX_PUBLIC void CPU_TrapEntry0x1a(void);
+NX_PUBLIC void CPU_TrapEntry0x1b(void);
+NX_PUBLIC void CPU_TrapEntry0x1c(void);
+NX_PUBLIC void CPU_TrapEntry0x1d(void);
+NX_PUBLIC void CPU_TrapEntry0x1e(void);
+NX_PUBLIC void CPU_TrapEntry0x1f(void);
 
-PUBLIC void CPU_TrapEntry0x20(void);
-PUBLIC void CPU_TrapEntry0x21(void);
-PUBLIC void CPU_TrapEntry0x22(void);
-PUBLIC void CPU_TrapEntry0x23(void);
-PUBLIC void CPU_TrapEntry0x24(void);
-PUBLIC void CPU_TrapEntry0x25(void);
-PUBLIC void CPU_TrapEntry0x26(void);
-PUBLIC void CPU_TrapEntry0x27(void);
-PUBLIC void CPU_TrapEntry0x28(void);
-PUBLIC void CPU_TrapEntry0x29(void);
-PUBLIC void CPU_TrapEntry0x2a(void);
-PUBLIC void CPU_TrapEntry0x2b(void);
-PUBLIC void CPU_TrapEntry0x2c(void);
-PUBLIC void CPU_TrapEntry0x2d(void);
-PUBLIC void CPU_TrapEntry0x2e(void);
-PUBLIC void CPU_TrapEntry0x2f(void);
+NX_PUBLIC void CPU_TrapEntry0x20(void);
+NX_PUBLIC void CPU_TrapEntry0x21(void);
+NX_PUBLIC void CPU_TrapEntry0x22(void);
+NX_PUBLIC void CPU_TrapEntry0x23(void);
+NX_PUBLIC void CPU_TrapEntry0x24(void);
+NX_PUBLIC void CPU_TrapEntry0x25(void);
+NX_PUBLIC void CPU_TrapEntry0x26(void);
+NX_PUBLIC void CPU_TrapEntry0x27(void);
+NX_PUBLIC void CPU_TrapEntry0x28(void);
+NX_PUBLIC void CPU_TrapEntry0x29(void);
+NX_PUBLIC void CPU_TrapEntry0x2a(void);
+NX_PUBLIC void CPU_TrapEntry0x2b(void);
+NX_PUBLIC void CPU_TrapEntry0x2c(void);
+NX_PUBLIC void CPU_TrapEntry0x2d(void);
+NX_PUBLIC void CPU_TrapEntry0x2e(void);
+NX_PUBLIC void CPU_TrapEntry0x2f(void);
 
-PUBLIC void CPU_SyscallEntry(void);
-PUBLIC void CPU_LoadIDT(UArch USize, UArch idtr);    
+NX_PUBLIC void CPU_SyscallEntry(void);
+NX_PUBLIC void CPU_LoadIDT(NX_UArch NX_USize, NX_UArch idtr);    
 
-PRIVATE void SetGate(struct CPU_Gate *gate, TrapHandler handler,
-                     U32 selector, U32 attributes, U8 privilege)
+NX_PRIVATE void SetGate(struct CPU_Gate *gate, TrapHandler handler,
+                     NX_U32 selector, NX_U32 attributes, NX_U8 privilege)
 {
-    UArch offset = (UArch) handler;
+    NX_UArch offset = (NX_UArch) handler;
     gate->offsetLow  = offset & 0xffff;
     gate->selector    = selector;
     gate->attributes  = attributes | (privilege << 5);
@@ -87,7 +87,7 @@ PRIVATE void SetGate(struct CPU_Gate *gate, TrapHandler handler,
     gate->offsetHigh = (offset >> 16) & 0xffff;
 }
 
-PUBLIC void CPU_InitGate(void)
+NX_PUBLIC void CPU_InitGate(void)
 {
     struct CPU_Gate *idt = (struct CPU_Gate *) (IDT_VADDR);
 

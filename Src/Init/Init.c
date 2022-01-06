@@ -11,48 +11,48 @@
 
 #include <XBook/InitCall.h>
 #include <Sched/Thread.h>
-#define LOG_NAME "InitCall"
+#define NX_LOG_NAME "InitCall"
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 
-IMPORT InitCallHandler __InitCallStart[];
-IMPORT InitCallHandler __InitCallEnd[];
-IMPORT InitCallHandler __ExitCallStart[];
-IMPORT InitCallHandler __ExitCallEnd[];
+NX_IMPORT NX_InitCallHandler __NX_InitCallStart[];
+NX_IMPORT NX_InitCallHandler __NX_InitCallEnd[];
+NX_IMPORT NX_InitCallHandler __NX_ExitCallStart[];
+NX_IMPORT NX_InitCallHandler __NX_ExitCallEnd[];
 
-PUBLIC void CallInvoke(InitCallHandler start[], InitCallHandler end[])
+NX_PUBLIC void NX_CallInvoke(NX_InitCallHandler start[], NX_InitCallHandler end[])
 {
-	InitCallHandler *func =  &(*start);
+	NX_InitCallHandler *func =  &(*start);
 	for (;func < &(*end); func++)
     {
 		(*func)();
     }
 }
 
-PUBLIC void InitCallInvoke(void)
+NX_PUBLIC void NX_InitCallInvoke(void)
 {
-    CallInvoke(__InitCallStart, __InitCallEnd);
+    NX_CallInvoke(__NX_InitCallStart, __NX_InitCallEnd);
 }
 
-PUBLIC void ExitCallInvoke(void)
+NX_PUBLIC void NX_ExitCallInvoke(void)
 {
-    CallInvoke(__ExitCallStart, __ExitCallEnd);
+    NX_CallInvoke(__NX_ExitCallStart, __NX_ExitCallEnd);
 }
 
-INTERFACE WEAK_SYM void PlatformMain(void)
+NX_INTERFACE NX_WEAK_SYM void HAL_PlatformMain(void)
 {
-    LOG_I("Deafult platform main running...\n");
+    NX_LOG_I("Deafult platform main running...\n");
 }
 
-PRIVATE void CallsEntry(void *arg)
+NX_PRIVATE void CallsEntry(void *arg)
 {
-    InitCallInvoke();
-    PlatformMain();
+    NX_InitCallInvoke();
+    HAL_PlatformMain();
 }
 
-PUBLIC void CallsInit(void)
+NX_PUBLIC void NX_CallsInit(void)
 {
-    Thread *thread = ThreadCreate("Calls", CallsEntry, NULL);
-    ASSERT(thread != NULL);
-    ASSERT(ThreadRun(thread) == OS_EOK);
+    NX_Thread *thread = NX_ThreadCreate("Calls", CallsEntry, NX_NULL);
+    NX_ASSERT(thread != NX_NULL);
+    NX_ASSERT(NX_ThreadRun(thread) == NX_EOK);
 }

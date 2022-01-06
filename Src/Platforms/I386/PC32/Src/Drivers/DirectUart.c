@@ -116,26 +116,26 @@ enum UartModemControl
 
 struct DirectUart
 {
-    U16 iobase;
-    IRQ_Number irqno;
+    NX_U16 iobase;
+    NX_IRQ_Number irqno;
 
-    U16 data;
-    U16 divisorLow;
-    U16 intrEnable;
-    U16 divisorHigh;
-    U16 intrIndenty;
-    U16 fifo;
-    U16 lineCtrl;
-    U16 modemCtrl;
-    U16 lineStatus;
-    U16 modem_status;
-    U16 scratch;
+    NX_U16 data;
+    NX_U16 divisorLow;
+    NX_U16 intrEnable;
+    NX_U16 divisorHigh;
+    NX_U16 intrIndenty;
+    NX_U16 fifo;
+    NX_U16 lineCtrl;
+    NX_U16 modemCtrl;
+    NX_U16 lineStatus;
+    NX_U16 modem_status;
+    NX_U16 scratch;
 };
 
-PRIVATE struct DirectUart DirectUart;
-PRIVATE IRQ_DelayWork UartWork;
+NX_PRIVATE struct DirectUart DirectUart;
+NX_PRIVATE NX_IRQ_DelayWork UartWork;
 
-PRIVATE void UartSent(struct DirectUart *uart, char data)
+NX_PRIVATE void UartSent(struct DirectUart *uart, char data)
 {
 #if UART_SEND_TIMEOUT == 1
     int timeout = 0x100000;
@@ -150,7 +150,7 @@ PRIVATE void UartSent(struct DirectUart *uart, char data)
     IO_Out8(uart->data, data);
 }
 
-PUBLIC void HAL_DirectUartPutc(char ch)
+NX_PUBLIC void HAL_DirectUartPutc(char ch)
 {
     if(ch == '\n') {
         UartSent(&DirectUart, '\r');
@@ -158,15 +158,15 @@ PUBLIC void HAL_DirectUartPutc(char ch)
     UartSent(&DirectUart, ch);
 }
 
-INTERFACE void HAL_ConsoleOutChar(char ch)
+NX_INTERFACE void HAL_ConsoleOutChar(char ch)
 {
     HAL_DirectUartPutc(ch);
 }
 
-PUBLIC void HAL_DirectUartInit(void)
+NX_PUBLIC void HAL_DirectUartInit(void)
 {
     struct DirectUart *uart = &DirectUart;
-    U16 iobase = UART0_BASE;
+    NX_U16 iobase = UART0_BASE;
 
     uart->irqno = IRQ_SERIAL1;
 
@@ -210,12 +210,12 @@ PUBLIC void HAL_DirectUartInit(void)
 /**
  * default handler
 */
-WEAK_SYM PUBLIC void HAL_DirectUartGetcHandler(char data)
+NX_WEAK_SYM NX_PUBLIC void HAL_DirectUartGetcHandler(char data)
 {
-    Printf("Deafult uart handler:%x/%c\n", data, data);
+    NX_Printf("Deafult uart handler:%x/%c\n", data, data);
 }
 
-PUBLIC int HAL_DirectUartGetc(void)
+NX_PUBLIC int HAL_DirectUartGetc(void)
 {
     struct DirectUart *uart = &DirectUart;
     
@@ -231,31 +231,31 @@ PUBLIC int HAL_DirectUartGetc(void)
     return data;
 }
 
-PRIVATE void UartWorkHandler(void *arg)
+NX_PRIVATE void UartWorkHandler(void *arg)
 {
     int data = HAL_DirectUartGetc();
     if (data != -1)
     {
-        if (HAL_DirectUartGetcHandler != NULL)
+        if (HAL_DirectUartGetcHandler != NX_NULL)
         {
             HAL_DirectUartGetcHandler(data);
         }
     }
 }
 
-PRIVATE OS_Error UartIrqHandler(IRQ_Number irqno, void *arg)
+NX_PRIVATE NX_Error UartIrqHandler(NX_IRQ_Number irqno, void *arg)
 {
-    IRQ_DelayWorkHandle(&UartWork);
-    return OS_EOK;
+    NX_IRQ_DelayWorkHandle(&UartWork);
+    return NX_EOK;
 }
 
-PUBLIC void HAL_DirectUartStage2(void)
+NX_PUBLIC void HAL_DirectUartStage2(void)
 {
     struct DirectUart *uart = &DirectUart;
     
-    ASSERT(IRQ_DelayWorkInit(&UartWork, UartWorkHandler, NULL, IRQ_WORK_NOREENTER) == OS_EOK);
-    ASSERT(IRQ_DelayQueueEnter(IRQ_NORMAL_QUEUE, &UartWork) == OS_EOK);
+    NX_ASSERT(NX_IRQ_DelayWorkInit(&UartWork, UartWorkHandler, NX_NULL, NX_IRQ_WORK_NOREENTER) == NX_EOK);
+    NX_ASSERT(NX_IRQ_DelayQueueEnter(NX_IRQ_NORMAL_QUEUE, &UartWork) == NX_EOK);
 
-    ASSERT(IRQ_Bind(uart->irqno, UartIrqHandler, NULL, "Uart", 0) == OS_EOK);
-    ASSERT(IRQ_Unmask(uart->irqno) == OS_EOK);
+    NX_ASSERT(NX_IRQ_Bind(uart->irqno, UartIrqHandler, NX_NULL, "Uart", 0) == NX_EOK);
+    NX_ASSERT(NX_IRQ_Unmask(uart->irqno) == NX_EOK);
 }

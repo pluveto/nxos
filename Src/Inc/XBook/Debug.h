@@ -10,37 +10,37 @@
  * 2022-1-3       JasonHu           Move to XBook dir
  */
 
-#ifndef __XBOOK_DEBUG__
-#define __XBOOK_DEBUG__
+#ifndef __XBOOK_NX_DEBUG__
+#define __XBOOK_NX_DEBUG__
 
 #include <XBook.h>
 
-#ifdef CONFIG_DEBUG
+#ifdef CONFIG_NX_DEBUG
 
-PUBLIC void DebugAssertionFailure(char *exp, char *file, char *baseFile, int line);
+NX_PUBLIC void NX_DebugAssertionFailure(char *exp, char *file, char *baseFile, int line);
 
-#define ASSERT(exp) \
+#define NX_ASSERT(exp) \
     do \
     { \
         if (!(exp)) \
         { \
-            DebugAssertionFailure(#exp, __FILE__, __BASE_FILE__, __LINE__); \
+            NX_DebugAssertionFailure(#exp, __FILE__, __BASE_FILE__, __LINE__); \
         } \
     } while(0)
 #else
-#define ASSERT(exp)
+#define NX_ASSERT(exp)
 #endif
 
 /**
  * Spin here
  */
-PUBLIC void DebugSpin(const char *str);
-#define SPIN(str) DebugSpin(str)
+NX_PUBLIC void NX_DebugSpin(const char *str);
+#define NX_SPIN(str) NX_DebugSpin(str)
 
 /**
  * OS Panic
  */
-PUBLIC void DebugPanic(const char *str);
-#define PANIC(str) DebugPanic(str)
+NX_PUBLIC void NX_DebugPanic(const char *str);
+#define NX_PANIC(str) NX_DebugPanic(str)
 
-#endif  /* __XBOOK_DEBUG__ */
+#endif  /* __XBOOK_NX_DEBUG__ */

@@ -14,7 +14,7 @@
 
 #include <XBook.h>
 
-INLINE int PowInt(int x, int n)
+NX_INLINE int NX_PowInt(int x, int n)
 {
     int res = 1;
     if (n < 0)

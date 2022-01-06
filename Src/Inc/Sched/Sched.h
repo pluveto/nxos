@@ -14,13 +14,13 @@
 
 #include <XBook.h>
 
-#define SCHED_HEAD          0x01
-#define SCHED_TAIL          0x02
+#define NX_SCHED_HEAD          0x01
+#define NX_SCHED_TAIL          0x02
 
-PUBLIC void SchedToFirstThread(void);
-PUBLIC void SchedWithInterruptDisabled(UArch irqLevel);
-PUBLIC void SchedYield(void);
-PUBLIC void ReSchedCheck(void);
-PUBLIC void SchedExit(void);
+NX_PUBLIC void NX_SchedToFirstThread(void);
+NX_PUBLIC void NX_SchedWithInterruptDisabled(NX_UArch irqLevel);
+NX_PUBLIC void NX_SchedYield(void);
+NX_PUBLIC void NX_ReSchedCheck(void);
+NX_PUBLIC void NX_SchedExit(void);
 
 #endif /* __XBOOK_SCHED___ */

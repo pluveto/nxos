@@ -16,72 +16,45 @@
 #include <XBook/Atomic.h>
 #include <Utils/List.h>
 
-/**
- * size class => span pages
- * ----------------------------
- * 8~1024 => 1 pages
- * 1024~8192 => 4 pages
- * 8192~36864 => 18 pages
- * 36864~104096 => 52 pages
- * 104096~262144 => 128 pages
- * N pages => N pages
- */
-
-/**
- * size class:
- * ----------------------------
- * step 8B: 8, 16  
- * step 16B: 32, 48, 64, 80, 96, 112, 128
- * step M -> AlignDown((N / 8), 2^n)
- */
-
-#define MAX_SIZE_CLASS_NR 97
-
-#define MAX_SMALL_OBJECT_SIZE (256 * SZ_KB)
-#define MAX_SMALL_SPAN_THRESOLD 8
-
-#define MAX_MIDDLE_OBJECT_SIZE (1 * SZ_MB)
-#define MAX_MIDDLE_OBJECT_THRESOLD 32
-
-struct HeapCache
+struct NX_HeapCache
 {
-    List spanFreeList;
-    List objectFreeList;
-    USize classSize; /* heap cache size */
-    Atomic spanFreeCount;
-    Atomic objectFreeCount;
+    NX_List spanFreeList;
+    NX_List objectFreeList;
+    NX_USize classSize; /* heap cache size */
+    NX_Atomic spanFreeCount;
+    NX_Atomic objectFreeCount;
 };
-typedef struct HeapCache HeapCache;
+typedef struct NX_HeapCache NX_HeapCache;
 
-struct SizeClass
+struct NX_SizeClass
 {
-    USize size;
-    struct HeapCache cache;
+    NX_USize size;
+    struct NX_HeapCache cache;
 };
 
 /* small object struct */
-struct SmallCacheObject
+struct NX_SmallCacheObject
 {
-    List list;
+    NX_List list;
 };
-typedef struct SmallCacheObject SmallCacheObject;
+typedef struct NX_SmallCacheObject NX_SmallCacheObject;
 
-PUBLIC void HeapCacheInit(void);
+NX_PUBLIC void NX_HeapCacheInit(void);
 
-PUBLIC void *HeapAlloc(USize size);
-PUBLIC OS_Error HeapFree(void *object);
-PUBLIC USize HeapGetObjectSize(void *object);
+NX_PUBLIC void *NX_HeapAlloc(NX_USize size);
+NX_PUBLIC NX_Error NX_HeapFree(void *object);
+NX_PUBLIC NX_USize NX_HeapGetObjectSize(void *object);
 
-INLINE OS_Error __HeapFreeSatety(void **object)
+NX_INLINE NX_Error __HeapFreeSatety(void **object)
 {
-    OS_Error err = HeapFree(*object);
-    if (err == OS_EOK)
+    NX_Error err = NX_HeapFree(*object);
+    if (err == NX_EOK)
     {
-        *object = NULL;
+        *object = NX_NULL;
     }
     return err;
 }
 
-#define HeapFreeSatety(p) __HeapFreeSatety((void **)(&(p)))
+#define NX_HeapFreeSatety(p) __HeapFreeSatety((void **)(&(p)))
 
 #endif /* __MM_HEAP_CACHE__ */

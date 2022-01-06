@@ -12,66 +12,66 @@
 #include <Sched/Spin.h>
 #include <Mods/Test/UTest.h>
 
-#ifdef CONFIG_UTEST_SCHED_SPIN
+#ifdef CONFIG_NX_UTEST_SCHED_SPIN
 
-TEST(SpinInit)
+NX_TEST(NX_SpinInit)
 {
-    Spin lock;
-    EXPECT_NE(SpinInit(NULL), OS_EOK);
-    EXPECT_EQ(SpinInit(&lock), OS_EOK);
-    EXPECT_NE(SpinInit(&lock), OS_EOK);
+    NX_Spin lock;
+    NX_EXPECT_NE(NX_SpinInit(NX_NULL), NX_EOK);
+    NX_EXPECT_EQ(NX_SpinInit(&lock), NX_EOK);
+    NX_EXPECT_NE(NX_SpinInit(&lock), NX_EOK);
 }
 
-TEST(SpinLock)
+NX_TEST(NX_SpinLock)
 {
-    Spin lock;
-    Spin lockNoInit;
+    NX_Spin lock;
+    NX_Spin lockNoInit;
 
-    EXPECT_EQ(SpinInit(&lock), OS_EOK);
+    NX_EXPECT_EQ(NX_SpinInit(&lock), NX_EOK);
 
-    EXPECT_NE(SpinLock(NULL, TRUE), OS_EOK);
-    EXPECT_NE(SpinLock(&lockNoInit, TRUE), OS_EOK);
+    NX_EXPECT_NE(NX_SpinLock(NX_NULL, NX_True), NX_EOK);
+    NX_EXPECT_NE(NX_SpinLock(&lockNoInit, NX_True), NX_EOK);
 
-    EXPECT_EQ(SpinLock(&lock, TRUE), OS_EOK);
-    EXPECT_NE(SpinLock(&lock, FALSE), OS_EOK);
+    NX_EXPECT_EQ(NX_SpinLock(&lock, NX_True), NX_EOK);
+    NX_EXPECT_NE(NX_SpinLock(&lock, NX_False), NX_EOK);
 }
 
-TEST(SpinUnlock)
+NX_TEST(NX_SpinUnlock)
 {
-    Spin lock;
-    Spin lockNoInit;
+    NX_Spin lock;
+    NX_Spin lockNoInit;
     
-    EXPECT_EQ(SpinInit(&lock), OS_EOK);
+    NX_EXPECT_EQ(NX_SpinInit(&lock), NX_EOK);
 
-    EXPECT_NE(SpinUnlock(NULL), OS_EOK);
-    EXPECT_NE(SpinUnlock(&lockNoInit), OS_EOK);
+    NX_EXPECT_NE(NX_SpinUnlock(NX_NULL), NX_EOK);
+    NX_EXPECT_NE(NX_SpinUnlock(&lockNoInit), NX_EOK);
 
-    EXPECT_EQ(SpinLock(&lock, TRUE), OS_EOK);
-    EXPECT_EQ(SpinUnlock(&lock), OS_EOK);
+    NX_EXPECT_EQ(NX_SpinLock(&lock, NX_True), NX_EOK);
+    NX_EXPECT_EQ(NX_SpinUnlock(&lock), NX_EOK);
 }
 
-TEST(SpinLockAndUnlock)
+NX_TEST(NX_SpinLockAndUnlock)
 {
-    Spin lock;
+    NX_Spin lock;
     
-    EXPECT_EQ(SpinInit(&lock), OS_EOK);
+    NX_EXPECT_EQ(NX_SpinInit(&lock), NX_EOK);
 
     int i;
     for (i = 0; i < 12; i++)
     {
-        EXPECT_EQ(SpinLock(&lock, TRUE), OS_EOK);
-        EXPECT_EQ(SpinUnlock(&lock), OS_EOK);
+        NX_EXPECT_EQ(NX_SpinLock(&lock, NX_True), NX_EOK);
+        NX_EXPECT_EQ(NX_SpinUnlock(&lock), NX_EOK);
     }
 }
 
-TEST_TABLE(Spin)
+NX_TEST_TABLE(NX_Spin)
 {
-    TEST_UNIT(SpinInit),
-    TEST_UNIT(SpinLock),
-    TEST_UNIT(SpinUnlock),
-    TEST_UNIT(SpinLockAndUnlock),
+    NX_TEST_UNIT(NX_SpinInit),
+    NX_TEST_UNIT(NX_SpinLock),
+    NX_TEST_UNIT(NX_SpinUnlock),
+    NX_TEST_UNIT(NX_SpinLockAndUnlock),
 };
 
-TEST_CASE(Spin);
+NX_TEST_CASE(NX_Spin);
 
 #endif

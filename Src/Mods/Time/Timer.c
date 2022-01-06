@@ -16,77 +16,77 @@
 #include <XBook/Debug.h>
 #include <Sched/Spin.h>
 
-#define IDLE_TIMER_TIMEOUT  MAX_TIMER_TIMEOUT
-#define IDLE_TIMER_TIMEOUT_TICKS  (IDLE_TIMER_TIMEOUT / (1000 / TICKS_PER_SECOND))
+#define NX_IDLE_TIMER_TIMEOUT  NX_MAX_TIMER_TIMEOUT
+#define NX_IDLE_TIMER_TIMEOUT_TICKS  (NX_IDLE_TIMER_TIMEOUT / (1000 / NX_TICKS_PER_SECOND))
 
-PRIVATE LIST_HEAD(TimerListHead);
+NX_PRIVATE NX_LIST_HEAD(TimerListHead);
 
 /* timer tick is different with clock tick */
-PRIVATE VOLATILE ClockTick TimerTicks = 0;
+NX_PRIVATE NX_VOLATILE NX_ClockTick TimerTicks = 0;
 
 /* next timeout tick */
-PRIVATE VOLATILE ClockTick NextTimeoutTicks = 0;
+NX_PRIVATE NX_VOLATILE NX_ClockTick NextTimeoutTicks = 0;
 
-PRIVATE Timer IdleTimer;
+NX_PRIVATE NX_Timer IdleTimer;
 
-PRIVATE Spin TimersSpin;
+NX_PRIVATE NX_Spin TimersSpin;
 
-PUBLIC OS_Error TimerInit(Timer *timer, UArch milliseconds, 
-                          Bool (*handler)(struct Timer *, void *arg), void *arg, 
+NX_PUBLIC NX_Error NX_TimerInit(NX_Timer *timer, NX_UArch milliseconds, 
+                          NX_Bool (*handler)(struct NX_Timer *, void *arg), void *arg, 
                           int flags)
 {
-    if (timer == NULL || !milliseconds || handler == NULL || flags == 0)
+    if (timer == NX_NULL || !milliseconds || handler == NX_NULL || flags == 0)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
-    if (!(flags & (TIMER_ONESHOT | TIMER_PERIOD)) || (flags & TIMER_DYNAMIC))
+    if (!(flags & (NX_TIMER_ONESHOT | NX_TIMER_PERIOD)) || (flags & NX_TIMER_DYNAMIC))
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
     timer->flags = flags;
-    timer->state = TIMER_INITED;
+    timer->state = NX_TIMER_INITED;
 
-    timer->timeTicks = MILLISECOND_TO_TICKS(milliseconds);
+    timer->timeTicks = NX_MILLISECOND_TO_TICKS(milliseconds);
     
     /* calc timeout here */
     timer->timeout = timer->timeTicks + TimerTicks;
     
     timer->handler = handler;
     timer->arg = arg;
-    ListInit(&timer->list);
-    return OS_EOK;
+    NX_ListInit(&timer->list);
+    return NX_EOK;
 }
 
-PUBLIC Timer *TimerCreate(UArch milliseconds, 
-                          Bool (*handler)(struct Timer *, void *arg), void *arg, 
+NX_PUBLIC NX_Timer *NX_TimerCreate(NX_UArch milliseconds, 
+                          NX_Bool (*handler)(struct NX_Timer *, void *arg), void *arg, 
                           int flags)
 {
-    Timer *timer = MemAlloc(sizeof(Timer));
-    if (timer == NULL)
+    NX_Timer *timer = NX_MemAlloc(sizeof(NX_Timer));
+    if (timer == NX_NULL)
     {
-        return NULL;
+        return NX_NULL;
     }
-    if (TimerInit(timer, milliseconds, handler, arg, flags) != OS_EOK)
+    if (NX_TimerInit(timer, milliseconds, handler, arg, flags) != NX_EOK)
     {
-        MemFree(timer);
-        return NULL;
+        NX_MemFree(timer);
+        return NX_NULL;
     }
-    timer->flags |= TIMER_DYNAMIC;
+    timer->flags |= NX_TIMER_DYNAMIC;
     return timer;
 }
 
-PRIVATE void TimerRemove(Timer *timer, Bool onTimerList, Bool destroy)
+NX_PRIVATE void NX_TimerRemove(NX_Timer *timer, NX_Bool onTimerList, NX_Bool destroy)
 {
-    if (onTimerList == TRUE)
+    if (onTimerList == NX_True)
     {
         /* del from list */
-        ListDel(&timer->list);
+        NX_ListDel(&timer->list);
 
         /* update next time */
-        Timer *next;
-        ListForEachEntry(next, &TimerListHead, list)
+        NX_Timer *next;
+        NX_ListForEachEntry(next, &TimerListHead, list)
         {
             if (next->timeout > TimerTicks)
             {
@@ -95,12 +95,12 @@ PRIVATE void TimerRemove(Timer *timer, Bool onTimerList, Bool destroy)
         }
         NextTimeoutTicks = next->timeout;
     }
-    if (destroy == TRUE)
+    if (destroy == NX_True)
     {
         /* free timer */
-        if (timer->flags & TIMER_DYNAMIC)
+        if (timer->flags & NX_TIMER_DYNAMIC)
         {
-            MemFree(timer);
+            NX_MemFree(timer);
         }
     }
 }
@@ -108,173 +108,173 @@ PRIVATE void TimerRemove(Timer *timer, Bool onTimerList, Bool destroy)
 /**
  * destroy a timer, timer must stopped or inited, not waiting and processing.
  */
-PUBLIC OS_Error TimerDestroy(Timer *timer)
+NX_PUBLIC NX_Error NX_TimerDestroy(NX_Timer *timer)
 {
-    if (timer == NULL)
+    if (timer == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     switch (timer->state)
     {
-    case TIMER_WAITING:
-    case TIMER_PROCESSING:
-        return OS_EAGAIN;
-    case TIMER_STOPPED:
-    case TIMER_INITED:
+    case NX_TIMER_WAITING:
+    case NX_TIMER_PROCESSING:
+        return NX_EAGAIN;
+    case NX_TIMER_STOPPED:
+    case NX_TIMER_INITED:
         {
-            UArch level;
-            SpinLockIRQ(&TimersSpin, &level);
-            TimerRemove(timer, FALSE, TRUE);
-            SpinUnlockIRQ(&TimersSpin, level);
+            NX_UArch level;
+            NX_SpinLockIRQ(&TimersSpin, &level);
+            NX_TimerRemove(timer, NX_False, NX_True);
+            NX_SpinUnlockIRQ(&TimersSpin, level);
         }
         break;
     default:
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PUBLIC OS_Error TimerStart(Timer *timer)
+NX_PUBLIC NX_Error NX_TimerStart(NX_Timer *timer)
 {
-    if (timer == NULL)
+    if (timer == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     
-    UArch level;
+    NX_UArch level;
 
-    SpinLockIRQ(&TimersSpin, &level);
+    NX_SpinLockIRQ(&TimersSpin, &level);
 
     /* timeout is invalid */
-    if (IDLE_TIMER_TIMEOUT_TICKS - timer->timeTicks < TimerTicks)
+    if (NX_IDLE_TIMER_TIMEOUT_TICKS - timer->timeTicks < TimerTicks)
     {
-        SpinUnlockIRQ(&TimersSpin, level);
-        return OS_EINVAL;
+        NX_SpinUnlockIRQ(&TimersSpin, level);
+        return NX_EINVAL;
     }
 
     /* make sure not on the list */
-    if (ListFind(&timer->list, &TimerListHead))
+    if (NX_ListFind(&timer->list, &TimerListHead))
     {
-        SpinUnlockIRQ(&TimersSpin, level);
-        return OS_EAGAIN;
+        NX_SpinUnlockIRQ(&TimersSpin, level);
+        return NX_EAGAIN;
     }
     
     /* waiting timeout state */
-    timer->state = TIMER_WAITING;
-    if (ListEmpty(&TimerListHead))
+    timer->state = NX_TIMER_WAITING;
+    if (NX_ListEmpty(&TimerListHead))
     {
         /* inseart at head */
-        ListAdd(&timer->list, &TimerListHead);
+        NX_ListAdd(&timer->list, &TimerListHead);
         NextTimeoutTicks = timer->timeout;
     }
     else
     {
-        Timer *first = ListFirstEntry(&TimerListHead, Timer, list);
+        NX_Timer *first = NX_ListFirstEntry(&TimerListHead, NX_Timer, list);
         if (timer->timeout < first->timeout)
         {
             /* insert at head */
-            ListAdd(&timer->list, &TimerListHead);
+            NX_ListAdd(&timer->list, &TimerListHead);
             NextTimeoutTicks = timer->timeout;
         }
         else
         {
             /* insert after nearly timer */
-            Timer *prev;
-            ListForEachEntry(prev, &TimerListHead, list)
+            NX_Timer *prev;
+            NX_ListForEachEntry(prev, &TimerListHead, list)
             {
                 if (prev->timeout <= timer->timeout)
                 {
-                    ListAddAfter(&timer->list, &prev->list);
+                    NX_ListAddAfter(&timer->list, &prev->list);
                     break;
                 }
             }
         }
     }
 
-    SpinUnlockIRQ(&TimersSpin, level);
-    return OS_EOK;
+    NX_SpinUnlockIRQ(&TimersSpin, level);
+    return NX_EOK;
 }
 
 /**
  * only stop a timer, not destroy
  */
-PRIVATE OS_Error TimerStopUnlocked(Timer *timer)
+NX_PRIVATE NX_Error NX_TimerStopUnlocked(NX_Timer *timer)
 {
-    if (timer == NULL)
+    if (timer == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
-    TimerState state = timer->state;
+    NX_TimerState state = timer->state;
 
     /* stop must when state is waiting or processing */
-    if (state != TIMER_PROCESSING && state != TIMER_WAITING)
+    if (state != NX_TIMER_PROCESSING && state != NX_TIMER_WAITING)
     {
-        return OS_EAGAIN;
+        return NX_EAGAIN;
     }
 
-    timer->state = TIMER_STOPPED;
+    timer->state = NX_TIMER_STOPPED;
 
     /* direct del timer when waiting timer */
-    if (state == TIMER_WAITING)
+    if (state == NX_TIMER_WAITING)
     {
-        TimerRemove(timer, TRUE, FALSE);
+        NX_TimerRemove(timer, NX_True, NX_False);
     }
 
-    return OS_EOK;
+    return NX_EOK;
 }
 
 /**
  * only stop a timer, not destroy
  */
-PUBLIC OS_Error TimerStop(Timer *timer)
+NX_PUBLIC NX_Error NX_TimerStop(NX_Timer *timer)
 {
-    if (timer == NULL)
+    if (timer == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
-    OS_Error err;
-    UArch level;
-    SpinLockIRQ(&TimersSpin, &level);
+    NX_Error err;
+    NX_UArch level;
+    NX_SpinLockIRQ(&TimersSpin, &level);
 
-    err = TimerStopUnlocked(timer);
+    err = NX_TimerStopUnlocked(timer);
     
-    SpinUnlockIRQ(&TimersSpin, level);
+    NX_SpinUnlockIRQ(&TimersSpin, level);
     return err;
 }
 
-PRIVATE void TimerInvoke(Timer *timer)
+NX_PRIVATE void NX_TimerInvoke(NX_Timer *timer)
 {
-    timer->state = TIMER_PROCESSING;
+    timer->state = NX_TIMER_PROCESSING;
     
     /* stop timer here */
-    if (timer->handler(timer, timer->arg) == FALSE)
+    if (timer->handler(timer, timer->arg) == NX_False)
     {
         /* stop period timer if return false */
-        if (timer->flags & TIMER_PERIOD)
+        if (timer->flags & NX_TIMER_PERIOD)
         {
-            timer->state = TIMER_STOPPED;
+            timer->state = NX_TIMER_STOPPED;
         }
     }
 
     /* when calling the handler, called stop timer, need stop here */
-    if (timer->state == TIMER_STOPPED)
+    if (timer->state == NX_TIMER_STOPPED)
     {
-        TimerRemove(timer, TRUE, TRUE);
+        NX_TimerRemove(timer, NX_True, NX_True);
     }
     else    /* always processing */
     {
-        if (timer->flags & TIMER_PERIOD)
+        if (timer->flags & NX_TIMER_PERIOD)
         {
             /* update timer timeout */
             timer->timeout = TimerTicks + timer->timeTicks;
-            timer->state = TIMER_WAITING;
+            timer->state = NX_TIMER_WAITING;
         }
         else
         {
-            timer->state = TIMER_STOPPED;
-            TimerRemove(timer, TRUE, TRUE);
+            timer->state = NX_TIMER_STOPPED;
+            NX_TimerRemove(timer, NX_True, NX_True);
         }        
     }
     
@@ -283,10 +283,10 @@ PRIVATE void TimerInvoke(Timer *timer)
 /**
  * only master cpu will call this
  */
-PUBLIC void TimerGo(void)
+NX_PUBLIC void NX_TimerGo(void)
 {
-    Timer *timer = NULL;
-    Timer *next = NULL;
+    NX_Timer *timer = NX_NULL;
+    NX_Timer *next = NX_NULL;
     
     TimerTicks++;
 
@@ -295,22 +295,22 @@ PUBLIC void TimerGo(void)
         return;
     }
 
-    UArch level;
+    NX_UArch level;
     
-    SpinLockIRQ(&TimersSpin, &level);
+    NX_SpinLockIRQ(&TimersSpin, &level);
 
-    ListForEachEntrySafe(timer, next, &TimerListHead, list)
+    NX_ListForEachEntrySafe(timer, next, &TimerListHead, list)
     {
         if (timer->timeout > TimerTicks) /* not timeout */
         {
             break;
         }
         /* timeout == TimerTicks -> timeout! */
-        TimerInvoke(timer);
+        NX_TimerInvoke(timer);
     }
 
     /* find next timer */
-    ListForEachEntry(timer, &TimerListHead, list)
+    NX_ListForEachEntry(timer, &TimerListHead, list)
     {
         if (timer->timeout > TimerTicks)
         {
@@ -318,40 +318,40 @@ PUBLIC void TimerGo(void)
         }
     }
     NextTimeoutTicks = timer->timeout;
-    SpinUnlockIRQ(&TimersSpin, level);
+    NX_SpinUnlockIRQ(&TimersSpin, level);
 }
 
-PUBLIC void TimerDump(Timer *timer)
+NX_PUBLIC void NX_TimerDump(NX_Timer *timer)
 {
-    LOG_I("==== Timer ====");
-    LOG_I("addr:%p", timer);
-    LOG_I("state:%d", timer->state);
-    LOG_I("timeout:%p", timer->timeout);
-    LOG_I("timeTicks:%p", timer->timeTicks);
-    LOG_I("flags:%x", timer->flags);
-    LOG_I("handler:%p", timer->handler);
-    LOG_I("arg:%p", timer->arg);
+    NX_LOG_I("==== NX_Timer ====");
+    NX_LOG_I("addr:%p", timer);
+    NX_LOG_I("state:%d", timer->state);
+    NX_LOG_I("timeout:%p", timer->timeout);
+    NX_LOG_I("timeTicks:%p", timer->timeTicks);
+    NX_LOG_I("flags:%x", timer->flags);
+    NX_LOG_I("handler:%p", timer->handler);
+    NX_LOG_I("arg:%p", timer->arg);
 }
 
 /**
  * recalc all timers timeout
  * this will called with interrupt disabled
  */
-PRIVATE Bool IdleTimerHandler(Timer *timer, void *arg)
+NX_PRIVATE NX_Bool IdleTimerHandler(NX_Timer *timer, void *arg)
 {
-    ClockTick delta = IdleTimer.timeout;
+    NX_ClockTick delta = IdleTimer.timeout;
     TimerTicks -= delta;
-    Timer *tmp;
-    ListForEachEntry (tmp, &TimerListHead, list)
+    NX_Timer *tmp;
+    NX_ListForEachEntry (tmp, &TimerListHead, list)
     {
         tmp->timeout -= delta;
     }
-    return TRUE;
+    return NX_True;
 }
 
-PUBLIC void TimersInit(void)
+NX_PUBLIC void NX_TimersInit(void)
 {
-    SpinInit(&TimersSpin);
-    ASSERT(TimerInit(&IdleTimer, IDLE_TIMER_TIMEOUT, IdleTimerHandler, NULL, TRUE) == OS_EOK);
-    ASSERT(TimerStart(&IdleTimer) == OS_EOK);
+    NX_SpinInit(&TimersSpin);
+    NX_ASSERT(NX_TimerInit(&IdleTimer, NX_IDLE_TIMER_TIMEOUT, IdleTimerHandler, NX_NULL, NX_True) == NX_EOK);
+    NX_ASSERT(NX_TimerStart(&IdleTimer) == NX_EOK);
 }

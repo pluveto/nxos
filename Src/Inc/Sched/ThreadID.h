@@ -15,21 +15,21 @@
 #include <XBook.h>
 #include <Sched/Mutex.h>
 
-#ifdef CONFIG_MAX_THREAD_NR
-#define MAX_THREAD_NR CONFIG_MAX_THREAD_NR
+#ifdef CONFIG_NX_MAX_THREAD_NR
+#define NX_MAX_THREAD_NR CONFIG_NX_MAX_THREAD_NR
 #else
-#define MAX_THREAD_NR 64
+#define NX_MAX_THREAD_NR 64
 #endif
 
-struct ThreadID
+struct NX_ThreadID
 {
-    U32 *maps;
-    U32 nextID;
-    Mutex idLock;
+    NX_U32 *maps;
+    NX_U32 nextID;
+    NX_Mutex idLock;
 };
 
-PUBLIC int ThreadIdAlloc(void);
-PUBLIC void ThreadIdFree(int id);
-PUBLIC void ThreadsInitID(void);
+NX_PUBLIC int NX_ThreadIdAlloc(void);
+NX_PUBLIC void NX_ThreadIdFree(int id);
+NX_PUBLIC void NX_ThreadsInitID(void);
 
 #endif /* __SCHED_THREAD_ID__ */

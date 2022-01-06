@@ -17,7 +17,7 @@
 #define IDT_LIMIT       0x000007ff
 #define IDT_PADDR       0x003F0800
 
-#define IDT_VADDR       (KVADDR_OFFSET + IDT_PADDR)
+#define IDT_VADDR       (NX_KVADDR_OFFSET + IDT_PADDR)
 
 #define MAX_IDT_NR (IDT_LIMIT/8)
 
@@ -35,7 +35,7 @@
 #define DA_GATE_DPL3 3
 
 #ifndef __ASSEMBLY__
-PUBLIC void CPU_InitGate(void);
+NX_PUBLIC void CPU_InitGate(void);
 #endif
 
 #endif  /* __I386_GATE__ */

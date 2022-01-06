@@ -11,7 +11,7 @@
 
 #include <Mods/Time/Clock.h>
 #include <Mods/Time/Timer.h>
-#define LOG_LEVEL LOG_INFO 
+#define NX_LOG_LEVEL NX_LOG_INFO 
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 
@@ -21,47 +21,43 @@
 
 #include <IO/DelayIRQ.h>
 
-#define LOG_NAME "Clock"
+#define NX_LOG_NAME "Clock"
 #include <Utils/Log.h>
 
-/* NOTE: must add VOLATILE here, avoid compiler optimization  */
-PRIVATE VOLATILE ClockTick SystemClockTicks;
+/* NOTE: must add NX_VOLATILE here, avoid compiler optimization  */
+NX_PRIVATE NX_VOLATILE NX_ClockTick SystemClockTicks;
 
-PRIVATE IRQ_DelayWork TimerWork;
-PRIVATE IRQ_DelayWork SchedWork;
+NX_PRIVATE NX_IRQ_DelayWork TimerWork;
+NX_PRIVATE NX_IRQ_DelayWork SchedWork;
 
-PUBLIC ClockTick ClockTickGet(void)
+NX_PUBLIC NX_ClockTick NX_ClockTickGet(void)
 {
     return SystemClockTicks;
 }
 
-PUBLIC void ClockTickSet(ClockTick tick)
+NX_PUBLIC void NX_ClockTickSet(NX_ClockTick tick)
 {
     SystemClockTicks = tick;
 }
 
-PUBLIC void ClockTickGo(void)
+NX_PUBLIC void NX_ClockTickGo(void)
 {
     /* only boot core change system clock and timer */
-    if (MultiCoreGetBootCore() == MultiCoreGetId())
+    if (NX_MultiCoreGetBootCore() == NX_MultiCoreGetId())
     {
         SystemClockTicks++;
-        if ((SystemClockTicks % TICKS_PER_SECOND) == 0)
-        {
-            //LOG_I("1s");
-        }
-        
-        IRQ_DelayWorkHandle(&TimerWork);
+
+        NX_IRQ_DelayWorkHandle(&TimerWork);
     }
-#ifdef CONFIG_ENABLE_SCHED
-    IRQ_DelayWorkHandle(&SchedWork);
+#ifdef CONFIG_NX_ENABLE_SCHED
+    NX_IRQ_DelayWorkHandle(&SchedWork);
 #endif
 }
 
-PUBLIC OS_Error ClockTickDelay(ClockTick ticks)
+NX_PUBLIC NX_Error NX_ClockTickDelay(NX_ClockTick ticks)
 {
-    ClockTick start = ClockTickGet();
-    while (ClockTickGet() - start < ticks)
+    NX_ClockTick start = NX_ClockTickGet();
+    while (NX_ClockTickGet() - start < ticks)
     {
         /* do nothing to delay */
 
@@ -70,52 +66,52 @@ PUBLIC OS_Error ClockTickDelay(ClockTick ticks)
          * 
          * if (thread exit flags == 1)
          * {
-         *     return OS_ETIMEOUT
+         *     return NX_ETIMEOUT
          * }
         */
     }
-    return OS_EOK; 
+    return NX_EOK; 
 }
 
-PRIVATE void TimerIrqHandler(void *arg)
+NX_PRIVATE void NX_TimerIrqHandler(void *arg)
 {
-    TimerGo();
+    NX_TimerGo();
 }
 
-PRIVATE void SchedIrqHandler(void *arg)
+NX_PRIVATE void NX_SchedIrqHandler(void *arg)
 {
-    Thread *thread = ThreadSelf();
+    NX_Thread *thread = NX_ThreadSelf();
     thread->ticks--;
     if (thread->ticks == 0)
     {
-        // LOG_I("thread:%s need sched", thread->name);
+        // NX_LOG_I("thread:%s need sched", thread->name);
         thread->needSched = 1; /* mark sched */
     }
-    ASSERT(thread->ticks >= 0);
+    NX_ASSERT(thread->ticks >= 0);
 }
 
-PUBLIC OS_Error ClockInit(void)
+NX_PUBLIC NX_Error NX_ClockInit(void)
 {
-    OS_Error err;
-    err = IRQ_DelayWorkInit(&TimerWork, TimerIrqHandler, NULL, IRQ_WORK_NOREENTER);
-    if (err != OS_EOK)
+    NX_Error err;
+    err = NX_IRQ_DelayWorkInit(&TimerWork, NX_TimerIrqHandler, NX_NULL, NX_IRQ_WORK_NOREENTER);
+    if (err != NX_EOK)
     {
         goto End;
     }
-    err = IRQ_DelayWorkInit(&SchedWork, SchedIrqHandler, NULL, IRQ_WORK_NOREENTER);
-    if (err != OS_EOK)
+    err = NX_IRQ_DelayWorkInit(&SchedWork, NX_SchedIrqHandler, NX_NULL, NX_IRQ_WORK_NOREENTER);
+    if (err != NX_EOK)
     {
         goto End;
     }
-    err = IRQ_DelayQueueEnter(IRQ_FAST_QUEUE, &TimerWork);
-    if (err != OS_EOK)
+    err = NX_IRQ_DelayQueueEnter(NX_IRQ_FAST_QUEUE, &TimerWork);
+    if (err != NX_EOK)
     {
         goto End;
     }
-    err = IRQ_DelayQueueEnter(IRQ_SCHED_QUEUE, &SchedWork);
-    if (err != OS_EOK)
+    err = NX_IRQ_DelayQueueEnter(NX_IRQ_SCHED_QUEUE, &SchedWork);
+    if (err != NX_EOK)
     {
-        IRQ_DelayQueueLeave(IRQ_SCHED_QUEUE, &TimerWork);
+        NX_IRQ_DelayQueueLeave(NX_IRQ_SCHED_QUEUE, &TimerWork);
     }
 End:
     return err;

@@ -16,11 +16,11 @@
 #include <PIC.h>
 #include <IO/IRQ.h>
 
-#define LOG_LEVEL LOG_DBG
-#define LOG_NAME "Interrupt"
+#define NX_LOG_LEVEL NX_LOG_DBG
+#define NX_LOG_NAME "Interrupt"
 #include <Utils/Log.h>
 
-PRIVATE char *ExceptionName[] = {
+NX_PRIVATE char *ExceptionName[] = {
     "#DE Divide Error",
     "#DB Debug Exception",
     "NMI Interrupt",
@@ -55,26 +55,26 @@ PRIVATE char *ExceptionName[] = {
     "Reserved",
 };
 
-PUBLIC void CPU_InitInterrupt(void)
+NX_PUBLIC void CPU_InitInterrupt(void)
 {
     PIC_Init();
 }
 
-PUBLIC void InterruptDispatch(void *stackFrame)
+NX_PUBLIC void HAL_InterruptDispatch(void *stackFrame)
 {
     HAL_TrapFrame *frame = (HAL_TrapFrame *) stackFrame;
-    U32 vector = frame->vectorNumber;
+    NX_U32 vector = frame->vectorNumber;
 
     /* call handler with different vector */
     if (vector >= EXCEPTION_BASE && vector < EXCEPTION_BASE + MAX_EXCEPTION_NR)
     {
         /* exception */
-        LOG_E("unhandled exception vector %x/%s", vector, ExceptionName[vector]);
+        NX_LOG_E("unhandled exception vector %x/%s", vector, ExceptionName[vector]);
         while (1);
     }
-    else if (vector >= EXTERNAL_BASE && vector < EXTERNAL_BASE + NR_IRQS)
+    else if (vector >= EXTERNAL_BASE && vector < EXTERNAL_BASE + NX_NR_IRQS)
     {
-        IRQ_Handle(vector - EXTERNAL_BASE);
+        NX_IRQ_Handle(vector - EXTERNAL_BASE);
         return;
     }
     else if (vector == SYSCALL_BASE)
@@ -83,65 +83,65 @@ PUBLIC void InterruptDispatch(void *stackFrame)
     }
     else
     {
-        LOG_W("uninstall intr vector %x", vector);
+        NX_LOG_W("uninstall intr vector %x", vector);
         while (1);
     }
 }
 
-PRIVATE OS_Error HAL_IrqUnmask(IRQ_Number irqno)
+NX_PRIVATE NX_Error HAL_IrqUnmask(NX_IRQ_Number irqno)
 {
-    if (irqno < 0 || irqno >= NR_IRQS)
+    if (irqno < 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
 
     PIC_Enable(irqno);
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PRIVATE OS_Error HAL_IrqMask(IRQ_Number irqno)
+NX_PRIVATE NX_Error HAL_IrqMask(NX_IRQ_Number irqno)
 {
-    if (irqno < 0 || irqno >= NR_IRQS)
+    if (irqno < 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     PIC_Disable(irqno);
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PRIVATE OS_Error HAL_IrqAck(IRQ_Number irqno)
+NX_PRIVATE NX_Error HAL_IrqAck(NX_IRQ_Number irqno)
 {
-    if (irqno < 0 || irqno >= NR_IRQS)
+    if (irqno < 0 || irqno >= NX_NR_IRQS)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     PIC_Ack(irqno);
-    return OS_EOK;
+    return NX_EOK;
 }
 
-PRIVATE void HAL_IrqEnable(void)
+NX_PRIVATE void HAL_IrqEnable(void)
 {
-    CASM("sti");
+    NX_CASM("sti");
 }
 
-PRIVATE void HAL_IrqDisable(void)
+NX_PRIVATE void HAL_IrqDisable(void)
 {
-    CASM("cli");
+    NX_CASM("cli");
 }
 
-PRIVATE UArch HAL_IrqSaveLevel(void)
+NX_PRIVATE NX_UArch HAL_IrqSaveLevel(void)
 {
-    UArch level = 0;
-    CASM("pushfl; popl %0; cli":"=g" (level): :"memory");
+    NX_UArch level = 0;
+    NX_CASM("pushfl; popl %0; cli":"=g" (level): :"memory");
     return level;
 }
 
-PRIVATE void HAL_IrqRestoreLevel(UArch level)
+NX_PRIVATE void HAL_IrqRestoreLevel(NX_UArch level)
 {
-    CASM("pushl %0; popfl": :"g" (level):"memory", "cc");
+    NX_CASM("pushl %0; popfl": :"g" (level):"memory", "cc");
 }
 
-INTERFACE IRQ_Controller IRQ_ControllerInterface = 
+NX_INTERFACE NX_IRQ_Controller NX_IRQ_ControllerInterface = 
 {
     .unmask = HAL_IrqUnmask,
     .mask = HAL_IrqMask,

@@ -12,63 +12,63 @@
 #include <Mods/Test/UTest.h>
 #include <Sched/Thread.h>
 
-#ifdef CONFIG_UTEST_SCHED_THREAD
+#ifdef CONFIG_NX_UTEST_SCHED_THREAD
 
-TEST(ThreadSleep)
+NX_TEST(NX_ThreadSleep)
 {
-    TimeVal s, e;
+    NX_TimeVal s, e;
 
-    EXPECT_EQ(ThreadSleep(1), OS_EOK);
-    EXPECT_EQ(ThreadSleep(10), OS_EOK);
-    EXPECT_EQ(ThreadSleep(50), OS_EOK);
+    NX_EXPECT_EQ(NX_ThreadSleep(1), NX_EOK);
+    NX_EXPECT_EQ(NX_ThreadSleep(10), NX_EOK);
+    NX_EXPECT_EQ(NX_ThreadSleep(50), NX_EOK);
 
-    s = ClockTickGetMillisecond();
-    EXPECT_EQ(ThreadSleep(100), OS_EOK);
-    e = ClockTickGetMillisecond();
-    EXPECT_IN_RANGE(e - s, 100, 100 + TICKS_PER_SECOND / (TICKS_PER_SECOND / 10));
+    s = NX_ClockTickGetMillisecond();
+    NX_EXPECT_EQ(NX_ThreadSleep(100), NX_EOK);
+    e = NX_ClockTickGetMillisecond();
+    NX_EXPECT_IN_RANGE(e - s, 100, 100 + NX_TICKS_PER_SECOND / (NX_TICKS_PER_SECOND / 10));
     
-    s = ClockTickGetMillisecond();
-    EXPECT_EQ(ThreadSleep(500), OS_EOK);
-    e = ClockTickGetMillisecond();
-    EXPECT_IN_RANGE(e - s, 500, 500 + TICKS_PER_SECOND / (TICKS_PER_SECOND / 10));
+    s = NX_ClockTickGetMillisecond();
+    NX_EXPECT_EQ(NX_ThreadSleep(500), NX_EOK);
+    e = NX_ClockTickGetMillisecond();
+    NX_EXPECT_IN_RANGE(e - s, 500, 500 + NX_TICKS_PER_SECOND / (NX_TICKS_PER_SECOND / 10));
     
-    s = ClockTickGetMillisecond();
-    EXPECT_EQ(ThreadSleep(1000), OS_EOK);
-    e = ClockTickGetMillisecond();
-    EXPECT_IN_RANGE(e - s, 100, 1000 + TICKS_PER_SECOND / (TICKS_PER_SECOND / 10));
+    s = NX_ClockTickGetMillisecond();
+    NX_EXPECT_EQ(NX_ThreadSleep(1000), NX_EOK);
+    e = NX_ClockTickGetMillisecond();
+    NX_EXPECT_IN_RANGE(e - s, 100, 1000 + NX_TICKS_PER_SECOND / (NX_TICKS_PER_SECOND / 10));
     
-    s = ClockTickGetMillisecond();
-    EXPECT_EQ(ThreadSleep(3000), OS_EOK);
-    e = ClockTickGetMillisecond();
-    EXPECT_IN_RANGE(e - s, 3000, 3000 + TICKS_PER_SECOND / (TICKS_PER_SECOND / 10));
+    s = NX_ClockTickGetMillisecond();
+    NX_EXPECT_EQ(NX_ThreadSleep(3000), NX_EOK);
+    e = NX_ClockTickGetMillisecond();
+    NX_EXPECT_IN_RANGE(e - s, 3000, 3000 + NX_TICKS_PER_SECOND / (NX_TICKS_PER_SECOND / 10));
 }
 
-PRIVATE void ThreadSleep1(void *arg)
+NX_PRIVATE void NX_ThreadSleep1(void *arg)
 {
-    EXPECT_NE(ThreadSleep(2000), OS_EOK);
+    NX_EXPECT_NE(NX_ThreadSleep(2000), NX_EOK);
 }
 
-TEST(ThreadSleepIntr)
+NX_TEST(NX_ThreadSleepIntr)
 {
     
-    Thread *thread = ThreadCreate("sleep1", ThreadSleep1, NULL);
-    EXPECT_NOT_NULL(thread);
-    EXPECT_EQ(ThreadRun(thread), OS_EOK);
+    NX_Thread *thread = NX_ThreadCreate("sleep1", NX_ThreadSleep1, NX_NULL);
+    NX_EXPECT_NOT_NULL(thread);
+    NX_EXPECT_EQ(NX_ThreadRun(thread), NX_EOK);
 
-    EXPECT_EQ(ThreadSleep(500), OS_EOK);
+    NX_EXPECT_EQ(NX_ThreadSleep(500), NX_EOK);
 
     /* term thread */
-    EXPECT_EQ(ThreadTerminate(thread), OS_EOK);
+    NX_EXPECT_EQ(NX_ThreadTerminate(thread), NX_EOK);
 
-    EXPECT_EQ(ThreadSleep(100), OS_EOK);
+    NX_EXPECT_EQ(NX_ThreadSleep(100), NX_EOK);
 }
 
-TEST_TABLE(Thread)
+NX_TEST_TABLE(NX_Thread)
 {
-    TEST_UNIT(ThreadSleep),
-    TEST_UNIT(ThreadSleepIntr),
+    NX_TEST_UNIT(NX_ThreadSleep),
+    NX_TEST_UNIT(NX_ThreadSleepIntr),
 };
 
-TEST_CASE(Thread);
+NX_TEST_CASE(NX_Thread);
 
 #endif

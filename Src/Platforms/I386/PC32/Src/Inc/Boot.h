@@ -17,7 +17,7 @@
 #define BOOT_INFO_ADDR 0x3F1000
 
 #define MAX_BOOT_MODS_NUM 1
-#define MAX_BOOT_MODS_SIZE (1 * SZ_MB)
+#define MAX_BOOT_MODS_SIZE (1 * NX_MB)
 
 enum BootModType
 {
@@ -40,14 +40,14 @@ struct BootModInfo
 	} modules[MAX_BOOT_MODS_NUM];
 } __attribute__ ((packed));
 
-static inline void BootModInfoInit()
+NX_INLINE void BootModInfoInit()
 {
 	struct BootModInfo *modInfo = (struct BootModInfo *)BOOT_INFO_ADDR;
 	modInfo->modNum = 0;
 	modInfo->modSize = 0;
 }
 
-static inline void *BootModInfoFind(unsigned long addr, enum BootModType type)
+NX_INLINE void *BootModInfoFind(unsigned long addr, enum BootModType type)
 {
 	int i;
 	struct BootModInfo *modInfo;

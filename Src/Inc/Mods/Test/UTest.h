@@ -15,58 +15,58 @@
 #include <XBook/InitCall.h>
 #include <Utils/Log.h>
 
-#ifdef CONFIG_ENABLE_TEST_UTEST
+#ifdef CONFIG_NX_ENABLE_TEST_UTEST
 
 #include <Mods/Test/UTestCondition.h>
 
-struct UTest
+struct NX_UTest
 {
     char *testName;
     void (*func)(void);
     void (*setup)(void);
     void (*clean)(void);
 };
-typedef struct UTest UTest;
+typedef struct NX_UTest NX_UTest;
 
-struct UTestCase
+struct NX_UTestCase
 {
     char *caseName;
-    OS_Error (*setup)(void);
-    OS_Error (*clean)(void);
-    UTest *unitTable;
-    USize unitCount;
+    NX_Error (*setup)(void);
+    NX_Error (*clean)(void);
+    NX_UTest *unitTable;
+    NX_USize unitCount;
 };
-typedef struct UTestCase UTestCase;
+typedef struct NX_UTestCase NX_UTestCase;
 
-struct UTestSum
+struct NX_UTestSum
 {
-    Bool hasError;
-    U32 passedNum;
-    U32 failedNum;
+    NX_Bool hasError;
+    NX_U32 passedNum;
+    NX_U32 failedNum;
 };
-typedef struct UTestSum UTestSum;
+typedef struct NX_UTestSum NX_UTestSum;
 
-#define TEST(name) \
-    PRIVATE void Utest##name(void)
+#define NX_TEST(name) \
+    NX_PRIVATE void Utest##name(void)
 
-#define TEST_SETUP(name) \
-    PRIVATE void Utest##name##Setup(void)
+#define NX_TEST_SETUP(name) \
+    NX_PRIVATE void Utest##name##Setup(void)
 
-#define TEST_CLEAN(name) \
-    PRIVATE void Utest##name##Clean(void)
+#define NX_TEST_CLEAN(name) \
+    NX_PRIVATE void Utest##name##Clean(void)
 
-#define TEST_TABLE(name) \
-    USED PRIVATE UTest __UTestCase##name##Table[] =  
+#define NX_TEST_TABLE(name) \
+    NX_USED NX_PRIVATE NX_UTest __UTestCase##name##Table[] =  
 
-#define TEST_UNIT(name) \
+#define NX_TEST_UNIT(name) \
     { \
         #name, \
         Utest##name, \
-        NULL, \
-        NULL \
+        NX_NULL, \
+        NX_NULL \
     }
 
-#define TEST_UNIT_SETUP_CLEAN(name) \
+#define NX_TEST_UNIT_SETUP_CLEAN(name) \
     { \
         #name, \
         Utest##name, \
@@ -74,42 +74,38 @@ typedef struct UTestSum UTestSum;
         Utest##name##Clean \
     }
 
-#define TEST_UNIT_SETUP(name) \
+#define NX_TEST_UNIT_SETUP(name) \
     { \
         #name, \
         Utest##name, \
         Utest##name##Setup, \
-        NULL \
+        NX_NULL \
     }
 
-#define TEST_UNIT_CLEAN(name) \
+#define NX_TEST_UNIT_CLEAN(name) \
     { \
         #name, \
         Utest##name, \
-        NULL, \
+        NX_NULL, \
         Utest##name##Clean \
     }
 
-#define TEST_CASE_SETUP(name)  OS_Error __UTestCase##name##Setup(void)
-#define TEST_CASE_CLEAN(name)  OS_Error __UTestCase##name##Clean(void)
+#define NX_TEST_CASE_SETUP(name)  NX_Error __UTestCase##name##Setup(void)
+#define NX_TEST_CASE_CLEAN(name)  NX_Error __UTestCase##name##Clean(void)
 
-#define TEST_CASE(name) \
-    TEST_CASE_SETUP(name) WEAK_SYM;\
-    TEST_CASE_CLEAN(name) WEAK_SYM;\
-    USED PRIVATE const UTestCase __utestTestcase \
-    SECTION("UTestCaseTable") = \
+#define NX_TEST_CASE(name) \
+    NX_TEST_CASE_SETUP(name) NX_WEAK_SYM;\
+    NX_TEST_CASE_CLEAN(name) NX_WEAK_SYM;\
+    NX_USED NX_PRIVATE const NX_UTestCase __utestTestcase \
+    NX_SECTION("UTestCaseTable") = \
     { \
         .caseName = #name, \
         .setup = __UTestCase##name##Setup, \
         .clean = __UTestCase##name##Clean, \
         .unitTable = __UTestCase##name##Table, \
-        .unitCount = ARRAY_SIZE(__UTestCase##name##Table) \
+        .unitCount = NX_ARRAY_SIZE(__UTestCase##name##Table) \
     }
 
-PUBLIC void UTestInit(void);
-/* invoke utest */
-PUBLIC void UTestInvoke(void);
-
-#endif /* CONFIG_ENABLE_TEST_UTEST */
+#endif /* CONFIG_NX_ENABLE_TEST_UTEST */
 
 #endif  /* __MODS_UTEST__ */

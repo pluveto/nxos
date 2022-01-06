@@ -13,14 +13,14 @@
 #include <Sched/Spin.h>
 
 /* spin lock for log output */
-PRIVATE STATIC_SPIN_UNLOCKED(LogOutLock);
+NX_PRIVATE STATIC_SPIN_UNLOCKED(LogOutputLock);
 
-PUBLIC OS_Error LogLineLock(UArch *level)
+NX_PUBLIC NX_Error LogLineLock(NX_UArch *level)
 {
-    return SpinLockIRQ(&LogOutLock, level);
+    return NX_SpinLockIRQ(&LogOutputLock, level);
 }
 
-PUBLIC OS_Error LogLineUnlock(UArch level)
+NX_PUBLIC NX_Error LogLineUnlock(NX_UArch level)
 {
-    return SpinUnlockIRQ(&LogOutLock, level);
+    return NX_SpinUnlockIRQ(&LogOutputLock, level);
 }

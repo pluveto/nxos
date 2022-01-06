@@ -1,11 +1,11 @@
-config UTEST_SCHED_MUTEX
+config NX_UTEST_SCHED_MUTEX
     bool "Enable utest for mutex"
     default n
 
-config UTEST_SCHED_SPIN
+config NX_UTEST_SCHED_SPIN
     bool "Enable utest for spin"
     default n
 
-config UTEST_SCHED_THREAD
+config NX_UTEST_SCHED_THREAD
     bool "Enable utest for thread"
     default n

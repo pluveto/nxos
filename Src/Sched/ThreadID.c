@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Thread ID for NXOS
+ * Contains: NX_Thread ID for NXOS
  * 
  * Change Logs:
  * Date           Author            Notes
@@ -14,54 +14,54 @@
 #include <XBook/Debug.h>
 #include <Utils/Memory.h>
 
-PRIVATE struct ThreadID ThreadIdObject;
+NX_PRIVATE struct NX_ThreadID ThreadIdObject;
 
-PUBLIC int ThreadIdAlloc(void)
+NX_PUBLIC int NX_ThreadIdAlloc(void)
 {
-    MutexLock(&ThreadIdObject.idLock, TRUE);
+    NX_MutexLock(&ThreadIdObject.idLock, NX_True);
 
-    U32 nextID = ThreadIdObject.nextID;
+    NX_U32 nextID = ThreadIdObject.nextID;
     do 
     {
-        U32 idx = nextID / 32;
-        U32 odd = nextID % 32;
+        NX_U32 idx = nextID / 32;
+        NX_U32 odd = nextID % 32;
         if (!(ThreadIdObject.maps[idx] & (1 << odd)))
         {
             /* mark id used */
             ThreadIdObject.maps[idx] |= (1 << odd);
             /* set next id */
-            ThreadIdObject.nextID = (nextID + 1) % MAX_THREAD_NR;
+            ThreadIdObject.nextID = (nextID + 1) % NX_MAX_THREAD_NR;
             break;
         }
-        nextID = (nextID + 1) % MAX_THREAD_NR;
+        nextID = (nextID + 1) % NX_MAX_THREAD_NR;
     } while (nextID != ThreadIdObject.nextID);
 
     /* nextID == ThreadIdObject.nextID means no id free */
     int id = (nextID != ThreadIdObject.nextID) ? nextID : -1;
-    MutexUnlock(&ThreadIdObject.idLock);
+    NX_MutexUnlock(&ThreadIdObject.idLock);
     return id;
 }
 
-PUBLIC void ThreadIdFree(int id)
+NX_PUBLIC void NX_ThreadIdFree(int id)
 {
-    if (id < 0 || id >= MAX_THREAD_NR)
+    if (id < 0 || id >= NX_MAX_THREAD_NR)
     {
         return;
     }
     
-    MutexLock(&ThreadIdObject.idLock, TRUE);
-    U32 idx = id / 32;
-    U32 odd = id % 32;
-    ASSERT(ThreadIdObject.maps[idx] & (1 << odd));
+    NX_MutexLock(&ThreadIdObject.idLock, NX_True);
+    NX_U32 idx = id / 32;
+    NX_U32 odd = id % 32;
+    NX_ASSERT(ThreadIdObject.maps[idx] & (1 << odd));
     ThreadIdObject.maps[idx] &= ~(1 << odd);   /* clear id */
-    MutexUnlock(&ThreadIdObject.idLock);  
+    NX_MutexUnlock(&ThreadIdObject.idLock);  
 }
 
-PUBLIC void ThreadsInitID(void)
+NX_PUBLIC void NX_ThreadsInitID(void)
 {
-    ThreadIdObject.maps = MemAlloc(MAX_THREAD_NR / 8);
-    ASSERT(ThreadIdObject.maps != NULL);
-    Zero(ThreadIdObject.maps, MAX_THREAD_NR / 8);
+    ThreadIdObject.maps = NX_MemAlloc(NX_MAX_THREAD_NR / 8);
+    NX_ASSERT(ThreadIdObject.maps != NX_NULL);
+    NX_MemZero(ThreadIdObject.maps, NX_MAX_THREAD_NR / 8);
     ThreadIdObject.nextID = 0;
-    MutexInit(&ThreadIdObject.idLock);
+    NX_MutexInit(&ThreadIdObject.idLock);
 }

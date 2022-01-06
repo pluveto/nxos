@@ -13,27 +13,27 @@
 #include <XBook/Debug.h>
 #include <IO/IRQ.h>
 
-#ifdef CONFIG_DEBUG
-PUBLIC void DebugAssertionFailure(char *exp, char *file, char *baseFile, int line)
+#ifdef CONFIG_NX_DEBUG
+NX_PUBLIC void NX_DebugAssertionFailure(char *exp, char *file, char *baseFile, int line)
 {
-	LOG_E("\nAssert(%s) failed:\nfile: %s\nbase_file: %s\nln: %d", 
+    NX_LOG_E("\nAssert(%s) failed:\nfile: %s\nbase_file: %s\nln: %d", 
         exp, file, baseFile, line);
-	while (1);
+    while (1);
 }
 #endif
 
-PUBLIC void DebugSpin(const char *str)
+NX_PUBLIC void NX_DebugSpin(const char *str)
 {
-    LOG_I(str, Endln "FILE:%s\nFUNCTION:%s\nLINE:%d", __FILE__, __FUNCTION__, __LINE__);
+    NX_LOG_I(str, NX_Endln "FILE:%s\nFUNCTION:%s\nLINE:%d", __FILE__, __FUNCTION__, __LINE__);
     while (1);
 }
 
 /**
  * OS Panic
  */
-PUBLIC void DebugPanic(const char *str)
+NX_PUBLIC void NX_DebugPanic(const char *str)
 {
-    INTR_Disable();
-    LOG_E("!PANIC!");
-    SPIN(str);
+    NX_IRQ_Disable();
+    NX_LOG_E("!NX_PANIC!");
+    NX_SPIN(str);
 }

@@ -2,14 +2,14 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Scheduler for NXOS
+ * Contains: NX_Scheduler for NXOS
  * 
  * Change Logs:
  * Date           Author            Notes
  * 2021-11-8      JasonHu           Init
  */
 
-#define LOG_LEVEL LOG_INFO
+#define NX_LOG_LEVEL NX_LOG_INFO
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 #include <IO/IRQ.h>
@@ -19,59 +19,59 @@
 #include <Sched/MultiCore.h>
 #include <Sched/Context.h>
 
-IMPORT ThreadManager ThreadManagerObject;
-IMPORT Atomic ActivedCoreCount;
+NX_IMPORT NX_ThreadManager NX_ThreadManagerObject;
+NX_IMPORT NX_Atomic NX_ActivedCoreCount;
 
-PUBLIC void SchedToFirstThread(void)
+NX_PUBLIC void NX_SchedToFirstThread(void)
 {
-    UArch coreId = MultiCoreGetId();
-    Thread *thread = MultiCoreDeququeThreadIrqDisabled(coreId);
-    ASSERT(thread != NULL);
-    ASSERT(MultiCoreSetRunning(coreId, thread) == OS_EOK);
-    LOG_D("Sched to first thread:%s/%d", thread->name, thread->tid);
-    ContextSwitchNext((Addr)&thread->stack);
+    NX_UArch coreId = NX_MultiCoreGetId();
+    NX_Thread *thread = NX_MultiCoreDeququeThreadIrqDisabled(coreId);
+    NX_ASSERT(thread != NX_NULL);
+    NX_ASSERT(NX_MultiCoreSetRunning(coreId, thread) == NX_EOK);
+    NX_LOG_D("Sched to first thread:%s/%d", thread->name, thread->tid);
+    NX_ContextSwitchNext((NX_Addr)&thread->stack);
     /* should never be here */
-    PANIC("Sched to first thread failed!");
+    NX_PANIC("Sched to first thread failed!");
 }
 
-PRIVATE void PullOrPushThread(UArch coreId)
+NX_PRIVATE void PullOrPushThread(NX_UArch coreId)
 {
-    Thread *thread;
-    CoreLocalStorage *cls = CLS_GetIndex(coreId);
-    IArch coreThreadCount = AtomicGet(&cls->threadCount);
+    NX_Thread *thread;
+    NX_CoreLocalStorage *cls = CLS_GetIndex(coreId);
+    NX_IArch coreThreadCount = NX_AtomicGet(&cls->threadCount);
 
     /**
      * Adding 1 is to allow the processor core to do more pull operations instead of push operations.
      * Can avoid the threads of the pending queue not running.
      */
-    UArch threadsPerCore = AtomicGet(&ThreadManagerObject.activeThreadCount) / AtomicGet(&ActivedCoreCount) + 1;
+    NX_UArch threadsPerCore = NX_AtomicGet(&NX_ThreadManagerObject.activeThreadCount) / NX_AtomicGet(&NX_ActivedCoreCount) + 1;
 
-    LOG_D("core#%d: core threads:%d", coreId, coreThreadCount);
-    LOG_D("core#%d: active threads:%d", coreId, AtomicGet(&ThreadManagerObject.activeThreadCount));
-    LOG_D("core#%d: pending threads:%d", coreId, AtomicGet(&ThreadManagerObject.pendingThreadCount));
-    LOG_D("core#%d: threads per core:%d", coreId, threadsPerCore);
+    NX_LOG_D("core#%d: core threads:%d", coreId, coreThreadCount);
+    NX_LOG_D("core#%d: active threads:%d", coreId, NX_AtomicGet(&NX_ThreadManagerObject.activeThreadCount));
+    NX_LOG_D("core#%d: pending threads:%d", coreId, NX_AtomicGet(&NX_ThreadManagerObject.pendingThreadCount));
+    NX_LOG_D("core#%d: threads per core:%d", coreId, threadsPerCore);
 
     if (coreThreadCount < threadsPerCore)
     {
         /* pull from pending */
-        thread = ThreadDequeuePendingList();
-        if (thread != NULL)
+        thread = NX_ThreadDequeuePendingList();
+        if (thread != NX_NULL)
         {
-            LOG_D("---> core#%d: pull thread:%s/%d", coreId, thread->name, thread->tid);
+            NX_LOG_D("---> core#%d: pull thread:%s/%d", coreId, thread->name, thread->tid);
             thread->onCore = coreId;
-            ThreadReadyRunLocked(thread, SCHED_HEAD);
+            NX_ThreadReadyRunLocked(thread, NX_SCHED_HEAD);
         }
     }
 
     if (coreThreadCount > threadsPerCore)
     {
         /* push to pending */
-        thread = MultiCoreDeququeNoAffinityThread(coreId);
-        if (thread != NULL)
+        thread = NX_MultiCoreDeququeNoAffinityThread(coreId);
+        if (thread != NX_NULL)
         {
-            LOG_D("---> core#%d: push thread:%s/%d", coreId, thread->name, thread->tid);
-            thread->onCore = NR_MULTI_CORES;
-            ThreadEnqueuePendingList(thread);
+            NX_LOG_D("---> core#%d: push thread:%s/%d", coreId, thread->name, thread->tid);
+            thread->onCore = NX_MULTI_CORES_NR;
+            NX_ThreadEnqueuePendingList(thread);
         }
     }
 }
@@ -79,85 +79,85 @@ PRIVATE void PullOrPushThread(UArch coreId)
 /**
  * NOTE: must disable interrupt before call this!
  */
-PUBLIC void SchedWithInterruptDisabled(UArch irqLevel)
+NX_PUBLIC void NX_SchedWithInterruptDisabled(NX_UArch irqLevel)
 {
-    Thread *next, *prev;
-    UArch coreId = MultiCoreGetId();
+    NX_Thread *next, *prev;
+    NX_UArch coreId = NX_MultiCoreGetId();
 
     /* put prev into list */
-    prev = CurrentThread;
+    prev = NX_CurrentThread;
 
-    if (prev->state == THREAD_EXIT)
+    if (prev->state == NX_THREAD_EXIT)
     {
-        prev = NULL;    /* not save prev context */
+        prev = NX_NULL;    /* not save prev context */
     }
     
     /* pull thread from pending list or push thread to pending list */
     PullOrPushThread(coreId);
 
     /* get next from local list */
-    next = MultiCoreDeququeThreadIrqDisabled(coreId);
-    MultiCoreSetRunning(coreId, next);
+    next = NX_MultiCoreDeququeThreadIrqDisabled(coreId);
+    NX_MultiCoreSetRunning(coreId, next);
 
-    if (prev != NULL)
+    if (prev != NX_NULL)
     {
-        ASSERT(prev && next);
-        LOG_D("CPU#%d Sched prev: %s/%d next: %s/%d", MultiCoreGetId(), prev->name, prev->tid, next->name, next->tid);
-        ContextSwitchPrevNext((Addr)&prev->stack, (Addr)&next->stack);
+        NX_ASSERT(prev && next);
+        NX_LOG_D("CPU#%d NX_Sched prev: %s/%d next: %s/%d", NX_MultiCoreGetId(), prev->name, prev->tid, next->name, next->tid);
+        NX_ContextSwitchPrevNext((NX_Addr)&prev->stack, (NX_Addr)&next->stack);
     }
     else
     {
-        ContextSwitchNext((Addr)&next->stack);
+        NX_ContextSwitchNext((NX_Addr)&next->stack);
     }
-    INTR_RestoreLevel(irqLevel);
+    NX_IRQ_RestoreLevel(irqLevel);
 }
 
-PUBLIC void SchedYield(void)
+NX_PUBLIC void NX_SchedYield(void)
 {
-    UArch level = INTR_SaveLevel();
+    NX_UArch level = NX_IRQ_SaveLevel();
 
-    Thread *cur = CurrentThread;
+    NX_Thread *cur = NX_CurrentThread;
     
-    ThreadReadyRunUnlocked(cur, SCHED_TAIL);
+    NX_ThreadReadyRunUnlocked(cur, NX_SCHED_TAIL);
 
-    SchedWithInterruptDisabled(level);
+    NX_SchedWithInterruptDisabled(level);
 }
 
-PUBLIC void SchedExit(void)
+NX_PUBLIC void NX_SchedExit(void)
 {
-    UArch level = INTR_SaveLevel();
+    NX_UArch level = NX_IRQ_SaveLevel();
 
-    Thread *cur = CurrentThread;
-    LOG_D("Thread exit: %d", cur->tid);
+    NX_Thread *cur = NX_CurrentThread;
+    NX_LOG_D("Thread exit: %d", cur->tid);
 
-    cur->state = THREAD_EXIT;
-    ThreadEnququeExitList(cur);
+    cur->state = NX_THREAD_EXIT;
+    NX_ThreadEnququeExitList(cur);
 
-    SchedWithInterruptDisabled(level);
+    NX_SchedWithInterruptDisabled(level);
 }
 
-PUBLIC void ReSchedCheck(void)
+NX_PUBLIC void NX_ReSchedCheck(void)
 {
-    INTR_Enable();
+    NX_IRQ_Enable();
 
-    Thread *thread = CurrentThread;
+    NX_Thread *thread = NX_CurrentThread;
     if (thread->isTerminated)
     {
-        LOG_D("call terminate: %d", thread->tid);
+        NX_LOG_D("call terminate: %d", thread->tid);
         thread->isTerminated = 0;
-        ThreadExit();
+        NX_ThreadExit();
     }
     if (thread->needSched)
     {
-        UArch level = INTR_SaveLevel();
+        NX_UArch level = NX_IRQ_SaveLevel();
         thread->needSched = 0;
 
         /* reset ticks from timeslice */
         thread->ticks = thread->timeslice;
 
-        ThreadReadyRunUnlocked(thread, SCHED_TAIL);
+        NX_ThreadReadyRunUnlocked(thread, NX_SCHED_TAIL);
 
-        SchedWithInterruptDisabled(level);
+        NX_SchedWithInterruptDisabled(level);
     }
-    INTR_Disable();
+    NX_IRQ_Disable();
 }

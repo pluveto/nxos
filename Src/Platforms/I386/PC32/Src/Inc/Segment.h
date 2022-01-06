@@ -64,7 +64,7 @@
 #define GDT_LIMIT           0x000007ff
 #define GDT_PADDR           0x003F0000
 
-#define GDT_VADDR           (KVADDR_OFFSET + GDT_PADDR)
+#define GDT_VADDR           (NX_KVADDR_OFFSET + GDT_PADDR)
 
 #define GDT_OFF2PTR(gdt, off)    (gdt + off)
 
@@ -79,7 +79,7 @@
 #define GDT_USER_TLS_ATTR           (DA_DR | DA_DPL3 | DA_32 | DA_G)  /* read only data seg */
 
 #ifndef __ASSEMBLY__
-PUBLIC void CPU_InitSegment(void);
+NX_PUBLIC void CPU_InitSegment(void);
 #endif
 
 #endif  /*__I386_SEGMENT__*/

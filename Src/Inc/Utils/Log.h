@@ -14,45 +14,45 @@
 
 #include <XBook.h>
 
-#ifdef CONFIG_DEBUG
-#define LOG_ENABLE
+#ifdef CONFIG_NX_DEBUG
+#define NX_LOG_ENABLE
 #endif
 
-#ifdef CONFIG_DEBUG_COLOR
-#define LOG_COLOR
+#ifdef CONFIG_NX_DEBUG_COLOR
+#define NX_LOG_COLOR
 #endif
 
 /* log level */
-#define LOG_ERROR   0
-#define LOG_WARNING 1
-#define LOG_INFO    2
-#define LOG_DBG     3
+#define NX_LOG_ERROR   0
+#define NX_LOG_WARNING 1
+#define NX_LOG_INFO    2
+#define NX_LOG_DBG     3
 
-#ifdef LOG_NAME
-#ifndef LOG_MOD_NAME
-#define LOG_MOD_NAME LOG_NAME
+#ifdef NX_LOG_NAME
+#ifndef NX_LOG_MOD_NAME
+#define NX_LOG_MOD_NAME NX_LOG_NAME
 #endif
 #else
-#ifndef LOG_MOD_NAME
-#define LOG_MOD_NAME "LOG"
+#ifndef NX_LOG_MOD_NAME
+#define NX_LOG_MOD_NAME "LOG"
 #endif
-#endif /* LOG_NAME */
+#endif /* NX_LOG_NAME */
 
-#ifdef LOG_ENABLE
+#ifdef NX_LOG_ENABLE
 #include <Mods/Console/Console.h>
 #include <Mods/Time/Clock.h>
 
-#ifdef LOG_LEVEL
-#ifndef LOG_MOD_LEVEL
-#define LOG_MOD_LEVEL LOG_LEVEL
+#ifdef NX_LOG_LEVEL
+#ifndef NX_LOG_MOD_LEVEL
+#define NX_LOG_MOD_LEVEL NX_LOG_LEVEL
 #endif
 #else
-#ifdef CONFIG_LOG_LEVEL
-#define LOG_MOD_LEVEL CONFIG_LOG_LEVEL
+#ifdef CONFIG_NX_LOG_LEVEL
+#define NX_LOG_MOD_LEVEL CONFIG_NX_LOG_LEVEL
 #else
-#define LOG_MOD_LEVEL LOG_WARNING
-#endif /* CONFIG_LOG_LEVEL */
-#endif /* LOG_LEVEL */
+#define NX_LOG_MOD_LEVEL NX_LOG_WARNING
+#endif /* CONFIG_NX_LOG_LEVEL */
+#endif /* NX_LOG_LEVEL */
 
 /**
  * terminal color
@@ -65,80 +65,80 @@
  * CYAN     36
  * WHITE    37
  */
-#ifdef LOG_COLOR
-#define __LOG_COLOR(n) Printf("\033[%sm", #n)
-#define __LOG_BEGIN(logName, color) Printf("\033[%sm[%s-%s] ", #color, logName, LOG_MOD_NAME)
-#define __LOG_END Printf("\033[0m" CON_NEWLINE)
+#ifdef NX_LOG_COLOR
+#define __NX_LOG_COLOR(n) NX_Printf("\033[%sm", #n)
+#define __NX_LOG_BEGIN(logName, color) NX_Printf("\033[%sm[%s-%s] ", #color, logName, NX_LOG_MOD_NAME)
+#define __NX_LOG_END NX_Printf("\033[0m" NX_CON_NEWLINE)
 #else
-#define __LOG_COLOR(n)
-#define __LOG_BEGIN(logName, color) Printf("[%s-%s] ", logName, LOG_MOD_NAME)
-#define __LOG_END Printf(CON_NEWLINE)
-#endif /* LOG_COLOR */
+#define __NX_LOG_COLOR(n)
+#define __NX_LOG_BEGIN(logName, color) NX_Printf("[%s-%s] ", logName, NX_LOG_MOD_NAME)
+#define __NX_LOG_END NX_Printf(NX_CON_NEWLINE)
+#endif /* NX_LOG_COLOR */
 
 
-#ifdef CONFIG_DEBUG_TIMELINE
-#define LOG_TIMELINE Printf("[%10d.%03d] ", ClockTickGetMillisecond() / 1000, ClockTickGetMillisecond() % 1000);
+#ifdef CONFIG_NX_DEBUG_TIMELINE
+#define NX_LOG_TIMELINE NX_Printf("[%10d.%03d] ", NX_ClockTickGetMillisecond() / 1000, NX_ClockTickGetMillisecond() % 1000);
 #else
-#define LOG_TIMELINE
+#define NX_LOG_TIMELINE
 #endif
 
-PUBLIC OS_Error LogLineLock(UArch *level);
-PUBLIC OS_Error LogLineUnlock(UArch level);
+NX_PUBLIC NX_Error LogLineLock(NX_UArch *level);
+NX_PUBLIC NX_Error LogLineUnlock(NX_UArch level);
 
-#define LOG_LINE(logName, color, ...) \
+#define NX_LOG_LINE(logName, color, ...) \
     do \
     { \
-        UArch _level; \
+        NX_UArch _level; \
         LogLineLock(&_level); \
-        LOG_TIMELINE \
-        __LOG_BEGIN(logName, color); \
-        Printf(__VA_ARGS__); \
-        __LOG_END; \
+        NX_LOG_TIMELINE \
+        __NX_LOG_BEGIN(logName, color); \
+        NX_Printf(__VA_ARGS__); \
+        __NX_LOG_END; \
         LogLineUnlock(_level); \
     } \
     while (0)
-#define __LOG_RAW(...) LOG_TIMELINE \
+#define __NX_LOG_RAW(...) NX_LOG_TIMELINE \
     do \
     { \
-        UArch _level; \
+        NX_UArch _level; \
         LogLineLock(&_level); \
-        Printf(__VA_ARGS__); \
+        NX_Printf(__VA_ARGS__); \
         LogLineUnlock(_level); \
     } \
     while (0)
 
 #else
-#define LOG_LINE(logName, color, fmt, ...)
-#define __LOG_RAW(fmt, ...)
-#endif /* LOG_ENABLE */
+#define NX_LOG_LINE(logName, color, fmt, ...)
+#define __NX_LOG_RAW(fmt, ...)
+#endif /* NX_LOG_ENABLE */
 
 /**
  * Log api
  */
-#if (LOG_MOD_LEVEL >= LOG_DBG)
-#define LOG_D(...)      LOG_LINE("DBG", 0, __VA_ARGS__)
+#if (NX_LOG_MOD_LEVEL >= NX_LOG_DBG)
+#define NX_LOG_D(...)      NX_LOG_LINE("DBG", 0, __VA_ARGS__)
 #else
-#define LOG_D(...)
+#define NX_LOG_D(...)
 #endif
 
-#if (LOG_MOD_LEVEL >= LOG_INFO)
-#define LOG_I(...)      LOG_LINE("INFO", 32, __VA_ARGS__)
+#if (NX_LOG_MOD_LEVEL >= NX_LOG_INFO)
+#define NX_LOG_I(...)      NX_LOG_LINE("INFO", 32, __VA_ARGS__)
 #else
-#define LOG_I(...)
+#define NX_LOG_I(...)
 #endif
 
-#if (LOG_MOD_LEVEL >= LOG_WARNING)
-#define LOG_W(...)      LOG_LINE("WARN", 33, __VA_ARGS__)
+#if (NX_LOG_MOD_LEVEL >= NX_LOG_WARNING)
+#define NX_LOG_W(...)      NX_LOG_LINE("WARN", 33, __VA_ARGS__)
 #else
-#define LOG_W(...)
+#define NX_LOG_W(...)
 #endif
 
-#if (LOG_MOD_LEVEL >= LOG_ERROR)
-#define LOG_E(...)      LOG_LINE("ERR", 31, __VA_ARGS__)
+#if (NX_LOG_MOD_LEVEL >= NX_LOG_ERROR)
+#define NX_LOG_E(...)      NX_LOG_LINE("ERR", 31, __VA_ARGS__)
 #else
-#define LOG_E(...)
+#define NX_LOG_E(...)
 #endif
 
-#define LOG_RAW(...)         __LOG_RAW(__VA_ARGS__)
+#define NX_LOG_RAW(...)         __NX_LOG_RAW(__VA_ARGS__)
 
 #endif  /* __UTILS_LOG__ */

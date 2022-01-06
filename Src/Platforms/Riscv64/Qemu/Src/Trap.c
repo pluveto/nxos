@@ -16,7 +16,7 @@
 #include <PLIC.h>
 #include <Regs.h>
 
-#define LOG_NAME "Trap"
+#define NX_LOG_NAME "Trap"
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 
@@ -25,7 +25,7 @@
 #include <Utils/Memory.h>
 
 /* trap name for riscv */
-PRIVATE const char *InterruptName[] =
+NX_PRIVATE const char *InterruptName[] =
 {
     "User Software Interrupt",
     "Supervisor Software Interrupt",
@@ -41,7 +41,7 @@ PRIVATE const char *InterruptName[] =
     "Reserved-11",
 };
 
-PRIVATE const char *ExceptionName[] =
+NX_PRIVATE const char *ExceptionName[] =
 {
     "Instruction Address Misaligned",
     "Instruction Access Fault",
@@ -61,55 +61,55 @@ PRIVATE const char *ExceptionName[] =
     "Store/AMO Page Fault"
 };
 
-PUBLIC void TrapFrameDump(HAL_TrapFrame *frame)
+NX_PUBLIC void TrapFrameDump(HAL_TrapFrame *frame)
 {
-    LOG_RAW("------------ Trap frame Dump ------------\n");
-    LOG_RAW("Function Registers:\n");
-    LOG_RAW("\tra(x1) = 0x%p\n", frame->ra);
-    LOG_RAW("\tuser_sp(x2) = 0x%p\n", frame->sp);
-    LOG_RAW("\tgp(x3) = 0x%p\n", frame->gp);
-    LOG_RAW("\ttp(x4) = 0x%p\n", frame->tp);
-    LOG_RAW("Temporary Registers:\n");
-    LOG_RAW("\tt0(x5) = 0x%p\n", frame->t0);
-    LOG_RAW("\tt1(x6) = 0x%p\n", frame->t1);
-    LOG_RAW("\tt2(x7) = 0x%p\n", frame->t2);
-    LOG_RAW("\tt3(x28) = 0x%p\n", frame->t3);
-    LOG_RAW("\tt4(x29) = 0x%p\n", frame->t4);
-    LOG_RAW("\tt5(x30) = 0x%p\n", frame->t5);
-    LOG_RAW("\tt6(x31) = 0x%p\n", frame->t6);
-    LOG_RAW("Saved Registers:\n");
-    LOG_RAW("\ts0/fp(x8) = 0x%p\n", frame->s0);
-    LOG_RAW("\ts1(x9) = 0x%p\n", frame->s1);
-    LOG_RAW("\ts2(x18) = 0x%p\n", frame->s2);
-    LOG_RAW("\ts3(x19) = 0x%p\n", frame->s3);
-    LOG_RAW("\ts4(x20) = 0x%p\n", frame->s4);
-    LOG_RAW("\ts5(x21) = 0x%p\n", frame->s5);
-    LOG_RAW("\ts6(x22) = 0x%p\n", frame->s6);
-    LOG_RAW("\ts7(x23) = 0x%p\n", frame->s7);
-    LOG_RAW("\ts8(x24) = 0x%p\n", frame->s8);
-    LOG_RAW("\ts9(x25) = 0x%p\n", frame->s9);
-    LOG_RAW("\ts10(x26) = 0x%p\n", frame->s10);
-    LOG_RAW("\ts11(x27) = 0x%p\n", frame->s11);
-    LOG_RAW("Function Arguments Registers:\n");
-    LOG_RAW("\ta0(x10) = 0x%p\n", frame->a0);
-    LOG_RAW("\ta1(x11) = 0x%p\n", frame->a1);
-    LOG_RAW("\ta2(x12) = 0x%p\n", frame->a2);
-    LOG_RAW("\ta3(x13) = 0x%p\n", frame->a3);
-    LOG_RAW("\ta4(x14) = 0x%p\n", frame->a4);
-    LOG_RAW("\ta5(x15) = 0x%p\n", frame->a5);
-    LOG_RAW("\ta6(x16) = 0x%p\n", frame->a6);
-    LOG_RAW("\ta7(x17) = 0x%p\n", frame->a7);
-    LOG_RAW("sstatus = 0x%p\n", frame->sstatus);
-    LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_SIE) ? "Supervisor Interrupt Enabled" : "Supervisor Interrupt Disabled");
-    LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_SPIE) ? "Last Time Supervisor Interrupt Enabled" : "Last Time Supervisor Interrupt Disabled");
-    LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_SPP) ? "Last Privilege is Supervisor Mode" : "Last Privilege is User Mode");
-    LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_FS) ? "FPU Enabled" : "FPU not Enabled");
+    NX_LOG_RAW("------------ Trap frame Dump ------------\n");
+    NX_LOG_RAW("Function Registers:\n");
+    NX_LOG_RAW("\tra(x1) = 0x%p\n", frame->ra);
+    NX_LOG_RAW("\tuser_sp(x2) = 0x%p\n", frame->sp);
+    NX_LOG_RAW("\tgp(x3) = 0x%p\n", frame->gp);
+    NX_LOG_RAW("\ttp(x4) = 0x%p\n", frame->tp);
+    NX_LOG_RAW("Temporary Registers:\n");
+    NX_LOG_RAW("\tt0(x5) = 0x%p\n", frame->t0);
+    NX_LOG_RAW("\tt1(x6) = 0x%p\n", frame->t1);
+    NX_LOG_RAW("\tt2(x7) = 0x%p\n", frame->t2);
+    NX_LOG_RAW("\tt3(x28) = 0x%p\n", frame->t3);
+    NX_LOG_RAW("\tt4(x29) = 0x%p\n", frame->t4);
+    NX_LOG_RAW("\tt5(x30) = 0x%p\n", frame->t5);
+    NX_LOG_RAW("\tt6(x31) = 0x%p\n", frame->t6);
+    NX_LOG_RAW("Saved Registers:\n");
+    NX_LOG_RAW("\ts0/fp(x8) = 0x%p\n", frame->s0);
+    NX_LOG_RAW("\ts1(x9) = 0x%p\n", frame->s1);
+    NX_LOG_RAW("\ts2(x18) = 0x%p\n", frame->s2);
+    NX_LOG_RAW("\ts3(x19) = 0x%p\n", frame->s3);
+    NX_LOG_RAW("\ts4(x20) = 0x%p\n", frame->s4);
+    NX_LOG_RAW("\ts5(x21) = 0x%p\n", frame->s5);
+    NX_LOG_RAW("\ts6(x22) = 0x%p\n", frame->s6);
+    NX_LOG_RAW("\ts7(x23) = 0x%p\n", frame->s7);
+    NX_LOG_RAW("\ts8(x24) = 0x%p\n", frame->s8);
+    NX_LOG_RAW("\ts9(x25) = 0x%p\n", frame->s9);
+    NX_LOG_RAW("\ts10(x26) = 0x%p\n", frame->s10);
+    NX_LOG_RAW("\ts11(x27) = 0x%p\n", frame->s11);
+    NX_LOG_RAW("Function Arguments Registers:\n");
+    NX_LOG_RAW("\ta0(x10) = 0x%p\n", frame->a0);
+    NX_LOG_RAW("\ta1(x11) = 0x%p\n", frame->a1);
+    NX_LOG_RAW("\ta2(x12) = 0x%p\n", frame->a2);
+    NX_LOG_RAW("\ta3(x13) = 0x%p\n", frame->a3);
+    NX_LOG_RAW("\ta4(x14) = 0x%p\n", frame->a4);
+    NX_LOG_RAW("\ta5(x15) = 0x%p\n", frame->a5);
+    NX_LOG_RAW("\ta6(x16) = 0x%p\n", frame->a6);
+    NX_LOG_RAW("\ta7(x17) = 0x%p\n", frame->a7);
+    NX_LOG_RAW("sstatus = 0x%p\n", frame->sstatus);
+    NX_LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_SIE) ? "Supervisor Interrupt Enabled" : "Supervisor Interrupt Disabled");
+    NX_LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_SPIE) ? "Last Time Supervisor Interrupt Enabled" : "Last Time Supervisor Interrupt Disabled");
+    NX_LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_SPP) ? "Last Privilege is Supervisor Mode" : "Last Privilege is User Mode");
+    NX_LOG_RAW("\t%s\n", (frame->sstatus & SSTATUS_FS) ? "FPU Enabled" : "FPU not Enabled");
     
-    USize satp = ReadCSR(satp);
-    LOG_RAW("satp = 0x%p\n", satp);
+    NX_USize satp = ReadCSR(satp);
+    NX_LOG_RAW("satp = 0x%p\n", satp);
     
-    LOG_RAW("\tCurrent PPN = 0x%p\n", (satp & ((1UL << 28) - 1)));
-    LOG_RAW("\tCurrent ASID = 0x%p\n", (satp >> 44) & ((1UL << 16) - 1));
+    NX_LOG_RAW("\tCurrent PPN = 0x%p\n", (satp & ((1UL << 28) - 1)));
+    NX_LOG_RAW("\tCurrent ASID = 0x%p\n", (satp >> 44) & ((1UL << 16) - 1));
 
     const char *mmuMode;
     switch ((satp >> 60) & 0xF)
@@ -134,18 +134,18 @@ PUBLIC void TrapFrameDump(HAL_TrapFrame *frame)
         break;
     }
 
-    LOG_RAW("\tAddress Transport Mode = %s\n", mmuMode);
-    LOG_RAW("------------ Trap frame Dump Done ------------\n");
+    NX_LOG_RAW("\tAddress Transport Mode = %s\n", mmuMode);
+    NX_LOG_RAW("------------ Trap frame Dump Done ------------\n");
 }
 
-IMPORT Addr TrapEntry0;
-IMPORT Addr TrapEntry1;
-IMPORT Addr TrapEntry2;
-IMPORT Addr TrapEntry3;
+NX_IMPORT NX_Addr TrapEntry0;
+NX_IMPORT NX_Addr TrapEntry1;
+NX_IMPORT NX_Addr TrapEntry2;
+NX_IMPORT NX_Addr TrapEntry3;
 
-PUBLIC void CPU_InitTrap(UArch coreId)
+NX_PUBLIC void CPU_InitTrap(NX_UArch coreId)
 {
-    Addr *trapEntry = 0;
+    NX_Addr *trapEntry = 0;
     switch (coreId)
     {
     case 0:
@@ -170,29 +170,29 @@ PUBLIC void CPU_InitTrap(UArch coreId)
     SetCSR(sie, SIE_SSIE);
 }
 
-PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
+NX_PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
 {
-    // LOG_D("trap dispatcher");
-    U64 cause = ReadCSR(scause);
-    U64 stval = ReadCSR(stval);
+    // NX_LOG_D("trap dispatcher");
+    NX_U64 cause = ReadCSR(scause);
+    NX_U64 stval = ReadCSR(stval);
 
-    const char *msg = NULL;
-    UArch id = cause & ((1UL << (RISCV_XLEN - 2)) - 1);
+    const char *msg = NX_NULL;
+    NX_UArch id = cause & ((1UL << (RISCV_XLEN - 2)) - 1);
 
     /* supervisor external interrupt */
     if ((SCAUSE_INTERRUPT & cause) && 
         SCAUSE_S_EXTERNAL_INTR == (cause & 0xff))
     {
-        IRQ_Number irqno = PLIC_Claim(MultiCoreGetBootCore());
+        NX_IRQ_Number irqno = PLIC_Claim(NX_MultiCoreGetBootCore());
         if (irqno != 0)
         {
-            IRQ_Handle(irqno);
+            NX_IRQ_Handle(irqno);
         }
         return;
     }
     else if ((SCAUSE_INTERRUPT | SCAUSE_S_TIMER_INTR) == cause)
     {
-        // LOG_D("supervisor timer");
+        // NX_LOG_D("supervisor timer");
         /* supervisor timer */
         HAL_ClockHandler();
         return;
@@ -207,7 +207,7 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
         {
             msg = "Unknown Interrupt";
         }
-        LOG_E("Unhandled Interrupt %ld:%s", id, msg);
+        NX_LOG_E("Unhandled Interrupt %ld:%s", id, msg);
     }
     else
     {
@@ -219,10 +219,10 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
         {
             msg = "Unknown Exception";
         }
-        LOG_E("Unhandled Exception %ld:%s", id, msg);
+        NX_LOG_E("Unhandled Exception %ld:%s", id, msg);
     }
 
-    LOG_E("scause:0x%p, stval:0x%p, sepc:0x%p", cause, stval, frame->epc);
+    NX_LOG_E("scause:0x%p, stval:0x%p, sepc:0x%p", cause, stval, frame->epc);
     TrapFrameDump(frame);
     while(1);
 }
@@ -230,23 +230,23 @@ PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
 /**
  * switch CPU stack to thread stack, thread stack maybe stack top or stack middle.
  */
-PUBLIC U8 *TrapSwitchStack(HAL_TrapFrame *frame)
+NX_PUBLIC NX_U8 *TrapSwitchStack(HAL_TrapFrame *frame)
 {
-    UArch sstatus = ReadCSR(sstatus);
-    U8 *sp;
+    NX_UArch sstatus = ReadCSR(sstatus);
+    NX_U8 *sp;
     if ((sstatus & SSTATUS_SPP)) /* trap from supervisor */
     {
         //LOG_D("from supervisor:%p, sstatus:%p", frame, sstatus);
-        sp = (U8 *)ReadCSR(sscratch); /* read from sscratch, it saved old sp in kernel */
+        sp = (NX_U8 *)ReadCSR(sscratch); /* read from sscratch, it saved old sp in kernel */
     }
     else    /* trap from user */
     {
-        LOG_W("from user:%p, sstatus:%p", frame, sstatus);
-        Thread *thread = ThreadSelf();
-        sp = (U8 *)(thread->stackBase + thread->stackSize);
+        NX_LOG_W("from user:%p, sstatus:%p", frame, sstatus);
+        NX_Thread *thread = NX_ThreadSelf();
+        sp = (NX_U8 *)(thread->stackBase + thread->stackSize);
     }
     sp -= sizeof(HAL_TrapFrame);
     /* copy TrapFrame to new stack */
-    Copy((void *)sp, frame, sizeof(HAL_TrapFrame));
+    NX_MemCopy((void *)sp, frame, sizeof(HAL_TrapFrame));
     return sp; 
 }

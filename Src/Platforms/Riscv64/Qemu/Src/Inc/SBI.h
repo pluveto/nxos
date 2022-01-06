@@ -142,18 +142,18 @@ struct sbi_ret
 };
 
 static __inline struct sbi_ret
-sbi_call(U64 arg7, U64 arg6, U64 arg0, U64 arg1,
-         U64 arg2, U64 arg3, U64 arg4)
+sbi_call(NX_U64 arg7, NX_U64 arg6, NX_U64 arg0, NX_U64 arg1,
+         NX_U64 arg2, NX_U64 arg3, NX_U64 arg4)
 {
     struct sbi_ret ret;
 
-    register UArch a0 __asm("a0") = (UArch)(arg0);
-    register UArch a1 __asm("a1") = (UArch)(arg1);
-    register UArch a2 __asm("a2") = (UArch)(arg2);
-    register UArch a3 __asm("a3") = (UArch)(arg3);
-    register UArch a4 __asm("a4") = (UArch)(arg4);
-    register UArch a6 __asm("a6") = (UArch)(arg6);
-    register UArch a7 __asm("a7") = (UArch)(arg7);
+    register NX_UArch a0 __asm("a0") = (NX_UArch)(arg0);
+    register NX_UArch a1 __asm("a1") = (NX_UArch)(arg1);
+    register NX_UArch a2 __asm("a2") = (NX_UArch)(arg2);
+    register NX_UArch a3 __asm("a3") = (NX_UArch)(arg3);
+    register NX_UArch a4 __asm("a4") = (NX_UArch)(arg4);
+    register NX_UArch a6 __asm("a6") = (NX_UArch)(arg6);
+    register NX_UArch a7 __asm("a7") = (NX_UArch)(arg7);
 
     __asm __volatile(\
                      "ecall"                                        \
@@ -178,7 +178,7 @@ sbi_probe_extension(long id)
 }
 
 /* TIME extension functions. */
-void sbi_set_timer(U64 val);
+void sbi_set_timer(NX_U64 val);
 
 /* IPI extension functions. */
 void sbi_send_ipi(const unsigned long *hart_mask);

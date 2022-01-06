@@ -19,10 +19,10 @@
 
 /* direct means not use driver framework */
 
-PUBLIC void HAL_DirectUartInit(void);
-PUBLIC void HAL_DirectUartStage2(void);
+NX_PUBLIC void HAL_DirectUartInit(void);
+NX_PUBLIC void HAL_DirectUartStage2(void);
 
-PUBLIC void HAL_DirectUartPutc(char ch);
-PUBLIC int HAL_DirectUartGetc(void);
+NX_PUBLIC void HAL_DirectUartPutc(char ch);
+NX_PUBLIC int HAL_DirectUartGetc(void);
 
 #endif /* __DIRECT_UART_HEADER__ */

@@ -13,157 +13,156 @@
 #include <MM/Alloc.h>
 
 /* protect flags */
-#define IRQ_WORK_PENDING        0x80000000    /* work is pending */
-#define IRQ_WORK_ON_QUEUED      0x40000000    /* work is on queue */
+#define NX_IRQ_WORK_PENDING        0x80000000    /* work is pending */
+#define NX_IRQ_WORK_ON_QUEUED      0x40000000    /* work is on queue */
 
+NX_PRIVATE NX_List DelayIrqListTable[NX_IRQ_QUEUE_NR];
+NX_PRIVATE NX_VOLATILE NX_U32 DelayIrqEvent;
 
-PRIVATE List DelayIrqListTable[IRQ_QUEUE_NR];
-PRIVATE VOLATILE U32 DelayIrqEvent;
-
-PUBLIC void IRQ_DelayQueueInit(void)
+NX_PUBLIC void NX_IRQ_DelayQueueInit(void)
 {
     int i;
-    for (i = 0; i < IRQ_QUEUE_NR; i++)
+    for (i = 0; i < NX_IRQ_QUEUE_NR; i++)
     {
-        ListInit(&DelayIrqListTable[i]);
+        NX_ListInit(&DelayIrqListTable[i]);
     }
     DelayIrqEvent = 0;
 }
 
-PRIVATE U32 IRQ_DelayEventGet(void)
+NX_PRIVATE NX_U32 IRQ_DelayEventGet(void)
 {
     return DelayIrqEvent;
 }
 
-PRIVATE void IRQ_DelayEventSet(U32 event)
+NX_PRIVATE void IRQ_DelayEventSet(NX_U32 event)
 {
     DelayIrqEvent |= event;
 }
 
-PRIVATE void IRQ_DelayEventClear(void)
+NX_PRIVATE void IRQ_DelayEventClear(void)
 {
     DelayIrqEvent = 0;
 }
 
-PUBLIC OS_Error IRQ_DelayQueueEnter(IRQ_DelayQueue queue, IRQ_DelayWork *work)
+NX_PUBLIC NX_Error NX_IRQ_DelayQueueEnter(NX_IRQ_DelayQueue queue, NX_IRQ_DelayWork *work)
 {
-    if (queue < 0 || queue >= IRQ_QUEUE_NR || work == NULL)
+    if (queue < 0 || queue >= NX_IRQ_QUEUE_NR || work == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     
-    if (ListFind(&work->list, &DelayIrqListTable[queue]))
+    if (NX_ListFind(&work->list, &DelayIrqListTable[queue]))
     {
-        return OS_EAGAIN;
+        return NX_EAGAIN;
     }
 
-    UArch level = INTR_SaveLevel();
+    NX_UArch level = NX_IRQ_SaveLevel();
     work->queue = queue;
-    work->flags |= IRQ_WORK_ON_QUEUED;
-    ListAddTail(&work->list, &DelayIrqListTable[queue]);
-    INTR_RestoreLevel(level);
-    return OS_EOK;
+    work->flags |= NX_IRQ_WORK_ON_QUEUED;
+    NX_ListAddTail(&work->list, &DelayIrqListTable[queue]);
+    NX_IRQ_RestoreLevel(level);
+    return NX_EOK;
 }
 
-PUBLIC OS_Error IRQ_DelayQueueLeave(IRQ_DelayQueue queue, IRQ_DelayWork *work)
+NX_PUBLIC NX_Error NX_IRQ_DelayQueueLeave(NX_IRQ_DelayQueue queue, NX_IRQ_DelayWork *work)
 {
-    if (queue < 0 || queue >= IRQ_QUEUE_NR || work == NULL)
+    if (queue < 0 || queue >= NX_IRQ_QUEUE_NR || work == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     
-    if (!ListFind(&work->list, &DelayIrqListTable[queue]))
+    if (!NX_ListFind(&work->list, &DelayIrqListTable[queue]))
     {
-        return OS_ENOSRCH;
+        return NX_ENOSRCH;
     }
 
-    UArch level = INTR_SaveLevel();
+    NX_UArch level = NX_IRQ_SaveLevel();
     work->queue = 0;
-    work->flags &= ~IRQ_WORK_ON_QUEUED;
+    work->flags &= ~NX_IRQ_WORK_ON_QUEUED;
 
-    ListDel(&work->list);
-    INTR_RestoreLevel(level);
-    return OS_EOK;
+    NX_ListDel(&work->list);
+    NX_IRQ_RestoreLevel(level);
+    return NX_EOK;
 }
 
-PUBLIC OS_Error IRQ_DelayWorkInit(IRQ_DelayWork *work, IRQ_WorkHandler handler, void *arg, U32 flags)
+NX_PUBLIC NX_Error NX_IRQ_DelayWorkInit(NX_IRQ_DelayWork *work, NX_IRQ_WorkHandler handler, void *arg, NX_U32 flags)
 {
-    if (work == NULL || handler == NULL)
+    if (work == NX_NULL || handler == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
     work->handler = handler;
     work->arg = arg;
     work->flags = flags;
-    work->flags &= ~IRQ_WORK_NOREENTER; /*  */
-    ListInit(&work->list);
-    return OS_EOK;
+    work->flags &= ~NX_IRQ_WORK_NOREENTER; /*  */
+    NX_ListInit(&work->list);
+    return NX_EOK;
 }
 
-PUBLIC IRQ_DelayWork *IRQ_DelayWorkCreate(IRQ_WorkHandler handler, void *arg, U32 flags)
+NX_PUBLIC NX_IRQ_DelayWork *NX_IRQ_DelayWorkCreate(NX_IRQ_WorkHandler handler, void *arg, NX_U32 flags)
 {
-    IRQ_DelayWork *work = MemAlloc(sizeof(IRQ_DelayWork));
-    if (work == NULL)
+    NX_IRQ_DelayWork *work = NX_MemAlloc(sizeof(NX_IRQ_DelayWork));
+    if (work == NX_NULL)
     {
-        return NULL;
+        return NX_NULL;
     }
-    if (IRQ_DelayWorkInit(work, handler, arg, flags) != OS_EOK)
+    if (NX_IRQ_DelayWorkInit(work, handler, arg, flags) != NX_EOK)
     {
-        MemFree(work);
-        return NULL;
+        NX_MemFree(work);
+        return NX_NULL;
     }
     return work;
 }
 
-PUBLIC OS_Error IRQ_DelayWorkDestroy(IRQ_DelayWork *work)
+NX_PUBLIC NX_Error NX_IRQ_DelayWorkDestroy(NX_IRQ_DelayWork *work)
 {
-    if (work == NULL)
+    if (work == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    MemFree(work);
-    return OS_EOK;
+    NX_MemFree(work);
+    return NX_EOK;
 }
 
 /**
  * Must called with interrupt disabled
  */
-PUBLIC OS_Error IRQ_DelayWorkHandle(IRQ_DelayWork *work)
+NX_PUBLIC NX_Error NX_IRQ_DelayWorkHandle(NX_IRQ_DelayWork *work)
 {
-    if (work == NULL)
+    if (work == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    if (!(work->flags & IRQ_WORK_ON_QUEUED))
+    if (!(work->flags & NX_IRQ_WORK_ON_QUEUED))
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
-    if (work->queue < 0 || work->queue >= IRQ_QUEUE_NR)
+    if (work->queue < 0 || work->queue >= NX_IRQ_QUEUE_NR)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
     IRQ_DelayEventSet((1 << work->queue));
-    work->flags |= IRQ_WORK_PENDING;
+    work->flags |= NX_IRQ_WORK_PENDING;
 
-    return OS_EOK;
+    return NX_EOK;
 }
 
-INLINE void IRQ_DelayWorkCheck(IRQ_DelayWork *work)
+NX_INLINE void IRQ_DelayWorkCheck(NX_IRQ_DelayWork *work)
 {
-    if (work->flags & IRQ_WORK_PENDING)
+    if (work->flags & NX_IRQ_WORK_PENDING)
     {
-        work->flags &= ~IRQ_WORK_PENDING; /* clear pending */
+        work->flags &= ~NX_IRQ_WORK_PENDING; /* clear pending */
 
-        if (!(work->flags & IRQ_WORK_NOREENTER))
+        if (!(work->flags & NX_IRQ_WORK_NOREENTER))
         {
-            INTR_Enable();   
+            NX_IRQ_Enable();   
         }
 
         work->handler(work->arg);
 
-        if (!(work->flags & IRQ_WORK_NOREENTER))
+        if (!(work->flags & NX_IRQ_WORK_NOREENTER))
         {
-            INTR_Disable();                      
+            NX_IRQ_Disable();                      
         }
     }
 }
@@ -171,35 +170,35 @@ INLINE void IRQ_DelayWorkCheck(IRQ_DelayWork *work)
 /**
  * Must called interrupt disabled
  */
-INTERFACE void IRQ_DelayQueueCheck(void)
+NX_INTERFACE void NX_IRQ_DelayQueueCheck(void)
 {
-    int checkTimes = IRQ_DELAY_WORK_CHECK_TIMES;
+    int checkTimes = NX_IRQ_DELAY_WORK_CHECK_TIMES;
     
     while (checkTimes-- > 0)
     {
-        U32 irqEvent = IRQ_DelayEventGet();
+        NX_U32 irqEvent = IRQ_DelayEventGet();
         IRQ_DelayEventClear();
         if (irqEvent == 0)
         {
             return;
         }
-        INTR_Enable();
+        NX_IRQ_Enable();
 
         int i;
-        for (i = 0; i < IRQ_QUEUE_NR; i++)
+        for (i = 0; i < NX_IRQ_QUEUE_NR; i++)
         {
             if (!(irqEvent & (1 << i)))
             {
                 continue;
             }
 
-            IRQ_DelayWork *work;
-            ListForEachEntry(work, &DelayIrqListTable[i], list)
+            NX_IRQ_DelayWork *work;
+            NX_ListForEachEntry(work, &DelayIrqListTable[i], list)
             {
                 IRQ_DelayWorkCheck(work);
             }
         }
 
-        INTR_Disable();
+        NX_IRQ_Disable();
     }
 }

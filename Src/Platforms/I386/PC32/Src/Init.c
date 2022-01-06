@@ -15,46 +15,45 @@
 #include <Interrupt.h>
 #include <TSS.h>
 #include <Clock.h>
-#include <Page.h>
+#include <PageZone.h>
 #include <Platform.h>
 
-#define LOG_LEVEL LOG_INFO
-#define LOG_NAME "INIT"
+#define NX_LOG_LEVEL NX_LOG_INFO
+#define NX_LOG_NAME "INIT"
 #include <Utils/Log.h>
 
 #include <Drivers/DirectUart.h>
 
+NX_PUBLIC void HAL_ClearBSS(void);
 
-PUBLIC void ClearBSS(void);
-
-INTERFACE OS_Error PlatformInit(UArch coreId)
+NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
 {
-    ClearBSS();
+    HAL_ClearBSS();
     
     HAL_DirectUartInit();
     
-    Printf("hello, world!\na=%x b=%d c=%c e=%s\n", 0x1234abcd, 123456789, 'A', "hello");
+    NX_Printf("hello, world!\na=%x b=%d c=%c e=%s\n", 0x1234abcd, 123456789, 'A', "hello");
     
-    LOG_I("Hello, PC32!");
+    NX_LOG_I("Hello, PC32!");
 
     CPU_InitGate();
     CPU_InitSegment();
     CPU_InitTSS();
     CPU_InitInterrupt();
     
-    PageInit();
+    NX_PageZoneInit();
 
-    return OS_EOK;
+    return NX_EOK;
 }
 
-INTERFACE OS_Error PlatformStage2(void)
+NX_INTERFACE NX_Error HAL_PlatformStage2(void)
 {
-    if (HAL_InitClock() != OS_EOK)
+    if (HAL_InitClock() != NX_EOK)
     {
-        LOG_E("Init clock failed!");
-        return OS_ERROR;
+        NX_LOG_E("Init clock failed!");
+        return NX_ERROR;
     }
     HAL_DirectUartStage2();
     
-    return OS_EOK;
+    return NX_EOK;
 }

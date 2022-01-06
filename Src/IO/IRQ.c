@@ -15,82 +15,82 @@
 #include <Utils/String.h>
 #include <MM/Alloc.h>
 
-PRIVATE IRQ_Node IRQ_NodeTable[NR_IRQS];
+NX_PRIVATE NX_IRQ_Node IRQ_NodeTable[NX_NR_IRQS];
 
-PUBLIC void IRQ_Init(void)
+NX_PUBLIC void NX_IRQ_Init(void)
 {
     int i;
-    IRQ_Node *irq;
-    for (i = 0; i < NR_IRQS; i++)
+    NX_IRQ_Node *irq;
+    for (i = 0; i < NX_NR_IRQS; i++)
     {
         irq = &IRQ_NodeTable[i];
         irq->flags = 0;
-        irq->controller = NULL;
-        AtomicSet(&irq->reference, 0);
-        ListInit(&irq->actionList);
+        irq->controller = NX_NULL;
+        NX_AtomicSet(&irq->reference, 0);
+        NX_ListInit(&irq->actionList);
     }
-    IRQ_DelayQueueInit();
+    NX_IRQ_DelayQueueInit();
 }
 
-PRIVATE IRQ_Node *IRQ_NodeGet(IRQ_Number irq)
+NX_PRIVATE NX_IRQ_Node *IRQ_NodeGet(NX_IRQ_Number irq)
 {
-    if (0 <= irq && irq < NR_IRQS) {
+    if (0 <= irq && irq < NX_NR_IRQS) {
         return &IRQ_NodeTable[irq];
     }
-    return NULL;
+    return NX_NULL;
 }
 
-PUBLIC OS_Error IRQ_Bind(IRQ_Number irqno,
-                         IRQ_Handler handler,
+NX_PUBLIC NX_Error NX_IRQ_Bind(NX_IRQ_Number irqno,
+                         NX_IRQ_Handler handler,
                          void *data,
                          char *name,
-                         U32 flags)
+                         NX_U32 flags)
 {
-    IRQ_Node *irqNode = IRQ_NodeGet(irqno);
-    if (irqNode == NULL)
+    NX_IRQ_Node *irqNode = IRQ_NodeGet(irqno);
+    if (irqNode == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    irqNode->controller = &IRQ_ControllerInterface;
+    irqNode->controller = &NX_IRQ_ControllerInterface;
     irqNode->flags = flags;
 
-    IRQ_Action *action = MemAlloc(sizeof(IRQ_Action));
-    if (action == NULL)
+    NX_IRQ_Action *action = NX_MemAlloc(sizeof(NX_IRQ_Action));
+    if (action == NX_NULL)
     {
-        return OS_ENOMEM;
+        return NX_ENOMEM;
     }
     action->data = data;
     action->flags = flags;
     action->handler = handler;
-    Zero(action->name, IRQ_NAME_LEN);
-    StrCopyN(action->name, name, IRQ_NAME_LEN);
+    NX_MemZero(action->name, NX_IRQ_NAME_LEN);
+    NX_StrCopyN(action->name, name, NX_IRQ_NAME_LEN);
     
     /* add to action list */
-    ListAddTail(&action->list, &irqNode->actionList);
+    NX_ListAddTail(&action->list, &irqNode->actionList);
     
-    AtomicInc(&irqNode->reference);
-    return OS_EOK;
+    NX_AtomicInc(&irqNode->reference);
+    return NX_EOK;
 }
 
-PUBLIC OS_Error IRQ_Unbind(IRQ_Number irqno, void *data)
+NX_PUBLIC NX_Error NX_IRQ_Unbind(NX_IRQ_Number irqno, void *data)
 {
-    IRQ_Node *irqNode = IRQ_NodeGet(irqno);
-    if (irqNode == NULL)
+    NX_IRQ_Node *irqNode = IRQ_NodeGet(irqno);
+    if (irqNode == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    if (irqNode->controller == NULL)
+    if (irqNode->controller == NX_NULL)
     {
-        return OS_EFAULT;
+        return NX_EFAULT;
     }
 
-    IRQ_Action *action = NULL;
-    IRQ_Action *actionFind = NULL;
+    NX_IRQ_Action *action = NX_NULL;
+    NX_IRQ_Action *actionFind = NX_NULL;
 
-    UArch level = INTR_SaveLevel();
-    if (irqNode->flags & IRQ_FLAG_SHARED)
+    NX_UArch level = NX_IRQ_SaveLevel();
+    if (irqNode->flags & NX_IRQ_FLAG_SHARED)
     {
-        ListForEachEntry(action, &irqNode->actionList, list)
+        NX_ListForEachEntry(action, &irqNode->actionList, list)
         {
             /* find irq device if data are same */
             if (action->data == data)
@@ -102,77 +102,77 @@ PUBLIC OS_Error IRQ_Unbind(IRQ_Number irqno, void *data)
     }
     else
     {
-        actionFind = ListFirstEntryOrNULL(&irqNode->actionList, IRQ_Action, list);
+        actionFind = NX_ListFirstEntryOrNULL(&irqNode->actionList, NX_IRQ_Action, list);
     }
-    if (actionFind == NULL)
+    if (actionFind == NX_NULL)
     {
-        INTR_RestoreLevel(level);
-        return OS_ENORES;
+        NX_IRQ_RestoreLevel(level);
+        return NX_ENORES;
     }
     /* remove action */
-    ListDel(&actionFind->list);
-    MemFree(actionFind);
+    NX_ListDel(&actionFind->list);
+    NX_MemFree(actionFind);
 
-    AtomicDec(&irqNode->reference);
+    NX_AtomicDec(&irqNode->reference);
     /* no device on this irq */
-    if (AtomicGet(&irqNode->reference) == 0)
+    if (NX_AtomicGet(&irqNode->reference) == 0)
     {
-        irqNode->controller = NULL;
+        irqNode->controller = NX_NULL;
         irqNode->flags = 0;
     }
-    INTR_RestoreLevel(level);
-    return OS_EOK;
+    NX_IRQ_RestoreLevel(level);
+    return NX_EOK;
 }
 
-PUBLIC OS_Error IRQ_Unmask(IRQ_Number irqno)
+NX_PUBLIC NX_Error NX_IRQ_Unmask(NX_IRQ_Number irqno)
 {
-    IRQ_Node *irqNode = IRQ_NodeGet(irqno);
-    if (irqNode == NULL)
+    NX_IRQ_Node *irqNode = IRQ_NodeGet(irqno);
+    if (irqNode == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    if (irqNode->controller != NULL && irqNode->controller->unmask != NULL)
+    if (irqNode->controller != NX_NULL && irqNode->controller->unmask != NX_NULL)
     {
         return irqNode->controller->unmask(irqno);
     }
-    return OS_ENOFUNC;
+    return NX_ENOFUNC;
 }
 
-PUBLIC OS_Error IRQ_Mask(IRQ_Number irqno)
+NX_PUBLIC NX_Error NX_IRQ_Mask(NX_IRQ_Number irqno)
 {
-    IRQ_Node *irqNode = IRQ_NodeGet(irqno);
-    if (irqNode == NULL)
+    NX_IRQ_Node *irqNode = IRQ_NodeGet(irqno);
+    if (irqNode == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    if (irqNode->controller != NULL && irqNode->controller->mask != NULL)
+    if (irqNode->controller != NX_NULL && irqNode->controller->mask != NX_NULL)
     {
         return irqNode->controller->mask(irqno);
     }
-    return OS_ENOFUNC;
+    return NX_ENOFUNC;
 }
 
-PUBLIC OS_Error IRQ_Handle(IRQ_Number irqno)
+NX_PUBLIC NX_Error NX_IRQ_Handle(NX_IRQ_Number irqno)
 {
-    IRQ_Node *irqNode = IRQ_NodeGet(irqno);
-    if (irqNode == NULL)
+    NX_IRQ_Node *irqNode = IRQ_NodeGet(irqno);
+    if (irqNode == NX_NULL)
     {
-        return OS_EINVAL;
+        return NX_EINVAL;
     }
-    IRQ_Action *action;
+    NX_IRQ_Action *action;
 
     /* invoke each action on irq node */
-    ListForEachEntry(action, &irqNode->actionList, list)
+    NX_ListForEachEntry(action, &irqNode->actionList, list)
     {
-        if (action->handler(irqno, action->data) == OS_EOK)
+        if (action->handler(irqno, action->data) == NX_EOK)
         {
             break;
         }
     }
     /* ack irq after handled */
-    if (irqNode->controller->ack != NULL)
+    if (irqNode->controller->ack != NX_NULL)
     {
         irqNode->controller->ack(irqno);
     }
-    return OS_EOK;
+    return NX_EOK;
 }

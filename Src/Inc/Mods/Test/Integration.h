@@ -14,30 +14,28 @@
 
 #include <XBook.h>
 
-#ifdef CONFIG_ENABLE_TEST_INTEGRATION
+#ifdef CONFIG_NX_ENABLE_TEST_INTEGRATION
 
-struct Integration
+struct NX_Integration
 {
     char *integrationName;
-    OS_Error (*func)(void);
+    NX_Error (*func)(void);
 };
-typedef struct Integration Integration;
+typedef struct NX_Integration NX_Integration;
 
-#define __INTEGRATION_TEST(name)  OS_Error __Integration##name##Test(void)
+#define __INTEGRATION_TEST(name)  NX_Error __Integration##name##Test(void)
 
-#define INTEGRATION_TEST(name) \
-    PRIVATE __INTEGRATION_TEST(name); \
-    USED PRIVATE const Integration __integrationTest \
-    SECTION("IntegrationTable") = \
+#define NX_INTEGRATION_TEST(name) \
+    NX_PRIVATE __INTEGRATION_TEST(name); \
+    NX_USED NX_PRIVATE const NX_Integration __integrationTest \
+    NX_SECTION("IntegrationTable") = \
     { \
         .integrationName = #name, \
         .func = __Integration##name##Test, \
     }; \
-    PRIVATE __INTEGRATION_TEST(name) \
-    
-PUBLIC void IntegrationInit(void);
+    NX_PRIVATE __INTEGRATION_TEST(name) \
 
-#endif /* CONFIG_ENABLE_TEST_INTEGRATION */
+#endif /* CONFIG_NX_ENABLE_TEST_INTEGRATION */
 
-#endif  /* __MODS_TEST_INTEGRATION__ */
+#endif /* __MODS_TEST_INTEGRATION__ */
 

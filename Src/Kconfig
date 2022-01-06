@@ -5,7 +5,7 @@
 #
 # CPU 64 bits width
 #
-config CPU_64BITS
+config NX_CPU_64BITS
     bool 
     default n
 

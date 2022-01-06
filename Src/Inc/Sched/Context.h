@@ -14,16 +14,16 @@
 
 #include <XBook.h>
 
-struct ContextOps
+struct NX_ContextOps
 {
     void *(*init)(void *startEntry, void *exitEntry, void *arg, void *stackTop);
-    void (*switchNext)(Addr nextSP);
-    void (*switchPrevNext)(Addr prevSP, Addr nextSP);
+    void (*switchNext)(NX_Addr nextSP);
+    void (*switchPrevNext)(NX_Addr prevSP, NX_Addr nextSP);
 };
-INTERFACE IMPORT struct ContextOps ContextOpsInterface;
+NX_INTERFACE NX_IMPORT struct NX_ContextOps NX_ContextOpsInterface;
 
-#define ContextInit(startEntry, exitEntry, arg, stackTop)   ContextOpsInterface.init(startEntry, exitEntry, arg, stackTop)
-#define ContextSwitchNext(nextSP)                           ContextOpsInterface.switchNext(nextSP)
-#define ContextSwitchPrevNext(prevSP, nextSP)               ContextOpsInterface.switchPrevNext(prevSP, nextSP)
+#define NX_ContextInit(startEntry, exitEntry, arg, stackTop)   NX_ContextOpsInterface.init(startEntry, exitEntry, arg, stackTop)
+#define NX_ContextSwitchNext(nextSP)                           NX_ContextOpsInterface.switchNext(nextSP)
+#define NX_ContextSwitchPrevNext(prevSP, nextSP)               NX_ContextOpsInterface.switchPrevNext(prevSP, nextSP)
 
 #endif /* __SCHED_CONTEXT___ */

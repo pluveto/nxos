@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2021, BookOS Development Team
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Contains: Thread ID test
+ * Contains: NX_Thread ID test
  * 
  * Change Logs:
  * Date           Author            Notes
@@ -10,28 +10,28 @@
  */
 
 #include <Sched/ThreadID.h>
-#include <XBook/Debug.h>
+#include <Utils/Log.h>
 #include <Mods/Test/Integration.h>
 
-#ifdef CONFIG_TEST_INTEGRATION_THREAD_ID
+#ifdef CONFIG_NX_TEST_INTEGRATION_THREAD_ID
 
-INTEGRATION_TEST(TestThreadID)
+NX_INTEGRATION_TEST(TestThreadID)
 {
     int i;
     for (i = 0; i < 32; i++)
     {
-        int id = ThreadIdAlloc();
-        LOG_D("alloc id: %d", id);
-        ThreadIdFree(id);
+        int id = NX_ThreadIdAlloc();
+        NX_LOG_D("alloc id: %d", id);
+        NX_ThreadIdFree(id);
     }
     
     for (i = 0; i < 4; i++)
     {
-        int id = ThreadIdAlloc();
-        LOG_D("alloc id: %d", id);
-        ThreadIdFree(id);
+        int id = NX_ThreadIdAlloc();
+        NX_LOG_D("alloc id: %d", id);
+        NX_ThreadIdFree(id);
     }
-    return OS_EOK;
+    return NX_EOK;
 }
 
 #endif

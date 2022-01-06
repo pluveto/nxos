@@ -12,9 +12,9 @@
 #ifndef __PLATFROM_RISCV__
 #define __PLATFROM_RISCV__
 
-#include <Configure.h>
+#include <NXConfigure.h>
 
-#ifdef CONFIG_CPU_64BITS
+#ifdef CONFIG_NX_CPU_64BITS
 #define STORE                   sd
 #define LOAD                    ld
 #define REGBYTES                8

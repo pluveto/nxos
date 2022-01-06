@@ -15,10 +15,10 @@
 
 .text
 
-.extern IRQ_DelayQueueCheck
+.extern NX_IRQ_DelayQueueCheck
 .extern TrapDispatch
 .extern TrapSwitchStack
-.extern ReSchedCheck
+.extern NX_ReSchedCheck
 
 .extern CPU_StackTop0
 .extern CPU_StackTop1
@@ -76,10 +76,10 @@ TrapEntry:
     beqz t0, TrapReturn /* No interrupt bit */
 
     /* do IRQ queue check */
-    call IRQ_DelayQueueCheck
+    call NX_IRQ_DelayQueueCheck
 
     /* check sched */
-    call ReSchedCheck
+    call NX_ReSchedCheck
 
     tail TrapReturn
 

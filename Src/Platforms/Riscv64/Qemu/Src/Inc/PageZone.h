@@ -9,23 +9,22 @@
  * 2021-9-18      JasonHu           Init
  */
 
-#ifndef __PLATFORM_PAGE__
-#define __PLATFORM_PAGE__
+#ifndef __PLATFORM_PAGE_ZONE__
+#define __PLATFORM_PAGE_ZONE__
 
 #include <XBook.h>
 
 /**
  * Must define & init PageZone in each paltfrom 
  */
-enum PageZone
+enum NX_PageZone
 {
-    PZ_NORMAL = 0,
-    PZ_DMA,
-    PZ_USER,
-    PZ_NR,  /* Must be last member */
+    NX_PAGE_ZONE_NORMAL = 0,
+    NX_PAGE_ZONE_USER,
+    NX_PAGE_ZONE_NR,  /* Must be last member */
 };
-typedef enum PageZone PageZone;
+typedef enum NX_PageZone NX_PageZone;
 
-PUBLIC void PageInit(void);
+NX_PUBLIC void NX_PageZoneInit(void);
 
-#endif  /* __PLATFORM_PAGE__ */
+#endif  /* __PLATFORM_PAGE_ZONE__ */

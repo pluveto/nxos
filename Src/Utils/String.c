@@ -12,12 +12,12 @@
 #include <Utils/String.h>
 #include <Utils/Log.h>
 
-PUBLIC char *StrCopy(const char *dst, const char *src)
+NX_PUBLIC char *NX_StrCopy(const char *dst, const char *src)
 {
-    if (dst == NULL || src == NULL)
+    if (dst == NX_NULL || src == NX_NULL)
     {
-        LOG_D("NULL arg: %s", __func__);
-        return NULL;
+        NX_LOG_D("NX_NULL arg: %s", __func__);
+        return NX_NULL;
     }
     char *dstPtr = (char *) dst;
     while ((*dstPtr++ = *src++))
@@ -26,12 +26,12 @@ PUBLIC char *StrCopy(const char *dst, const char *src)
     return (char *)dst;
 }
 
-PUBLIC char *StrCopyN(const char *dst, const char *src, USize len)
+NX_PUBLIC char *NX_StrCopyN(const char *dst, const char *src, NX_USize len)
 {
-    if (dst == NULL || src == NULL || !len)
+    if (dst == NX_NULL || src == NX_NULL || !len)
     {
-        LOG_D("NULL arg: %s", __func__);
-        return NULL;
+        NX_LOG_D("NX_NULL arg: %s", __func__);
+        return NX_NULL;
     }
     char *dstPtr = (char *) dst;
     while ((*dstPtr++ = *src++) && len-- > 0)
@@ -40,11 +40,11 @@ PUBLIC char *StrCopyN(const char *dst, const char *src, USize len)
     return (char *)dst;
 }
 
-PUBLIC int StrCmp(const char *a, const char *b)
+NX_PUBLIC int NX_StrCmp(const char *a, const char *b)
 {
-    if (a == NULL || b == NULL)
+    if (a == NX_NULL || b == NX_NULL)
     {
-        LOG_D("NULL arg: %s", __func__);
+        NX_LOG_D("NX_NULL arg: %s", __func__);
         return 0;
     }
 
@@ -57,11 +57,11 @@ PUBLIC int StrCmp(const char *a, const char *b)
     return (*a - *b);
 }
 
-PUBLIC int StrLen(const char *str)
+NX_PUBLIC int NX_StrLen(const char *str)
 {
-    if (str == NULL)
+    if (str == NX_NULL)
     {
-        LOG_D("NULL arg: %s", __func__);
+        NX_LOG_D("NX_NULL arg: %s", __func__);
         return 0;
     }
     const char *p = str;

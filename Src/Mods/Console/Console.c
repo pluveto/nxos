@@ -15,20 +15,20 @@
 #include <Utils/VarArgs.h>
 
 #ifdef CONFIG_PRINT_BUF_LEN
-#define PRINT_BUF_LEN CONFIG_PRINT_BUF_LEN
+#define NX_PRINT_BUF_LEN CONFIG_PRINT_BUF_LEN
 #else
-#define PRINT_BUF_LEN 256
+#define NX_PRINT_BUF_LEN 256
 #endif
 
 /* Conosle HAL */
-INTERFACE WEAK_SYM void HAL_ConsoleOutChar(char ch) {}
+NX_INTERFACE NX_WEAK_SYM void HAL_ConsoleOutChar(char ch) {}
 
-PUBLIC void ConsoleOutChar(char ch)
+NX_PUBLIC void NX_ConsoleOutChar(char ch)
 {
     HAL_ConsoleOutChar(ch);
 }
 
-PUBLIC void ConsoleOutStr(const char *str)
+NX_PUBLIC void NX_ConsoleOutStr(const char *str)
 {
     char *p = (char *)str;
     while (*p)
@@ -37,12 +37,12 @@ PUBLIC void ConsoleOutStr(const char *str)
     }
 }
 
-void Printf(const char *fmt, ...)
+NX_PUBLIC void NX_Printf(const char *fmt, ...)
 {
-	char buf[PRINT_BUF_LEN] = {0};
-	VarList arg;
-    VarStart(arg, fmt);
-    VarStrPrintfN(buf, PRINT_BUF_LEN, fmt, arg);
-	VarEnd(arg);
-    ConsoleOutStr(buf);
+	char buf[NX_PRINT_BUF_LEN] = {0};
+	NX_VarList arg;
+    NX_VarStart(arg, fmt);
+    NX_VSNPrintf(buf, NX_PRINT_BUF_LEN, fmt, arg);
+	NX_VarEnd(arg);
+    NX_ConsoleOutStr(buf);
 }

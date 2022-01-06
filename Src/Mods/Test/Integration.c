@@ -11,63 +11,64 @@
 
 #include <Mods/Test/Integration.h>
 
-#ifdef CONFIG_ENABLE_TEST_INTEGRATION
+#ifdef CONFIG_NX_ENABLE_TEST_INTEGRATION
 
 #include <Utils/String.h>
 #include <Utils/Memory.h>
+#include <Utils/Log.h>
 #include <XBook/Debug.h>
 #include <Sched/Thread.h>
 #include <XBook/InitCall.h>
 
-PRIVATE Integration *IntegrationTable = NULL;
-PRIVATE USize IntegrationCount;
+NX_PRIVATE NX_Integration *IntegrationTable = NX_NULL;
+NX_PRIVATE NX_USize IntegrationCount;
 
-IMPORT const Addr __IntegrationTableStart;
-IMPORT const Addr __IntegrationTableEnd;
+NX_IMPORT const NX_Addr __NX_IntegrationTableStart;
+NX_IMPORT const NX_Addr __NX_IntegrationTableEnd;
 
-PRIVATE void IntegrationInvoke(void)
+NX_PRIVATE void IntegrationInvoke(void)
 {
-    IntegrationTable = (Integration *)&__IntegrationTableStart;
-    IntegrationCount = (Integration *) &__IntegrationTableEnd - IntegrationTable;
-    LOG_I("[==========] Total integrations: %d", IntegrationCount);
+    IntegrationTable = (NX_Integration *)&__NX_IntegrationTableStart;
+    IntegrationCount = (NX_Integration *) &__NX_IntegrationTableEnd - IntegrationTable;
+    NX_LOG_I("[==========] Total integrations: %d", IntegrationCount);
     int integrationIndex;
-    OS_Error err;
-    USize passedTests = 0; 
+    NX_Error err;
+    NX_USize passedTests = 0; 
     for (integrationIndex = 0; integrationIndex < IntegrationCount; integrationIndex++)
     {
-        LOG_I("[==========] [ integration ] Running (%d/%d) test (%s).", integrationIndex + 1, IntegrationCount, IntegrationTable->integrationName);
+        NX_LOG_I("[==========] [ integration ] Running (%d/%d) test (%s).", integrationIndex + 1, IntegrationCount, IntegrationTable->integrationName);
         err = IntegrationTable->func();
-        if (err == OS_EOK)
+        if (err == NX_EOK)
         {
             passedTests++;
-            LOG_I("[==========] [ integration ] (%d/%d) test ran with state %s .",
+            NX_LOG_I("[==========] [ integration ] (%d/%d) test ran with state %s .",
                 integrationIndex + 1, IntegrationCount, "success");
         }
         else
         {
-            LOG_E("[==========] [ integration ] (%d/%d) test ran with state %s .",
+            NX_LOG_E("[==========] [ integration ] (%d/%d) test ran with state %s .",
                 integrationIndex + 1, IntegrationCount, "failed");
             break;
         }
         IntegrationTable++;
     }
-    LOG_I("[  FINAL   ] %d integration test finshed. %d/%d are passed. %d/%d are failed.",
+    NX_LOG_I("[  FINAL   ] %d integration test finshed. %d/%d are passed. %d/%d are failed.",
         IntegrationCount, passedTests, IntegrationCount, IntegrationCount - passedTests, IntegrationCount);
 }
 
-PRIVATE void IntegrationEntry(void *arg)
+NX_PRIVATE void IntegrationEntry(void *arg)
 {
     /* call integration */
     IntegrationInvoke();
 }
 
-PUBLIC void IntegrationInit(void)
+NX_PRIVATE void IntegrationInit(void)
 {
-    Thread *thread = ThreadCreate("Integration", IntegrationEntry, NULL);
-    ASSERT(thread != NULL);
-    ASSERT(ThreadRun(thread) == OS_EOK);
+    NX_Thread *thread = NX_ThreadCreate("Integration", IntegrationEntry, NX_NULL);
+    NX_ASSERT(thread != NX_NULL);
+    NX_ASSERT(NX_ThreadRun(thread) == NX_EOK);
 }
 
-INIT_TEST(IntegrationInit);
+NX_INIT_TEST(IntegrationInit);
 
 #endif

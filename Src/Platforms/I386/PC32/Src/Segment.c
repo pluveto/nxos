@@ -12,17 +12,17 @@
 #include <Segment.h>
 #include <TSS.h>
 
-PUBLIC void CPU_LoadGDT(UArch USize, UArch gdtr);
+NX_PUBLIC void CPU_LoadGDT(NX_UArch NX_USize, NX_UArch gdtr);
 
 struct CPU_Segment
 {
-    U16 limitLow, baseLow;
-    U8 baseMid, accessRight;
-    U8 limitHigh, baseHigh;
+    NX_U16 limitLow, baseLow;
+    NX_U8 baseMid, accessRight;
+    NX_U8 limitHigh, baseHigh;
 };
 
-PRIVATE void SetSegment(struct CPU_Segment *seg, UArch limit,
-                        UArch base, UArch attributes)
+NX_PRIVATE void SetSegment(struct CPU_Segment *seg, NX_UArch limit,
+                        NX_UArch base, NX_UArch attributes)
 {
     seg->limitLow    = limit & 0xffff;
     seg->baseLow     = base & 0xffff;
@@ -32,7 +32,7 @@ PRIVATE void SetSegment(struct CPU_Segment *seg, UArch limit,
     seg->baseHigh    = (base >> 24) & 0xff;
 }
 
-PUBLIC void CPU_InitSegment(void)
+NX_PUBLIC void CPU_InitSegment(void)
 {
     /* Global segment table */
     struct CPU_Segment *gdt = (struct CPU_Segment *) GDT_VADDR;
@@ -47,7 +47,7 @@ PUBLIC void CPU_InitSegment(void)
     SetSegment(GDT_OFF2PTR(gdt, INDEX_KERNEL_DATA), GDT_BOUND_TOP, GDT_BOUND_BOTTOM, GDT_KERNEL_DATA_ATTR);
 
     struct CPU_TSS *tss = CPU_GetTSS();
-    SetSegment(GDT_OFF2PTR(gdt, INDEX_TSS), sizeof(struct CPU_TSS) - 1, (UArch)tss, GDT_TSS_ATTR);
+    SetSegment(GDT_OFF2PTR(gdt, INDEX_TSS), sizeof(struct CPU_TSS) - 1, (NX_UArch)tss, GDT_TSS_ATTR);
 
     SetSegment(GDT_OFF2PTR(gdt, INDEX_USER_CODE), GDT_BOUND_TOP, GDT_BOUND_BOTTOM, GDT_USER_CODE_ATTR);
     SetSegment(GDT_OFF2PTR(gdt, INDEX_USER_DATA), GDT_BOUND_TOP, GDT_BOUND_BOTTOM, GDT_USER_DATA_ATTR);

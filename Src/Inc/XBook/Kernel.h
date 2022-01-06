@@ -12,18 +12,18 @@
 #ifndef __XBOOK_KERNEL__
 #define __XBOOK_KERNEL__
 
-#include <Configure.h>
+#include <NXConfigure.h>
 
-#ifndef CONFIG_KVADDR_OFFSET
-#error "Please config KVADDR_OFFSET"
+#ifndef CONFIG_NX_KVADDR_OFFSET
+#error "Please config NX_KVADDR_OFFSET"
 #else
-#define KVADDR_OFFSET CONFIG_KVADDR_OFFSET
+#define NX_KVADDR_OFFSET CONFIG_NX_KVADDR_OFFSET
 #endif
 
-#ifndef CONFIG_NR_MULTI_CORES
-#error "Please config NR_MULTI_CORES"
+#ifndef CONFIG_NX_MULTI_CORES_NR
+#error "Please config NX_MULTI_CORES_NR"
 #else
-#define NR_MULTI_CORES CONFIG_NR_MULTI_CORES
+#define NX_MULTI_CORES_NR CONFIG_NX_MULTI_CORES_NR
 #endif
 
 #endif  /* __XBOOK_KERNEL__ */

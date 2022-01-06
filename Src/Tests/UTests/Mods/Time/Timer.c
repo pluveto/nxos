@@ -13,113 +13,113 @@
 
 #include <Mods/Time/Timer.h>
 
-#ifdef CONFIG_UTEST_MODS_TIMER
+#ifdef CONFIG_NX_UTEST_MODS_TIMER
 
-PRIVATE int TimerOneshotFlags = 0;
+NX_PRIVATE int TimerOneshotFlags = 0;
 
-PRIVATE Bool TimerHandler(Timer *timer, void *arg)
+NX_PRIVATE NX_Bool NX_TimerHandler(NX_Timer *timer, void *arg)
 {
     TimerOneshotFlags++;
     if (arg == (void *)0x1234abcd)
     {
         TimerOneshotFlags++;    
     }
-    return TRUE;
+    return NX_True;
 }
 
-#define TIMER_PERIOD_COUNT 10
-PRIVATE int TimerPeriodFlags = 0;
-PRIVATE Bool TimerHandler2(Timer *timer, void *arg)
+#define NX_TIMER_PERIOD_COUNT 10
+NX_PRIVATE int TimerPeriodFlags = 0;
+NX_PRIVATE NX_Bool NX_TimerHandler2(NX_Timer *timer, void *arg)
 {
     TimerPeriodFlags++;
-    if (TimerPeriodFlags == TIMER_PERIOD_COUNT)
+    if (TimerPeriodFlags == NX_TIMER_PERIOD_COUNT)
     {
-        return FALSE; /* no next timer */
+        return NX_False; /* no next timer */
     }
-    return TRUE;
+    return NX_True;
 }
 
-TEST(TimerCreateAndDestroy)
+NX_TEST(TimerCreateAndDestroy)
 {
-    Timer *timer0 = TimerCreate(1000, TimerHandler, (void *)0x1234abcd, TIMER_ONESHOT);
-    EXPECT_NOT_NULL(timer0);
+    NX_Timer *timer0 = NX_TimerCreate(1000, NX_TimerHandler, (void *)0x1234abcd, NX_TIMER_ONESHOT);
+    NX_EXPECT_NOT_NULL(timer0);
 
-    Timer *timer1 = TimerCreate(1000, TimerHandler, (void *)0x1234abcd, TIMER_ONESHOT);
-    EXPECT_NOT_NULL(timer1);
+    NX_Timer *timer1 = NX_TimerCreate(1000, NX_TimerHandler, (void *)0x1234abcd, NX_TIMER_ONESHOT);
+    NX_EXPECT_NOT_NULL(timer1);
 
-    Timer *timer2 = TimerCreate(0, TimerHandler, (void *)0x1234abcd, TIMER_ONESHOT);
-    EXPECT_NULL(timer2);
+    NX_Timer *timer2 = NX_TimerCreate(0, NX_TimerHandler, (void *)0x1234abcd, NX_TIMER_ONESHOT);
+    NX_EXPECT_NULL(timer2);
 
-    Timer *timer3 = TimerCreate(10, NULL, (void *)0x1234abcd, TIMER_ONESHOT);
-    EXPECT_NULL(timer3);
+    NX_Timer *timer3 = NX_TimerCreate(10, NX_NULL, (void *)0x1234abcd, NX_TIMER_ONESHOT);
+    NX_EXPECT_NULL(timer3);
 
-    Timer *timer4 = TimerCreate(10, TimerHandler, NULL, TIMER_ONESHOT);
-    EXPECT_NOT_NULL(timer4);
+    NX_Timer *timer4 = NX_TimerCreate(10, NX_TimerHandler, NX_NULL, NX_TIMER_ONESHOT);
+    NX_EXPECT_NOT_NULL(timer4);
 
-    EXPECT_NE(TimerDestroy(NULL), OS_EOK);
-    EXPECT_EQ(TimerDestroy(timer0), OS_EOK);
-    EXPECT_EQ(TimerDestroy(timer1), OS_EOK);
-    EXPECT_NE(TimerDestroy(timer2), OS_EOK);
-    EXPECT_NE(TimerDestroy(timer3), OS_EOK);
-    EXPECT_EQ(TimerDestroy(timer4), OS_EOK);
+    NX_EXPECT_NE(NX_TimerDestroy(NX_NULL), NX_EOK);
+    NX_EXPECT_EQ(NX_TimerDestroy(timer0), NX_EOK);
+    NX_EXPECT_EQ(NX_TimerDestroy(timer1), NX_EOK);
+    NX_EXPECT_NE(NX_TimerDestroy(timer2), NX_EOK);
+    NX_EXPECT_NE(NX_TimerDestroy(timer3), NX_EOK);
+    NX_EXPECT_EQ(NX_TimerDestroy(timer4), NX_EOK);
 }
 
-TEST(TimerStart)
+NX_TEST(TimerStart)
 {
     TimerOneshotFlags = 0;
-    EXPECT_NE(TimerStart(NULL), OS_EOK);
-    Timer *timer0 = TimerCreate(100, TimerHandler, (void *)0x1234abcd, TIMER_ONESHOT);
-    EXPECT_NOT_NULL(timer0);
-    EXPECT_EQ(TimerStart(timer0), OS_EOK);
-    ClockTickDelayMillisecond(150);
-    EXPECT_EQ(TimerOneshotFlags, 2);
+    NX_EXPECT_NE(NX_TimerStart(NX_NULL), NX_EOK);
+    NX_Timer *timer0 = NX_TimerCreate(100, NX_TimerHandler, (void *)0x1234abcd, NX_TIMER_ONESHOT);
+    NX_EXPECT_NOT_NULL(timer0);
+    NX_EXPECT_EQ(NX_TimerStart(timer0), NX_EOK);
+    NX_ClockTickDelayMillisecond(150);
+    NX_EXPECT_EQ(TimerOneshotFlags, 2);
 
     TimerPeriodFlags = 0;
-    Timer *timer1 = TimerCreate(100, TimerHandler2, (void *)0x1234abcd, TIMER_PERIOD);
-    EXPECT_NOT_NULL(timer1);
-    EXPECT_EQ(TimerStart(timer1), OS_EOK);
-    ClockTickDelayMillisecond(1100);
-    EXPECT_EQ(TimerPeriodFlags, TIMER_PERIOD_COUNT);
+    NX_Timer *timer1 = NX_TimerCreate(100, NX_TimerHandler2, (void *)0x1234abcd, NX_TIMER_PERIOD);
+    NX_EXPECT_NOT_NULL(timer1);
+    NX_EXPECT_EQ(NX_TimerStart(timer1), NX_EOK);
+    NX_ClockTickDelayMillisecond(1100);
+    NX_EXPECT_EQ(TimerPeriodFlags, NX_TIMER_PERIOD_COUNT);
 }
 
-PRIVATE Bool TimerStopHandler(Timer *timer, void *arg)
+NX_PRIVATE NX_Bool NX_TimerStopHandler(NX_Timer *timer, void *arg)
 {
-    EXPECT_FALSE(1); /* should never occur! */
-    return TRUE;
+    NX_EXPECT_FALSE(1); /* should never occur! */
+    return NX_True;
 }
 
-PRIVATE int StopTimerOccurTimes = 0;
-PRIVATE Bool TimerStopHandler2(Timer *timer, void *arg)
+NX_PRIVATE int StopTimerOccurTimes = 0;
+NX_PRIVATE NX_Bool NX_TimerStopHandler2(NX_Timer *timer, void *arg)
 {
     StopTimerOccurTimes++;
-    EXPECT_EQ(StopTimerOccurTimes, 1);
-    return FALSE; /* no next timer */
+    NX_EXPECT_EQ(StopTimerOccurTimes, 1);
+    return NX_False; /* no next timer */
 }
 
-TEST(TimerStop)
+NX_TEST(TimerStop)
 {
-    Timer *timer1 = TimerCreate(100, TimerStopHandler, NULL, TIMER_ONESHOT);
-    EXPECT_NOT_NULL(timer1);
-    EXPECT_EQ(TimerStart(timer1), OS_EOK);
-    ClockTickDelayMillisecond(50);
+    NX_Timer *timer1 = NX_TimerCreate(100, NX_TimerStopHandler, NX_NULL, NX_TIMER_ONESHOT);
+    NX_EXPECT_NOT_NULL(timer1);
+    NX_EXPECT_EQ(NX_TimerStart(timer1), NX_EOK);
+    NX_ClockTickDelayMillisecond(50);
     /* stop timer before occur! */
-    EXPECT_EQ(TimerStop(timer1), OS_EOK);
-    EXPECT_EQ(TimerDestroy(timer1), OS_EOK);
+    NX_EXPECT_EQ(NX_TimerStop(timer1), NX_EOK);
+    NX_EXPECT_EQ(NX_TimerDestroy(timer1), NX_EOK);
     
     StopTimerOccurTimes = 0;
-    Timer *timer2 = TimerCreate(100, TimerStopHandler2, NULL, TIMER_PERIOD);
-    EXPECT_NOT_NULL(timer2);
-    EXPECT_EQ(TimerStart(timer2), OS_EOK);
-    ClockTickDelayMillisecond(200);
+    NX_Timer *timer2 = NX_TimerCreate(100, NX_TimerStopHandler2, NX_NULL, NX_TIMER_PERIOD);
+    NX_EXPECT_NOT_NULL(timer2);
+    NX_EXPECT_EQ(NX_TimerStart(timer2), NX_EOK);
+    NX_ClockTickDelayMillisecond(200);
 }
 
-TEST_TABLE(Timer)
+NX_TEST_TABLE(NX_Timer)
 {
-    TEST_UNIT(TimerCreateAndDestroy),
-    TEST_UNIT(TimerStart),
-    TEST_UNIT(TimerStop),
+    NX_TEST_UNIT(TimerCreateAndDestroy),
+    NX_TEST_UNIT(TimerStart),
+    NX_TEST_UNIT(TimerStop),
 };
 
-TEST_CASE(Timer);
+NX_TEST_CASE(NX_Timer);
 
 #endif

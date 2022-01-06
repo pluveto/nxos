@@ -14,30 +14,27 @@
 
 #include <XBook.h>
 
-typedef void (*InitCallHandler)(void);
-typedef void (*ExitCallHandler)(void);
-
-#define INIT __attribute__ ((__section__ (".init.text")))
-#define EXIT __attribute__ ((__section__ (".exit.text")))
+typedef void (*NX_InitCallHandler)(void);
+typedef void (*NX_ExitCallHandler)(void);
 
 #define __DEFINE_INITCALL(level, fn, id) \
-	PRIVATE const InitCallHandler __initCall##fn##Id \
+	NX_PRIVATE const NX_InitCallHandler __NX_initCall##fn##Id \
 	__attribute__((__used__, __section__(".initCall" level ".text"))) = fn
 
 #define __DEFINE_EXITCALL(level, fn, id) \
-	PRIVATE const ExitCallHandler __ExitCall##fn##Id \
+	NX_PRIVATE const NX_ExitCallHandler __NX_ExitCall##fn##Id \
 	__attribute__((__used__, __section__(".exitCall" level ".text"))) = fn
 
-#define INITCALL(fn)		        __DEFINE_INITCALL("0", fn, 0)
-#define EXITCALL(fn)		        __DEFINE_EXITCALL("0", fn, 0)
+#define NX_INITCALL(fn)		        __DEFINE_INITCALL("0", fn, 0)
+#define NX_EXITCALL(fn)		        __DEFINE_EXITCALL("0", fn, 0)
 
-#define INIT_TEST(fn)               __DEFINE_INITCALL("9", fn, 9)
+#define NX_INIT_TEST(fn)            __DEFINE_INITCALL("9", fn, 9)
 
-PUBLIC void CallInvoke(InitCallHandler start[], InitCallHandler end[]);
+NX_PUBLIC void NX_CallInvoke(NX_InitCallHandler start[], NX_InitCallHandler end[]);
 
-PUBLIC void InitCallInvoke(void);
-PUBLIC void ExitCallInvoke(void);
+NX_PUBLIC void NX_InitCallInvoke(void);
+NX_PUBLIC void NX_ExitCallInvoke(void);
 
-PUBLIC void CallsInit(void);
+NX_PUBLIC void NX_CallsInit(void);
 
 #endif  /* __XBOOK_INIT_CALL__ */

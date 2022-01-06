@@ -16,7 +16,7 @@
 #include <IO/IRQ.h>
 #include <IO/DelayIRQ.h>
 
-#define LOG_NAME "Clock"
+#define NX_LOG_NAME "Clock"
 #include <Utils/Log.h>
 
 /* PIT （Programmable Interval Timer）8253/8254 */
@@ -133,32 +133,32 @@ enum ctrl_mode_bits
 };
 
 #define TIMER_FREQ     1193180  /* clock frequency */
-#define COUNTER0_VALUE  (TIMER_FREQ / TICKS_PER_SECOND)
+#define COUNTER0_VALUE  (TIMER_FREQ / NX_TICKS_PER_SECOND)
 
-PRIVATE OS_Error ClockHandler(U32 irq, void *arg)
+NX_PRIVATE NX_Error ClockHandler(NX_U32 irq, void *arg)
 {
-    ClockTickGo();
-    return OS_EOK;
+    NX_ClockTickGo();
+    return NX_EOK;
 }
 
-PUBLIC OS_Error HAL_InitClock(void)
+NX_PUBLIC NX_Error HAL_InitClock(void)
 {
     IO_Out8(PIT_CTRL, PIT_MODE_2 | PIT_MODE_MSB_LSB |
             PIT_MODE_COUNTER_0 | PIT_MODE_BINARY);
-    IO_Out8(PIT_COUNTER0, (U8) (COUNTER0_VALUE & 0xff));
-    IO_Out8(PIT_COUNTER0, (U8) (COUNTER0_VALUE >> 8) & 0xff);
+    IO_Out8(PIT_COUNTER0, (NX_U8) (COUNTER0_VALUE & 0xff));
+    IO_Out8(PIT_COUNTER0, (NX_U8) (COUNTER0_VALUE >> 8) & 0xff);
 
-    OS_Error err = IRQ_Bind(IRQ_CLOCK, ClockHandler, NULL, "Clock", 0);
-    if (err != OS_EOK)
+    NX_Error err = NX_IRQ_Bind(IRQ_CLOCK, ClockHandler, NX_NULL, "Clock", 0);
+    if (err != NX_EOK)
     {
-        LOG_E("IRQ bind failed! %d", err);
-        return OS_ERROR;
+        NX_LOG_E("IRQ bind failed! %d", err);
+        return NX_ERROR;
     }
-    err = IRQ_Unmask(IRQ_CLOCK);
-    if (err != OS_EOK)
+    err = NX_IRQ_Unmask(IRQ_CLOCK);
+    if (err != NX_EOK)
     {
-        LOG_E("IRQ unmask failed! %d", err);
-        return OS_ERROR;
+        NX_LOG_E("IRQ unmask failed! %d", err);
+        return NX_ERROR;
     }
-    return OS_EOK;
+    return NX_EOK;
 }

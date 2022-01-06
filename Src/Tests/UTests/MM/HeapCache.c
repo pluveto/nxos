@@ -13,44 +13,44 @@
 #include <MM/HeapCache.h>
 #include <Utils/Memory.h>
 
-#ifdef CONFIG_UTEST_HEAP_CACHE
+#ifdef CONFIG_NX_UTEST_HEAP_CACHE
 
-TEST(HeapAllocAndFree)
+NX_TEST(HeapAllocAndFree)
 {
-    ASSERT_NULL(HeapAlloc(0));
-    ASSERT_EQ(HeapFree(NULL), OS_EINVAL);
+    NX_ASSERT_NULL(NX_HeapAlloc(0));
+    NX_ASSERT_EQ(NX_HeapFree(NX_NULL), NX_EINVAL);
 
-    void *p = HeapAlloc(32);
-    ASSERT_NOT_NULL(p);
-    Zero(p, 32);
-    ASSERT_EQ(HeapFree(p), OS_EOK);
+    void *p = NX_HeapAlloc(32);
+    NX_ASSERT_NOT_NULL(p);
+    NX_MemZero(p, 32);
+    NX_ASSERT_EQ(NX_HeapFree(p), NX_EOK);
 
-    p = HeapAlloc(256);
-    ASSERT_NOT_NULL(p);
-    Zero(p, 256);
-    ASSERT_EQ(HeapFree(p), OS_EOK);
+    p = NX_HeapAlloc(256);
+    NX_ASSERT_NOT_NULL(p);
+    NX_MemZero(p, 256);
+    NX_ASSERT_EQ(NX_HeapFree(p), NX_EOK);
 
-    p = HeapAlloc(128 * 1024);
-    ASSERT_NOT_NULL(p);
-    Zero(p, 128 * 1024);
-    ASSERT_EQ(HeapFree(p), OS_EOK);
+    p = NX_HeapAlloc(128 * 1024);
+    NX_ASSERT_NOT_NULL(p);
+    NX_MemZero(p, 128 * 1024);
+    NX_ASSERT_EQ(NX_HeapFree(p), NX_EOK);
 
-    p = HeapAlloc(512 * 1024);
-    ASSERT_NOT_NULL(p);
-    Zero(p, 512 * 1024);
-    ASSERT_EQ(HeapFree(p), OS_EOK);
+    p = NX_HeapAlloc(512 * 1024);
+    NX_ASSERT_NOT_NULL(p);
+    NX_MemZero(p, 512 * 1024);
+    NX_ASSERT_EQ(NX_HeapFree(p), NX_EOK);
 
-    p = HeapAlloc(1024*1024*4);
-    EXPECT_NOT_NULL(p);
-    EXPECT_EQ(HeapFreeSatety(p), OS_EOK);
-    EXPECT_NE(HeapFree(p), OS_EOK);
+    p = NX_HeapAlloc(1024*1024*4);
+    NX_EXPECT_NOT_NULL(p);
+    NX_EXPECT_EQ(NX_HeapFreeSatety(p), NX_EOK);
+    NX_EXPECT_NE(NX_HeapFree(p), NX_EOK);
 }
 
-TEST_TABLE(HeapCache)
+NX_TEST_TABLE(NX_HeapCache)
 {
-    TEST_UNIT(HeapAllocAndFree),
+    NX_TEST_UNIT(HeapAllocAndFree),
 };
 
-TEST_CASE(HeapCache);
+NX_TEST_CASE(NX_HeapCache);
 
 #endif

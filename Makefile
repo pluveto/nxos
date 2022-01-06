@@ -88,8 +88,8 @@ export G
 #
 # Kconfig path
 #
-CONFIG_OUT_FILE = ./Src/Inc/Configure.h
-CONFIG_OUT_FILE_PLATFORM = ./Src/Platforms/$(ARCH)/$(MACH)/Src/Inc/Configure.h
+CONFIG_OUT_FILE = ./Src/Inc/NXConfigure.h
+CONFIG_OUT_FILE_PLATFORM = ./Src/Platforms/$(ARCH)/$(MACH)/Src/Inc/NXConfigure.h
 CONFIG_IN_FILE = .config
 
 #
@@ -111,7 +111,7 @@ cleanAll: clean
 	@-rm -f .config
 	@-rm -f .config.old
 	@-rm -f ./Src/Platforms/Kconfig
-	@-rm -f ./Src/Inc/Configure.h
+	@-rm -f ./Src/Inc/NXConfigure.h
 
 #
 # Clean all targets
@@ -155,8 +155,8 @@ menuconfig:
 ifeq ($(USE_KCONFIGLIB), y)
 	@python $(KCONFIGLIB_DIR)/menuconfig.py Kconfig
 	@python $(KCONFIGLIB_DIR)/genconfig.py --header-path=$(CONFIG_OUT_FILE).tmp
-	@echo "#ifndef __OS_CONFIG__" > $(CONFIG_OUT_FILE)
-	@echo "#define __OS_CONFIG__" >> $(CONFIG_OUT_FILE)
+	@echo "#ifndef __NX_CONFIG__" > $(CONFIG_OUT_FILE)
+	@echo "#define __NX_CONFIG__" >> $(CONFIG_OUT_FILE)
 	@cat $(CONFIG_OUT_FILE).tmp >> $(CONFIG_OUT_FILE)
 	@echo "#endif" >> $(CONFIG_OUT_FILE)
 	@rm -f $(CONFIG_OUT_FILE).tmp

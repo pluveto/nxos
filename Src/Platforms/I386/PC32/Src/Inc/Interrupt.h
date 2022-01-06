@@ -41,34 +41,34 @@
 
 struct HAL_TrapFrame
 {
-    U32 vectorNumber;
+    NX_U32 vectorNumber;
 
-    U32 edi;
-    U32 esi;
-    U32 ebp;
-    U32 espDummy; /* espdummy not used, only use a position */
-    U32 ebx;
-    U32 edx;
-    U32 ecx;
-    U32 eax;
+    NX_U32 edi;
+    NX_U32 esi;
+    NX_U32 ebp;
+    NX_U32 espDummy; /* espdummy not used, only use a position */
+    NX_U32 ebx;
+    NX_U32 edx;
+    NX_U32 ecx;
+    NX_U32 eax;
 
-    U32 gs;
-    U32 fs;
-    U32 es;
-    U32 ds;
-    U32 errorCode; /* error code will push into stack if exception has it, or not push 0 by ourself */
-    U32 eip;
-    U32 cs;
-    U32 eflags;
+    NX_U32 gs;
+    NX_U32 fs;
+    NX_U32 es;
+    NX_U32 ds;
+    NX_U32 errorCode; /* error code will push into stack if exception has it, or not push 0 by ourself */
+    NX_U32 eip;
+    NX_U32 cs;
+    NX_U32 eflags;
     /* 
      * below will push into stack when from user privilege level enter
      * kernel privilege level (syscall/excption/interrupt) 
      */
-    U32 esp;
-    U32 ss;
-} PACKED;
+    NX_U32 esp;
+    NX_U32 ss;
+} NX_PACKED;
 typedef struct HAL_TrapFrame HAL_TrapFrame;
 
-PUBLIC void CPU_InitInterrupt(void);
+NX_PUBLIC void CPU_InitInterrupt(void);
 
 #endif  /* __PLATFORM_INTERRUPT__ */
