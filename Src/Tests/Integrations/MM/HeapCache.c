@@ -11,7 +11,7 @@
 
 #include <Mods/Test/Integration.h>
 #include <MM/HeapCache.h>
-#define NX_LOG_NAME "NX_HeapCache"
+#define NX_LOG_NAME "TestHeapCache"
 #include <Utils/Log.h>
 
 #ifdef CONFIG_NX_TEST_INTEGRATION_HEAP_CACHE
@@ -64,8 +64,11 @@ NX_PRIVATE void MiddleObjectTest(void)
 
     for (i = 256 + 1, j = 0; i < 1024; i += 16, j++)
     {
-        NX_HeapFree(buf[j]);
-        NX_LOG_D("free: %p", buf[j]);
+        if (buf[j] != NX_NULL)
+        {
+            NX_HeapFree(buf[j]);
+            NX_LOG_D("free: %p", buf[j]);
+        }
     }
 }
 
@@ -74,47 +77,84 @@ NX_PRIVATE void SmallObjectTest(void)
     /* small object */
     void *p = NX_HeapAlloc(8);
     p = NX_HeapAlloc(9);
-    NX_LOG_D("Alloc & Free: %p", p);
-    NX_HeapFree(p);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(16);
-    NX_LOG_D("Alloc & Free: %p", p);
-    NX_HeapFree(p);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(20);
-    NX_LOG_D("Alloc & Free: %p", p);
-    NX_HeapFree(p);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(28);
-    NX_LOG_D("Alloc & Free: %p", p);
-    NX_HeapFree(p);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(32);
-    NX_LOG_D("Alloc & Free: %p", p);
-    NX_HeapFree(p);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(48);
-    NX_LOG_D("Alloc & Free: %p", p);
-    NX_HeapFree(p);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(63);
-    NX_LOG_D("Alloc & Free: %p", p);
-    NX_HeapFree(p);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(72);
-    NX_LOG_D("Alloc & Free: %p", p);
-    NX_HeapFree(p);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(120);
-    NX_LOG_D("Alloc & Free: %p", p);
-    NX_HeapFree(p);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(250);
-
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     int i, j;
     for (i = 0; i < 20; i++)
     {
         p = NX_HeapAlloc(512);
-        NX_LOG_D("Alloc & Free: %p", p);
-        NX_HeapFree(p);
+        if (p != NX_NULL)
+        {
+            NX_LOG_D("Alloc & Free 512: %p", p);
+            NX_HeapFree(p);
+        }
     }
     
     for (i = 0; i < 20; i++)
     {
         p = NX_HeapAlloc(2048);
-        NX_LOG_D("Alloc & Free: %p", p);
-        NX_HeapFree(p);
+        if (p != NX_NULL)
+        {
+            NX_LOG_D("Alloc & Free 2048: %p", p);
+            NX_HeapFree(p);
+        }
     }
     
     for (i = 1; i < 4096; i+=8)
@@ -122,8 +162,11 @@ NX_PRIVATE void SmallObjectTest(void)
         for (j = 0; j < 10; j++)
         {
             p = NX_HeapAlloc(i);
-            NX_LOG_D("Alloc & Free: %p NX_USize: %d", p, NX_HeapGetObjectSize(p));
-            NX_HeapFree(p);
+            if (p != NX_NULL)
+            {
+                NX_LOG_D("Alloc & Free: %p NX_USize: %d", p, NX_HeapGetObjectSize(p));
+                NX_HeapFree(p);
+            }
         }
     }
 }

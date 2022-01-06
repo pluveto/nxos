@@ -17,7 +17,7 @@
 #include <Sched/Mutex.h>
 
 #define NX_LOG_LEVEL NX_LOG_INFO
-#define NX_LOG_NAME "NX_HeapCache"
+#define NX_LOG_NAME "HeapCache"
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
 

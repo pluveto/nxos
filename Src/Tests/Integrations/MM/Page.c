@@ -26,8 +26,11 @@ NX_INTEGRATION_TEST(NX_PageAlloc)
     for (i = 0; i < 16; i++)
     {
         void *buf = NX_PageAlloc(i + 1);
-        NX_MemZero(buf, NX_PAGE_SIZE);
-        NX_LOG_D("Alloc: %x", buf);
+        if (buf != NX_NULL)
+        {
+            NX_MemZero(buf, NX_PAGE_SIZE);
+            NX_LOG_D("Alloc: %x", buf);
+        }
         bufs[i] = buf; 
     }
 
@@ -42,16 +45,24 @@ NX_INTEGRATION_TEST(NX_PageAlloc)
     for (i = 0; i < 16; i++)
     {
         void *buf = NX_PageAlloc(i + 1);
-        NX_MemZero(buf, NX_PAGE_SIZE);
-        NX_LOG_D("Alloc: %x", buf);
+        if (buf != NX_NULL)
+        {
+            NX_MemZero(buf, NX_PAGE_SIZE);
+            NX_LOG_D("Alloc: %x", buf);
+        }
         bufs[i] = buf; 
     }
+
+#ifdef __I386__
 
     for (i = 0; i < 16; i++)
     {
         void *buf = NX_PageAllocInZone(NX_PAGE_ZONE_DMA, i + 1);
-        NX_MemZero(buf, NX_PAGE_SIZE);
-        NX_LOG_D("Alloc: %x", buf);
+        if (buf != NX_NULL)
+        {
+            NX_MemZero(buf, NX_PAGE_SIZE);
+            NX_LOG_D("Alloc: %x", buf);
+        }
         bufs[i] = buf; 
     }
 
@@ -66,10 +77,15 @@ NX_INTEGRATION_TEST(NX_PageAlloc)
     for (i = 0; i < 16; i++)
     {
         void *buf = NX_PageAllocInZone(NX_PAGE_ZONE_DMA, i + 1);
-        NX_MemZero(buf, NX_PAGE_SIZE);
-        NX_LOG_D("Alloc: %x", buf);
+        if (buf != NX_NULL)
+        {
+            NX_MemZero(buf, NX_PAGE_SIZE);
+            NX_LOG_D("Alloc: %x", buf);
+        }
         bufs[i] = buf; 
     }
+#endif
+
     return NX_EOK;
 }
 

@@ -22,19 +22,32 @@
 NX_PRIVATE void NX_PageHeapLarge(void)
 {
     void *span = NX_PageHeapAlloc(128);
-    NX_LOG_D("span: %p", span);
-    NX_PageHeapFree(span);
+    if (span)
+    {
+        NX_LOG_D("span: %p", span);
+        NX_PageHeapFree(span);
+    }
+
     span = NX_PageHeapAlloc(128);
-    NX_LOG_D("span: %p", span);
-    NX_PageHeapFree(span);
+    if (span)
+    {    
+        NX_LOG_D("span: %p", span);
+        NX_PageHeapFree(span);
+    }
 
     span = NX_PageHeapAlloc(256);
-    NX_LOG_D("span: %p", span);
-    NX_PageHeapFree(span + NX_PAGE_SIZE);
-    
+    if (span)
+    {
+        NX_LOG_D("span: %p", span);
+        NX_PageHeapFree(span + NX_PAGE_SIZE);
+    }
+
     span = NX_PageHeapAlloc(256);
-    NX_LOG_D("span: %p", span);
-    NX_PageHeapFree(span + NX_PAGE_SIZE);
+    if (span)
+    {
+        NX_LOG_D("span: %p", span);
+        NX_PageHeapFree(span + NX_PAGE_SIZE);
+    }
 
     void *table[100];
     
@@ -42,14 +55,20 @@ NX_PRIVATE void NX_PageHeapLarge(void)
     for (i = 0; i < 100; i++)
     {
         table[i] = NX_PageHeapAlloc(128 + i);
-        NX_LOG_D("alloc span: %p", table[i]);
-        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE * 128 + i);
+        if (table[i])
+        {
+            NX_LOG_D("alloc span: %p", table[i]);
+            NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE * 128 + i);
+        }
     }
 
     for (i = 0; i < 100; i++)
     {
-        NX_LOG_D("free span: %p", table[i]);
-        NX_PageHeapFree(table[i]);
+        if (table[i])
+        {
+            NX_LOG_D("free span: %p", table[i]);
+            NX_PageHeapFree(table[i]);
+        }
     }
     
 }
@@ -57,18 +76,29 @@ NX_PRIVATE void NX_PageHeapLarge(void)
 NX_PRIVATE void NX_PageHeapSmall(void)
 {
     void *span = NX_PageHeapAlloc(1);
-    NX_LOG_D("span: %p", span);
-    NX_PageHeapFree(span);
+    if (span)
+    {
+        NX_LOG_D("span: %p", span);
+        NX_PageHeapFree(span);
+    }
     span = NX_PageHeapAlloc(1);
-    NX_LOG_D("span: %p", span);
-    NX_PageHeapFree(span);
-
+    if (span)
+    {
+        NX_LOG_D("span: %p", span);
+        NX_PageHeapFree(span);
+    }
     span = NX_PageHeapAlloc(10);
-    NX_LOG_D("span: %p", span);
-    NX_PageHeapFree(span);
+    if (span)
+    {
+        NX_LOG_D("span: %p", span);
+        NX_PageHeapFree(span);
+    }
     span = NX_PageHeapAlloc(10);
-    NX_LOG_D("span: %p", span);
-    NX_PageHeapFree(span);
+    if (span)
+    {
+        NX_LOG_D("span: %p", span);
+        NX_PageHeapFree(span);
+    }
 
     void *table[128];
     
@@ -76,29 +106,41 @@ NX_PRIVATE void NX_PageHeapSmall(void)
     for (i = 0; i < 128; i++)
     {
         table[i] = NX_PageHeapAlloc(i + 1);
-        NX_ASSERT(table[i] != NX_NULL);
-        NX_LOG_D("alloc span:%d-> %p", i, table[i]);
-        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE * (i + 1));
+        if (table[i])
+        {
+            NX_ASSERT(table[i] != NX_NULL);
+            NX_LOG_D("alloc span:%d-> %p", i, table[i]);
+            NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE * (i + 1));
+        }
     }
 
     for (i = 0; i < 128; i++)
     {
-        NX_LOG_D("free span:%d-> %p", i, table[i]);
-        NX_PageHeapFree(table[i]);
+        if (table[i])
+        {
+            NX_LOG_D("free span:%d-> %p", i, table[i]);
+            NX_PageHeapFree(table[i]);
+        }
     }
 
     for (i = 0; i < 128; i++)
     {
         table[i] = NX_PageHeapAlloc(i + 1);
-        NX_ASSERT(table[i] != NX_NULL);
-        NX_LOG_D("alloc span:%d-> %p", i, table[i]);
-        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE * (i + 1));
+        if (table[i])
+        {
+            NX_ASSERT(table[i] != NX_NULL);
+            NX_LOG_D("alloc span:%d-> %p", i, table[i]);
+            NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE * (i + 1));
+        }
     }
 
     for (i = 0; i < 128; i++)
     {
-        NX_LOG_D("free span:%d-> %p", i, table[i]);
-        NX_PageHeapFree(table[i]);
+        if (table[i])
+        {
+            NX_LOG_D("free span:%d-> %p", i, table[i]);
+            NX_PageHeapFree(table[i]);
+        }
     }
 }
 
@@ -109,26 +151,38 @@ NX_PRIVATE void NX_PageHeapOnePage(void)
     for (i = 0; i < 1024; i++)
     {
         table[i] = NX_PageHeapAlloc(1);
-        NX_LOG_D("alloc span: %p", table[i]);
-        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE);
+        if (table[i])
+        {
+            NX_LOG_D("alloc span: %p", table[i]);
+            NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE);
+        }
     }
 
     for (i = 0; i < 1024; i++)
     {
-        NX_LOG_D("free span: %p", table[i]);
-        NX_PageHeapFree(table[i]);
+        if (table[i])
+        {
+            NX_LOG_D("free span: %p", table[i]);
+            NX_PageHeapFree(table[i]);
+        }
     }
     for (i = 0; i < 1024; i++)
     {
         table[i] = NX_PageHeapAlloc(1);
-        NX_LOG_D("alloc span: %p", table[i]);
-        NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE);
+        if (table[i])
+        {
+            NX_LOG_D("alloc span: %p", table[i]);
+            NX_MemSet(table[i], 0x5a, NX_PAGE_SIZE);
+        }
     }
 
     for (i = 0; i < 1024; i++)
     {
-        NX_LOG_D("free span: %p", table[i]);
-        NX_PageHeapFree(table[i]);
+        if (table[i])
+        {
+            NX_LOG_D("free span: %p", table[i]);
+            NX_PageHeapFree(table[i]);
+        }
     }
 }
 

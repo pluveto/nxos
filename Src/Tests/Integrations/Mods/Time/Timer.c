@@ -31,6 +31,7 @@ NX_PRIVATE NX_Bool NX_TimerHandler2(NX_Timer *timer, void *arg)
     NX_LOG_I("timerCounter:%d\n", timerCounter);
     if (timerCounter >= 4)
     {
+        timerCounter++;
         return NX_False;
     }
     return NX_True;
@@ -80,7 +81,7 @@ NX_INTEGRATION_TEST(NX_Timer)
 
     while (1)
     {
-        if (timerCounter >= 4)
+        if (timerCounter >= 5)
         {
             NX_LOG_I("timerCounter:%d break", timerCounter);
             break;
