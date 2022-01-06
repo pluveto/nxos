@@ -14,7 +14,7 @@
 
 #include <XBook.h>
 
-#define DRAM_SIZE_DEFAULT (128 * NX_MB)
+#define DRAM_SIZE_DEFAULT (256 * NX_MB)
 
 #define MEM_SBI_BASE    0x80000000
 #define MEM_SBI_SZ      (2 * NX_MB)

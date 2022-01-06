@@ -33,12 +33,12 @@ DUMP		:= $(CROSS_COMPILE)objdump
 #
 # Qemu args configure
 # 
-QEMU_ARGS 	:=  -m 128m \
+QEMU_ARGS 	:=  -m 256m \
 				-name "NXOS - Plartform QEMU - Arch Riscv64"
 
 # cpus
 ifndef CORES
-CORES := 4
+CORES := 1
 endif # CORES
 
 QEMU_ARGS	+= 	-machine virt
