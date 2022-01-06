@@ -17,6 +17,8 @@
 
 #include <XBook/Debug.h>
 
+NX_IMPORT NX_Error HAL_InitClock(void);
+
 NX_PUBLIC NX_STATIC_ATOMIC_INIT(NX_ActivedCoreCount, 0);
 
 /* init as zero, avoid cleared by clear bss action */
@@ -75,7 +77,6 @@ NX_PUBLIC void NX_SMP_Main(NX_UArch coreId)
 
 NX_PUBLIC void NX_SMP_Stage2(NX_UArch appCoreId)
 {
-    // NX_LOG_I("core %d stage2", appCoreId);
     NX_Error err;
     err = NX_SMP_EnterApp(appCoreId);
     if (err != NX_EOK)
@@ -84,7 +85,14 @@ NX_PUBLIC void NX_SMP_Stage2(NX_UArch appCoreId)
     }
     else
     {
-        NX_LOG_I("app core: %d setup success!", appCoreId);
+        if (HAL_InitClock() != NX_EOK)
+        {
+            NX_LOG_E("app core: %d init clock failed!", appCoreId);
+        }
+        else
+        {
+            NX_LOG_I("app core: %d setup success!", appCoreId);    
+        }
     }
 }
 

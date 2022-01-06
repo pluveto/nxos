@@ -31,7 +31,7 @@ NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
 {
     HAL_ClearBSS();
 
-    /* NOTE: after inited trap, you can use core id func */
+    /* NOTE: init trap first before do anything */
     CPU_InitTrap(coreId);
 
     HAL_DirectUartInit();
@@ -41,7 +41,6 @@ NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
 
     NX_LOG_I("Hello, QEMU Riscv64!");
     
-    HAL_InitClock();
     PLIC_Init(NX_True);
     
     HAL_PageZoneInit();
@@ -53,7 +52,6 @@ NX_INTERFACE NX_Error HAL_PlatformStage2(void)
 {
     NX_LOG_I("stage2!");
     HAL_DirectUartStage2();
-    // NX_IRQ_Enable();
-    // while (1);
+
     return NX_EOK;
 }

@@ -79,17 +79,8 @@ NX_PRIVATE NX_Error HAL_CoreEnterApp(NX_UArch appCoreId)
     /* NOTE: init trap first before do anything */
     CPU_InitTrap(appCoreId);
     NX_LOG_I("core#%d enter application!", appCoreId);
-    HAL_InitClock();
     PLIC_Init(NX_False);
 
-    return NX_EOK;
-    // return NX_EOK;
-    /* don't sched now */
-    // NX_IRQ_Enable();
-    while (1)
-    {
-        NX_CASM("wfi");
-    }    
     return NX_EOK;
 }
 

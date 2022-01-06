@@ -14,7 +14,6 @@
 
 #include <XBook.h>
 
-NX_PUBLIC void HAL_InitClock(void);
 NX_PUBLIC void HAL_ClockHandler(void);
 
 #endif /* __PLATFROM_CLOCK__ */

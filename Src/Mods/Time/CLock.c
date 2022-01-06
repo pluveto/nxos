@@ -24,6 +24,8 @@
 #define NX_LOG_NAME "Clock"
 #include <Utils/Log.h>
 
+NX_IMPORT NX_Error HAL_InitClock(void);
+
 /* NOTE: must add NX_VOLATILE here, avoid compiler optimization  */
 NX_PRIVATE NX_VOLATILE NX_ClockTick SystemClockTicks;
 
@@ -111,8 +113,18 @@ NX_PUBLIC NX_Error NX_ClockInit(void)
     err = NX_IRQ_DelayQueueEnter(NX_IRQ_SCHED_QUEUE, &SchedWork);
     if (err != NX_EOK)
     {
-        NX_IRQ_DelayQueueLeave(NX_IRQ_SCHED_QUEUE, &TimerWork);
+        NX_IRQ_DelayQueueLeave(NX_IRQ_FAST_QUEUE, &TimerWork);
+        goto End;
     }
+    
+    err = HAL_InitClock();
+    if (err != NX_EOK)
+    {
+        NX_IRQ_DelayQueueLeave(NX_IRQ_FAST_QUEUE, &TimerWork);
+        NX_IRQ_DelayQueueLeave(NX_IRQ_SCHED_QUEUE, &SchedWork);
+        goto End;
+    }
+
 End:
     return err;
 }

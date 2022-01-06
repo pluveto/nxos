@@ -192,7 +192,6 @@ NX_PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
     }
     else if ((SCAUSE_INTERRUPT | SCAUSE_S_TIMER_INTR) == cause)
     {
-        // NX_LOG_D("supervisor timer");
         /* supervisor timer */
         HAL_ClockHandler();
         return;

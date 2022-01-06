@@ -14,7 +14,6 @@
 #include <Gate.h>
 #include <Interrupt.h>
 #include <TSS.h>
-#include <Clock.h>
 #include <PageZone.h>
 #include <Platform.h>
 
@@ -48,11 +47,6 @@ NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
 
 NX_INTERFACE NX_Error HAL_PlatformStage2(void)
 {
-    if (HAL_InitClock() != NX_EOK)
-    {
-        NX_LOG_E("Init clock failed!");
-        return NX_ERROR;
-    }
     HAL_DirectUartStage2();
     
     return NX_EOK;
