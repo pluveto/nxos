@@ -15,6 +15,7 @@
 #include <Utils/List.h>
 #include <Mods/Time/Timer.h>
 #include <Sched/Spin.h>
+#include <Sched/Process.h>
 
 #ifdef CONFIG_NX_THREAD_NAME_LEN
 #define NX_THREAD_NAME_LEN CONFIG_NX_THREAD_NAME_LEN
@@ -44,6 +45,7 @@ typedef enum NX_ThreadState NX_ThreadState;
 struct NX_ThreadResource
 {
     NX_Timer *sleepTimer;
+    NX_Process *process;
 };
 typedef struct NX_ThreadResource NX_ThreadResource;
 
@@ -52,6 +54,7 @@ struct NX_Thread
     /* thread list */
     NX_List list;
     NX_List globalList;
+    NX_List processList;    /* list for process */
 
     NX_Spin lock;  /* lock for thread */
 
@@ -112,8 +115,8 @@ NX_PUBLIC NX_Error NX_ThreadSleep(NX_UArch microseconds);
 NX_PUBLIC NX_Error NX_ThreadWakeup(NX_Thread *thread);
 
 NX_PUBLIC void NX_ThreadsInit(void);
-NX_PUBLIC void TestThread(void);
 
+/* thread sched */
 NX_PUBLIC void NX_SchedToFirstThread(void);
 
 NX_PUBLIC void NX_ThreadEnququeExitList(NX_Thread *thread);
@@ -122,5 +125,7 @@ NX_PUBLIC NX_Thread *NX_ThreadDequeuePendingList(void);
 
 NX_PUBLIC void NX_ThreadReadyRunLocked(NX_Thread *thread, int flags);
 NX_PUBLIC void NX_ThreadReadyRunUnlocked(NX_Thread *thread, int flags);
+
+NX_PUBLIC void NX_ThreadExitProcess(NX_Thread *thread, NX_Process *process);
 
 #endif /* __SCHED_THREAD__ */

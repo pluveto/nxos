@@ -72,6 +72,7 @@ typedef struct MMU MMU;
 
 NX_PUBLIC void MMU_EarlyMap(MMU *mmu, NX_Addr virStart, NX_USize size);
 NX_PUBLIC void MMU_SetPageTable(NX_Addr addr);
+NX_PUBLIC NX_Addr MMU_GetPageTable(void);
 NX_PUBLIC void MMU_Enable(void);
 
 #endif  /* __PLATFORM_MMU__ */

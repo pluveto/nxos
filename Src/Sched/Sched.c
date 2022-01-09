@@ -18,9 +18,40 @@
 #include <Sched/Thread.h>
 #include <Sched/SMP.h>
 #include <Sched/Context.h>
+#include <Sched/Process.h>
 
 NX_IMPORT NX_ThreadManager NX_ThreadManagerObject;
 NX_IMPORT NX_Atomic NX_ActivedCoreCount;
+
+NX_INLINE void SchedSwithProcess(NX_Thread *thread)
+{
+    NX_Process *process = thread->resource.process;
+    void *pageTable = NX_NULL;
+
+    if (process == NX_NULL)
+    {
+        pageTable = NX_ProcessGetKernelPageTable();
+    }
+    else
+    {
+        pageTable = process->pageTable;
+    }
+
+    NX_ASSERT(pageTable != NX_NULL);
+    NX_ASSERT(NX_ProcessSwitchPageTable(pageTable) == NX_EOK);
+}
+
+NX_INLINE void SchedToNext(NX_Thread *next)
+{
+    SchedSwithProcess(next);
+    NX_ContextSwitchNext((NX_Addr)&next->stack);
+}
+
+NX_INLINE void SchedFromPrevToNext(NX_Thread *prev, NX_Thread *next)
+{
+    SchedSwithProcess(next);
+    NX_ContextSwitchPrevNext((NX_Addr)&prev->stack, (NX_Addr)&next->stack);
+}
 
 NX_PUBLIC void NX_SchedToFirstThread(void)
 {
@@ -29,7 +60,7 @@ NX_PUBLIC void NX_SchedToFirstThread(void)
     NX_ASSERT(thread != NX_NULL);
     NX_ASSERT(NX_SMP_SetRunning(coreId, thread) == NX_EOK);
     NX_LOG_D("Sched to first thread:%s/%d", thread->name, thread->tid);
-    NX_ContextSwitchNext((NX_Addr)&thread->stack);
+    SchedToNext(thread);
     /* should never be here */
     NX_PANIC("Sched to first thread failed!");
 }
@@ -103,11 +134,11 @@ NX_PUBLIC void NX_SchedWithInterruptDisabled(NX_UArch irqLevel)
     {
         NX_ASSERT(prev && next);
         NX_LOG_D("CPU#%d NX_Sched prev: %s/%d next: %s/%d", NX_SMP_GetIdx(), prev->name, prev->tid, next->name, next->tid);
-        NX_ContextSwitchPrevNext((NX_Addr)&prev->stack, (NX_Addr)&next->stack);
+        SchedFromPrevToNext(prev, next);
     }
     else
     {
-        NX_ContextSwitchNext((NX_Addr)&next->stack);
+        SchedToNext(next);
     }
     NX_IRQ_RestoreLevel(irqLevel);
 }

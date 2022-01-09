@@ -18,6 +18,7 @@
 NX_INTERFACE void HAL_PlatformMain(void)
 {
     NX_LOG_I("PC32 platform main running...\n");
+
 }
 
 NX_PUBLIC void HAL_DirectUartGetcHandler(char data)

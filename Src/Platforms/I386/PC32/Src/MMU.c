@@ -61,6 +61,11 @@ NX_PUBLIC void MMU_SetPageTable(NX_Addr addr)
     CPU_WriteCR3(addr);
 }
 
+NX_PUBLIC NX_Addr MMU_GetPageTable(void)
+{
+    return CPU_ReadCR3();
+}
+
 NX_PUBLIC void MMU_Enable(void)
 {
     CPU_WriteCR0(CPU_ReadCR0() | CR0_PG);

@@ -38,6 +38,8 @@ NX_PRIVATE NX_Error ThreadInit(NX_Thread *thread,
 
     NX_ListInit(&thread->list);
     NX_ListInit(&thread->globalList);
+    NX_ListInit(&thread->processList);
+    
     NX_StrCopy(thread->name, name);
     thread->tid = NX_ThreadIdAlloc();
     if (thread->tid < 0)
@@ -60,6 +62,7 @@ NX_PRIVATE NX_Error ThreadInit(NX_Thread *thread,
     thread->coreAffinity = NX_MULTI_CORES_NR; /* no core affinity */
 
     thread->resource.sleepTimer = NX_NULL;
+    thread->resource.process = NX_NULL;
 
     NX_SpinInit(&thread->lock);
     return NX_EOK;
@@ -225,6 +228,13 @@ NX_PRIVATE void ThreadReleaseResouce(NX_Thread *thread)
         NX_TimerStop(thread->resource.sleepTimer);
         thread->resource.sleepTimer = NX_NULL;
     }
+
+    /* thread had bind on process */
+    if (thread->resource.process != NX_NULL)
+    {
+        NX_ThreadExitProcess(thread, thread->resource.process);
+    }
+
 }
 
 /**
@@ -232,6 +242,12 @@ NX_PRIVATE void ThreadReleaseResouce(NX_Thread *thread)
  */
 NX_PRIVATE void ThreadReleaseSelf(NX_Thread *thread)
 {
+    /* release thread with process */
+    if (thread->resource.process != NX_NULL)
+    {
+        NX_ASSERT(NX_ProcessDestroy(thread->resource.process) == NX_EOK);
+    }
+
     /* free stack */
     NX_MemFree(thread->stackBase);
     /* free thread struct */
@@ -454,17 +470,16 @@ NX_PRIVATE void DaemonThreadEntry(void *arg)
         NX_SpinLockIRQ(&NX_ThreadManagerObject.exitLock, &level);
         NX_ListForEachEntrySafe (thread, safe, &NX_ThreadManagerObject.exitList, globalList)
         {
-            NX_LOG_D("---> daemon release thread: %s/%d", thread->name, thread->tid);
             /* del from exit list */
             NX_ListDel(&thread->globalList);
-            NX_SpinUnlockIRQ(&NX_ThreadManagerObject.exitLock, level);
+            NX_LOG_D("---> daemon release thread: %s/%d", thread->name, thread->tid);
             ThreadReleaseSelf(thread);
-            NX_SpinLockIRQ(&NX_ThreadManagerObject.exitLock, &level);
         }
         NX_SpinUnlockIRQ(&NX_ThreadManagerObject.exitLock, level);
 
         /* do delay or timeout, sleep 0.5s */
-        NX_ThreadYield();
+        //NX_ThreadYield();
+        NX_ThreadSleep(500);
     }
 }
 

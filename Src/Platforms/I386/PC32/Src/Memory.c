@@ -23,9 +23,9 @@
 
 #define GRUB2_READ_MEMORY_BYTES_ADDR (0x000001000)
 
-NX_PUBLIC MMU kernelMMU;
+NX_PUBLIC MMU KernelMMU;
 
-NX_PRIVATE NX_VOLATILE NX_U32 kernelTable[NX_PAGE_SIZE / sizeof(NX_U32)] NX_CALIGN(NX_PAGE_SIZE);
+NX_PRIVATE NX_VOLATILE NX_U32 KernelTable[NX_PAGE_SIZE / sizeof(NX_U32)] NX_CALIGN(NX_PAGE_SIZE);
 
 /**
  * Init physic memory and map kernel on virtual memory.
@@ -67,14 +67,14 @@ NX_PUBLIC void HAL_PageZoneInit(void)
     NX_PageInitZone(NX_PAGE_ZONE_NORMAL, (void *)MEM_NORMAL_BASE, normalSize);
     NX_PageInitZone(NX_PAGE_ZONE_USER, (void *)userBase, userSize);
 
-    kernelMMU.virStart = 0;
-    kernelMMU.earlyEnd = userBase;
-    kernelMMU.virEnd = MEM_KERNEL_TOP;
-    kernelMMU.table = kernelTable;
+    KernelMMU.virStart = 0;
+    KernelMMU.earlyEnd = userBase;
+    KernelMMU.virEnd = MEM_KERNEL_TOP;
+    KernelMMU.table = KernelTable;
 
-    MMU_EarlyMap(&kernelMMU, kernelMMU.virStart, kernelMMU.earlyEnd);
+    MMU_EarlyMap(&KernelMMU, KernelMMU.virStart, KernelMMU.earlyEnd);
 
-    MMU_SetPageTable((NX_UArch)kernelMMU.table);
+    MMU_SetPageTable((NX_UArch)KernelMMU.table);
     MMU_Enable();
 
     NX_LOG_I("MMU enabled");

@@ -15,6 +15,7 @@
 #include <Utils/Memory.h>
 #include <PIC.h>
 #include <IO/IRQ.h>
+#include <Regs.h>
 
 #define NX_LOG_LEVEL NX_LOG_DBG
 #define NX_LOG_NAME "Interrupt"
@@ -60,6 +61,54 @@ NX_PUBLIC void CPU_InitInterrupt(void)
     PIC_Init();
 }
 
+NX_PUBLIC void CPU_TrapFrameDump(HAL_TrapFrame *frame)
+{
+    NX_LOG_E("edi:%x esi:%x ebp:%x esp dummy:%x ebx:%x edx:%x ecx:%x eax:%x",
+            frame->edi, frame->esi, frame->ebp, frame->espDummy,
+            frame->ebx, frame->edx, frame->ecx, frame->eax);
+    NX_LOG_E("gs:%x fs:%x es:%x ds:%x error code:%x eip:%x cs:%x eflags:%x esp:%x ss:%x",
+            frame->gs, frame->fs, frame->es, frame->ds, frame->errorCode,
+            frame->eip, frame->cs, frame->eflags, frame->esp, frame->ss);
+}
+
+NX_PRIVATE void CPU_ExceptionDump(HAL_TrapFrame *frame)
+{
+    NX_LOG_E("Stack frame: exception name %s", ExceptionName[frame->vectorNumber]);
+    if (frame->vectorNumber == 14)
+    {
+        NX_LOG_E("page fault addr: %x", CPU_ReadCR2());
+    }
+    CPU_TrapFrameDump(frame);
+    if (frame->errorCode != 0xFFFFFFFF)
+    {
+        if (frame->errorCode & 1)
+        {
+            NX_LOG_E("    External Event: NMI,hard interruption,ect.");
+        }
+        else
+        {
+            NX_LOG_E("    Not External Event: inside.");
+        }
+        if (frame->errorCode & (1 << 1))
+        {
+            NX_LOG_E("    IDT: selector in idt.");
+        }
+        else
+        {
+            NX_LOG_E("    IDT: selector in gdt or ldt.");
+        }
+        if(frame->errorCode & (1 <<2 ))
+        {
+            NX_LOG_E("    TI: selector in ldt.");
+        }
+        else
+        {
+            NX_LOG_E("    TI: selector in gdt.");
+        }
+        NX_LOG_E("    Selector: idx %d", (frame->errorCode & 0xfff8) >> 3);
+    }
+}
+
 NX_PUBLIC void HAL_InterruptDispatch(void *stackFrame)
 {
     HAL_TrapFrame *frame = (HAL_TrapFrame *) stackFrame;
@@ -70,6 +119,7 @@ NX_PUBLIC void HAL_InterruptDispatch(void *stackFrame)
     {
         /* exception */
         NX_LOG_E("unhandled exception vector %x/%s", vector, ExceptionName[vector]);
+        CPU_ExceptionDump(frame);
         while (1);
     }
     else if (vector >= EXTERNAL_BASE && vector < EXTERNAL_BASE + NX_NR_IRQS)

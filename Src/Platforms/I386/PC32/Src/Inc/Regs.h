@@ -40,6 +40,20 @@ NX_INLINE void CPU_WriteCR3(NX_U32 val)
     NX_CASM("movl %0, %%cr3" : : "a" (val));
 }
 
+NX_INLINE NX_U32 CPU_ReadCR3(void)
+{
+    NX_U32 val;
+    NX_CASM("movl %%cr3, %0\n\t": "=a" (val));
+    return val;
+}
+
+NX_INLINE NX_U32 CPU_ReadCR2(void)
+{
+    NX_U32 val;
+    NX_CASM("movl %%cr2, %0\n\t": "=a" (val));
+    return val;
+}
+
 NX_INLINE NX_U32 CPU_ReadCR0(void)
 {
     NX_U32 val;
