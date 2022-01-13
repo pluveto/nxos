@@ -78,7 +78,7 @@ NX_PRIVATE void ProcessThreadEntry(void *arg)
 {
     NX_Thread *thread = NX_ThreadSelf();
     NX_LOG_I("Process %s/%d running...", thread->name, thread->tid);
-
+    /* Jump into userspace to run app */
 }
 
 /**

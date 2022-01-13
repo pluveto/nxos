@@ -9,3 +9,7 @@ config NX_UTEST_SCHED_SPIN
 config NX_UTEST_SCHED_THREAD
     bool "Enable utest for thread"
     default n
+
+config NX_UTEST_SCHED_PROCESS
+    bool "Enable utest for process"
+    default n
