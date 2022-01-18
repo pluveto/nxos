@@ -13,21 +13,22 @@
 #define __RISCV_PLIC__
 
 #include <XBook.h>
+#include <Riscv.h>
 #include <IO/IRQ.h>
 
-#define PLIC_PHY_ADDR           0x0C000000L
+#define PLIC_ADDR               RISCV_PLIC_PADDR
 
 /* interrupt priority */
-#define PLIC_PRIORITY           (PLIC_PHY_ADDR + 0x0)
+#define PLIC_PRIORITY           (PLIC_ADDR + 0x0)
 /* interrupt pending */
-#define PLIC_PENDING            (PLIC_PHY_ADDR + 0x1000)
+#define PLIC_PENDING            (PLIC_ADDR + 0x1000)
 
 /* supervisor interrupt enable for each hart */
-#define PLIC_SENABLE(hart)      (PLIC_PHY_ADDR + 0x2080 + (hart) * 0x100)
+#define PLIC_SENABLE(hart)      (PLIC_ADDR + 0x2080 + (hart) * 0x100)
 /* supervisor priority threshold for each hart */
-#define PLIC_STHRESHOLD(hart)   (PLIC_PHY_ADDR + 0x201000 + (hart) * 0x2000)
+#define PLIC_STHRESHOLD(hart)   (PLIC_ADDR + 0x201000 + (hart) * 0x2000)
 /* supervisor claim for each hart */
-#define PLIC_SCLAIM(hart)       (PLIC_PHY_ADDR + 0x201004 + (hart) * 0x2000)
+#define PLIC_SCLAIM(hart)       (PLIC_ADDR + 0x201004 + (hart) * 0x2000)
 
 NX_PUBLIC NX_Error PLIC_EnableIRQ(NX_U32 hart, NX_IRQ_Number irqno);
 NX_PUBLIC NX_Error PLIC_DisableIRQ(NX_U32 hart, NX_IRQ_Number irqno);

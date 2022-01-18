@@ -32,14 +32,16 @@
 
 NX_PUBLIC void NX_PageInitZone(NX_PageZone zone, void *mem, NX_USize size);
 NX_PUBLIC void *NX_PageAllocInZone(NX_PageZone zone, NX_USize count);
-NX_PUBLIC void NX_PageFreeInZone(NX_PageZone zone, void *ptr);
+NX_PUBLIC NX_Error NX_PageFreeInZone(NX_PageZone zone, void *ptr);
+NX_PUBLIC NX_Error NX_PageIncreaseInZone(NX_PageZone zone, void *ptr);
 NX_PUBLIC void *NX_PageZoneGetBase(NX_PageZone zone);
 NX_PUBLIC NX_USize NX_PageZoneGetPages(NX_PageZone zone);
 
 NX_PUBLIC void *NX_PageZoneGetBuddySystem(NX_PageZone zone);
 
-#define NX_PageAlloc(size) NX_PageAllocInZone(NX_PAGE_ZONE_NORMAL, size)
+#define NX_PageAlloc(count) NX_PageAllocInZone(NX_PAGE_ZONE_NORMAL, count)
 #define NX_PageFree(ptr) NX_PageFreeInZone(NX_PAGE_ZONE_NORMAL, ptr)
+#define NX_PageIncrease(ptr) NX_PageIncreaseInZone(NX_PAGE_ZONE_NORMAL, ptr)
 
 #define NX_Phy2Virt(addr) ((addr) + NX_KVADDR_OFFSET)
 #define NX_Virt2Phy(addr) ((addr) - NX_KVADDR_OFFSET)

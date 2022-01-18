@@ -16,7 +16,7 @@
 
 #define DRAM_SIZE_DEFAULT (256 * NX_MB)
 
-#define MEM_SBI_BASE    0x80000000
+#define MEM_SBI_BASE    0x80000000UL
 #define MEM_SBI_SZ      (2 * NX_MB)
 
 #define MEM_KERNEL_BASE (MEM_SBI_BASE + MEM_SBI_SZ)
@@ -68,5 +68,9 @@
  * | MMIO/UNMAPPED          |
  * +------------------------+ <- 0x00000000
  */
+
+NX_IMPORT void HAL_ClearBSS(void);
+NX_IMPORT void MMU_EarlyMap(void);
+NX_PUBLIC void *HAL_GetKernelPageTable(void);
 
 #endif /* __PLATFORM_HEADER__ */

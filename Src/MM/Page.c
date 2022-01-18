@@ -32,10 +32,16 @@ NX_PUBLIC void *NX_PageAllocInZone(NX_PageZone zone, NX_USize count)
     return NX_BuddyAllocPage(BuddySystemArray[zone], count);
 }
 
-NX_PUBLIC void NX_PageFreeInZone(NX_PageZone zone, void *ptr)
+NX_PUBLIC NX_Error NX_PageFreeInZone(NX_PageZone zone, void *ptr)
 {
     NX_ASSERT(zone >= NX_PAGE_ZONE_NORMAL && zone < NX_PAGE_ZONE_NR && ptr != NX_NULL);
-    NX_BuddyFreePage(BuddySystemArray[zone], ptr);
+    return NX_BuddyFreePage(BuddySystemArray[zone], ptr);
+}
+
+NX_PUBLIC NX_Error NX_PageIncreaseInZone(NX_PageZone zone, void *ptr)
+{
+    NX_ASSERT(zone >= NX_PAGE_ZONE_NORMAL && zone < NX_PAGE_ZONE_NR && ptr != NX_NULL);
+    return NX_BuddyIncreasePage(BuddySystemArray[zone], ptr);
 }
 
 NX_PUBLIC void *NX_PageZoneGetBase(NX_PageZone zone)

@@ -25,8 +25,6 @@
 #define NX_LOG_NAME "INIT"
 #include <XBook/Debug.h>
 
-NX_PUBLIC void HAL_ClearBSS(void);
-
 NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
 {
     HAL_ClearBSS();
@@ -51,6 +49,9 @@ NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
 NX_INTERFACE NX_Error HAL_PlatformStage2(void)
 {
     NX_LOG_I("stage2!");
+    /* map kernel and enable mmu */
+    MMU_EarlyMap();
+    
     HAL_DirectUartStage2();
 
     return NX_EOK;

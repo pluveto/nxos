@@ -22,4 +22,9 @@
 #error "not support 32bit!"
 #endif
 
+/* local interrupt controller, which contains the timer. */
+#define RISCV_CLINT_PADDR       0x02000000UL
+/* Platform level interrupt controller */
+#define RISCV_PLIC_PADDR        0x0c000000UL
+
 #endif  /* __PLATFROM_RISCV__ */

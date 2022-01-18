@@ -82,6 +82,19 @@ NX_PRIVATE void ProcessThreadEntry(void *arg)
 }
 
 /**
+ * Load code & data for process image
+ */
+NX_PUBLIC NX_Error NX_ProcessLoadImage(NX_Process *process, char *path)
+{
+    /* open file */
+
+    /* read file */
+
+    /* close file */
+    return NX_EOK;
+}
+
+/**
  * execute a process with image
  */
 NX_PUBLIC NX_Error NX_ProcessExecute(char *name, char *path, NX_U32 flags)
@@ -108,9 +121,14 @@ NX_PUBLIC NX_Error NX_ProcessExecute(char *name, char *path, NX_U32 flags)
         return NX_ENOMEM;
     }
 
-    ProcessAppendThread(process, thread);
+    if (NX_ProcessLoadImage(process, path) != NX_EOK)
+    {
+        NX_ProcessDestroy(process);
+        NX_ThreadDestroy(thread);
+        return NX_EIO;
+    }
 
-    /* TODO: load execute image */
+    ProcessAppendThread(process, thread);
 
     if (NX_ThreadRun(thread) != NX_EOK)
     {

@@ -237,7 +237,7 @@ NX_PRIVATE void *PagePrepareUsed(NX_BuddySystem* system, NX_Page* page, int orde
     {
         PageSplit(system, page, order);
     }
-
+    NX_AtomicSet(&page->reference, 1);
     return PageToPtr(system, page);
 }
 
@@ -263,20 +263,56 @@ NX_PUBLIC void *NX_BuddyAllocPage(NX_BuddySystem* system, NX_USize count)
     return PagePrepareUsed(system, page, order);
 }
 
-NX_PUBLIC void NX_BuddyFreePage(NX_BuddySystem* system, void *ptr)
+NX_PUBLIC NX_Error NX_BuddyIncreasePage(NX_BuddySystem* system, void *ptr)
 {
     NX_ASSERT(system && ptr);
 
     if (ptr)
     {
         NX_Page* page = NX_PageFromPtr(system, ptr);
+        NX_AtomicInc(&page->reference);
+        return NX_EOK;
+    }
+    return NX_EINVAL;
+}
+
+/**
+ * free page, if reference > 1, dec reference and return NX_EAGAIN.
+ * if reference = 0, free the page and return NX_EOK.
+ * 
+ * return others if failed!
+ */
+NX_PUBLIC NX_Error NX_BuddyFreePage(NX_BuddySystem* system, void *ptr)
+{
+    NX_ASSERT(system && ptr);
+
+    if (ptr)
+    {
+        if (NX_PAGE_INVALID_ADDR(system, ptr))
+        {
+            return NX_EINVAL;
+        }
+
+        NX_Page* page = NX_PageFromPtr(system, ptr);
 
         if (DoPageFree(page))
         {
             NX_LOG_E("Double free!");
-            return;
+            return NX_EFAULT;
         }
+        NX_ASSERT(NX_AtomicGet(&page->reference) > 0);
+
+        NX_AtomicDec(&page->reference);
+
+        if (NX_AtomicGet(&page->reference) > 0)    
+        {
+            return NX_EAGAIN;   /* need free again, but free success */
+        }
+
+        /* do real page free when ref zero */
         page = PageMerge(system, page);
-        BuddyAddPage(system, page);
+        BuddyAddPage(system, page);        
+        return NX_EOK;
     }
+    return NX_EINVAL;
 }
