@@ -23,8 +23,6 @@
 
 #include <Drivers/DirectUart.h>
 
-NX_PUBLIC void HAL_ClearBSS(void);
-
 NX_INTERFACE NX_Error HAL_PlatformInit(NX_UArch coreId)
 {
     HAL_ClearBSS();

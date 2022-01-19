@@ -16,15 +16,14 @@
 #include <MMU.h>
 #include <Utils/Log.h>
 #include <XBook/Debug.h>
-
-NX_IMPORT MMU KernelMMU;
+#include <Platform.h>
 
 NX_PRIVATE NX_Error HAL_ProcessInitUserSpace(NX_Process *process)
 {
     process->pageTable = NX_MemAlloc(NX_PAGE_SIZE);
     NX_ASSERT(process->pageTable != NX_NULL);
     NX_MemZero(process->pageTable, NX_PAGE_SIZE);
-    NX_MemCopy(process->pageTable, (void *)KernelMMU.table, NX_PAGE_SIZE);
+    NX_MemCopy(process->pageTable, HAL_GetKernelPageTable(), NX_PAGE_SIZE);
     return NX_EOK;
 }
 
@@ -41,7 +40,7 @@ NX_PRIVATE NX_Error HAL_ProcessSwitchPageTable(void *pageTableVir)
 
 NX_PRIVATE void *HAL_ProcessGetKernelPageTable(void)
 {
-    return (void *)KernelMMU.table;
+    return HAL_GetKernelPageTable();
 }
 
 NX_INTERFACE struct NX_ProcessOps NX_ProcessOpsInterface = 
