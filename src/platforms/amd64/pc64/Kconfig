@@ -1,0 +1,9 @@
+config NX_PLATFROM_NAME
+    string "Platform name"
+    default "amd64-PC64"
+
+config PLATFROM_AMD64_PC64
+    bool
+    default y
+    select NX_CPU_64BITS
+    

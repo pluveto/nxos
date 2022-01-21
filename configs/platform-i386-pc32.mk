@@ -1,0 +1,1 @@
+PLATFORM?=i386-pc32

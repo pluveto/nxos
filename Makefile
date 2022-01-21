@@ -12,7 +12,7 @@
 #
 # Get platform config
 #
-sinclude Platform.mk
+sinclude platform.mk
 
 #
 # Tools name
@@ -22,7 +22,7 @@ sinclude Platform.mk
 # Use build dir for target
 #
 USE_BUILD_DIR	:=y
-BUILD_DIR :=Build
+BUILD_DIR :=build
 
 #
 # Set compile and machine
@@ -40,7 +40,7 @@ export NXOS_NAME
 # Use kconfiglib
 #
 USE_KCONFIGLIB	:=y
-KCONFIGLIB_DIR	:= Scripts/Kconfiglib
+KCONFIGLIB_DIR	:= scripts/kconfiglib
 
 #
 # Enable GDB debug
@@ -55,8 +55,8 @@ ARCH			:= $(word 1, $(subst -, , $(PLATFORM)))
 MACH			:= $(word 2, $(subst -, , $(PLATFORM)))
 else
 # you can set default platfrom here
-ARCH			:= I386
-MACH			:= PC32
+ARCH			:= i386
+MACH			:= pc32
 endif
 
 #
@@ -73,7 +73,7 @@ endif
 #
 # Override default variables.
 #
-sinclude Src/Platforms/$(ARCH)/$(MACH)/COMPILE.mk
+sinclude src/platforms/$(ARCH)/$(MACH)/compile.mk
 
 #
 # Export global values
@@ -88,8 +88,8 @@ export G
 #
 # Kconfig path
 #
-CONFIG_OUT_FILE = ./Src/Inc/NXConfigure.h
-CONFIG_OUT_FILE_PLATFORM = ./Src/Platforms/$(ARCH)/$(MACH)/Src/Inc/NXConfigure.h
+CONFIG_OUT_FILE = ./src/inc/nx_configure.h
+CONFIG_OUT_FILE_PLATFORM = ./src/platforms/$(ARCH)/$(MACH)/src/inc/nx_configure.h
 CONFIG_IN_FILE = .config
 
 #
@@ -102,51 +102,51 @@ CONFIG_IN_FILE = .config
 #
 all:
 ifeq ($(USE_BUILD_DIR), y)
-	@$(MAKE) -s -C Src O=$(BUILD_DIR)
+	@$(MAKE) -s -C src O=$(BUILD_DIR)
 else
-	@$(MAKE) -s -C Src
+	@$(MAKE) -s -C src
 endif
 
 cleanAll: clean
 	@-rm -f .config
 	@-rm -f .config.old
-	@-rm -f ./Src/Platforms/Kconfig
-	@-rm -f ./Src/Inc/NXConfigure.h
+	@-rm -f ./src/platforms/Kconfig
+	@-rm -f ./src/inc/nx_configure.h
 
 #
 # Clean all targets
 #
 clean:
 ifeq ($(USE_BUILD_DIR), y)
-	@$(MAKE) -s -C Src clean O=$(BUILD_DIR)
+	@$(MAKE) -s -C src clean O=$(BUILD_DIR)
 else
-	@$(MAKE) -s -C Src clean
+	@$(MAKE) -s -C src clean
 endif
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) clean
+	@$(MAKE) -s -C src/platforms/$(ARCH)/$(MACH) clean
 
 #
 # Run OS
 #
 run: all
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) run
+	@$(MAKE) -s -C src/platforms/$(ARCH)/$(MACH) run
 
 #
 # Prepare platform tools
 #
 prepare: 
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) prepare
+	@$(MAKE) -s -C src/platforms/$(ARCH)/$(MACH) prepare
 
 #
 # GDB command
 #
 gdb:
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) gdb
+	@$(MAKE) -s -C src/platforms/$(ARCH)/$(MACH) gdb
 
 #
 # dump kernel
 #
 dump:
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) dump
+	@$(MAKE) -s -C src/platforms/$(ARCH)/$(MACH) dump
 
 #
 # menuconfig
@@ -166,13 +166,13 @@ endif
 defconfig:
 	@-rm -f .config
 	@-rm -f .config.old
-	@-cp Src/Platforms/$(ARCH)/$(MACH)/defconfig ./.config
-	@-cp Src/Platforms/$(ARCH)/$(MACH)/Kconfig ./Src/Platforms/Kconfig
+	@-cp src/platforms/$(ARCH)/$(MACH)/defconfig ./.config
+	@-cp src/platforms/$(ARCH)/$(MACH)/Kconfig ./src/platforms/Kconfig
 	@-cp $(CONFIG_OUT_FILE_PLATFORM) $(CONFIG_OUT_FILE)
 	@echo update Kconfig from platform $(ARCH)-$(MACH) .
 
 saveconfig:
-	@-cp ./.config Src/Platforms/$(ARCH)/$(MACH)/defconfig
-	@-cp ./Src/Platforms/Kconfig ./Src/Platforms/$(ARCH)/$(MACH)/Kconfig 
+	@-cp ./.config src/platforms/$(ARCH)/$(MACH)/defconfig
+	@-cp ./src/platforms/Kconfig ./src/platforms/$(ARCH)/$(MACH)/Kconfig 
 	@-cp $(CONFIG_OUT_FILE) $(CONFIG_OUT_FILE_PLATFORM)
 	@echo save Kconfig to platform $(ARCH)-$(MACH) .

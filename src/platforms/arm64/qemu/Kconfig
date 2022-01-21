@@ -1,0 +1,9 @@
+config NX_PLATFROM_NAME
+    string "Platform name"
+    default "arm64-qemu"
+
+config PLATFROM_ARM64_QEMU
+    bool
+    default y
+    select NX_CPU_64BITS
+    
