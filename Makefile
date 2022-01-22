@@ -88,8 +88,8 @@ export G
 #
 # Kconfig path
 #
-CONFIG_OUT_FILE = ./src/inc/nx_configure.h
-CONFIG_OUT_FILE_PLATFORM = ./src/platforms/$(ARCH)/$(MACH)/src/inc/nx_configure.h
+CONFIG_OUT_FILE = ./src/include/nx_configure.h
+CONFIG_OUT_FILE_PLATFORM = ./src/platforms/$(ARCH)/$(MACH)/src/include/nx_configure.h
 CONFIG_IN_FILE = .config
 
 #
@@ -111,7 +111,7 @@ cleanAll: clean
 	@-rm -f .config
 	@-rm -f .config.old
 	@-rm -f ./src/platforms/Kconfig
-	@-rm -f ./src/inc/nx_configure.h
+	@-rm -f ./src/include/nx_configure.h
 
 #
 # Clean all targets

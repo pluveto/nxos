@@ -67,10 +67,10 @@ CFLAGS		+=	-ffunction-sections -fdata-sections -ffreestanding -std=gnu99 $(DEFIN
 #
 # Add necessary directory for INCDIRS and SRCDIRS.
 #
-INCDIRS		+=	inc
+INCDIRS		+=	include
 INCDIRS		+=	./
-INCDIRS		+=	platforms/$(ARCH)/src/inc
-INCDIRS		+=	platforms/$(ARCH)/$(MACH)/src/inc
+INCDIRS		+=	platforms/$(ARCH)/src/include
+INCDIRS		+=	platforms/$(ARCH)/$(MACH)/src/include
 
 # Srouce codes
 SRCDIRS		+=	platforms/$(ARCH)/src/

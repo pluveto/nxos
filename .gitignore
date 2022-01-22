@@ -4,5 +4,5 @@
 scripts/kconfiglib/__pycache__/*.pyc
 scripts/kconfiglib/kconfiglib.pyc
 src/platforms/Kconfig
-src/inc/nx_configure.h
+src/include/nx_configure.h
 platform.mk
