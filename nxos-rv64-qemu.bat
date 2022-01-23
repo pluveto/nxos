@@ -7,5 +7,5 @@
 @echo [ROOT DIR ] %NXOS_ROOT_DIR%
 @echo [SRC DIR  ] %NXOS_SRC_DIR%
 @echo [EXEC PATH] %NXOS_EXEC_PATH%
-@cp configs/platform-riscv64-qemu.mk platform.mk
-@echo [PLAFORM  ] riscv64-qemu
+@cp configs/platform-riscv64-qemu_riscv64.mk platform.mk
+@echo [PLAFORM  ] riscv64-qemu_riscv64

@@ -7,5 +7,5 @@
 @echo [ROOT DIR ] %NXOS_ROOT_DIR%
 @echo [SRC DIR  ] %NXOS_SRC_DIR%
 @echo [EXEC PATH] %NXOS_EXEC_PATH%
-@cp configs/platform-i386-pc32.mk platform.mk
-@echo [PLAFORM  ] i386-pc32
+@cp configs/platform-x86-i386.mk platform.mk
+@echo [PLAFORM  ] x86-i386

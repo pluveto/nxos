@@ -1,1 +1,0 @@
-PLATFORM?=riscv64-qemu

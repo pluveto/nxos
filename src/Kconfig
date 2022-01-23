@@ -37,10 +37,10 @@ menu "OS Kernel"
 endmenu
 
 #
-# platfrom select
+# platfrom config
 #
 menu "Platform"
-    source "$NXOS_SRC_DIR/platforms/Kconfig"
+    source "$NXOS_SRC_DIR/platform/Kconfig"
 endmenu
 
 #
