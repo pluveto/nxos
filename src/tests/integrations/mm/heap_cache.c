@@ -75,7 +75,18 @@ NX_PRIVATE void MiddleObjectTest(void)
 NX_PRIVATE void SmallObjectTest(void)
 {
     /* small object */
-    void *p = NX_HeapAlloc(8);
+    void *p = NX_HeapAlloc(1);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
+    p = NX_HeapAlloc(8);
+    if (p != NX_NULL)
+    {
+        NX_LOG_D("Alloc & Free: %p", p);
+        NX_HeapFree(p);
+    }
     p = NX_HeapAlloc(9);
     if (p != NX_NULL)
     {
