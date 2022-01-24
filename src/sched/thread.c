@@ -328,10 +328,7 @@ NX_PRIVATE NX_Bool TimerThreadSleepTimeout(NX_Timer *timer, void *arg)
     {
         NX_LOG_E("Wakeup thread:%s/%d failed!", thread->name, thread->tid);
     }
-    else
-    {
-        NX_LOG_I("Wakeup thread:%s/%d success!", thread->name, thread->tid);
-    }
+    
     return NX_True;
 }
 
@@ -349,20 +346,29 @@ NX_PUBLIC NX_Error NX_ThreadSleep(NX_UArch microseconds)
         return NX_ClockTickDelayMillisecond(microseconds);
     }
 
-    NX_Thread *self = NX_ThreadSelf();
     NX_Timer sleepTimer;
     NX_Error err;
+
+    NX_UArch irqLevel = NX_IRQ_SaveLevel();
+    NX_Thread *self = NX_ThreadSelf();
+
+    /* must exit if terminated */
+    if (self->isTerminated != 0)
+    {
+        NX_ThreadExit();
+        NX_PANIC("thread sleep was terminate but exit failed");
+    }
+
     err = NX_TimerInit(&sleepTimer, microseconds, TimerThreadSleepTimeout, (void *)self, NX_TIMER_ONESHOT);
     if (err != NX_EOK)
     {
+        NX_IRQ_RestoreLevel(irqLevel);
         return err;
     }
 
-    NX_UArch irqLevel = NX_IRQ_SaveLevel();
-    /* lock thread */
     self->resource.sleepTimer = &sleepTimer;
 
-    NX_TimerStart(&sleepTimer);
+    NX_TimerStart(self->resource.sleepTimer);
 
     /* set thread as sleep state */
     ThreadBlockInterruptDisabled(NX_THREAD_SLEEP, irqLevel);
@@ -370,9 +376,16 @@ NX_PUBLIC NX_Error NX_ThreadSleep(NX_UArch microseconds)
     /* if sleep timer always here, it means that the thread was interrupted! */
     if (self->resource.sleepTimer != NX_NULL)
     {
-        /* thread was interrupted! */
+        /* timer not stop now */
         NX_TimerStop(self->resource.sleepTimer);
         self->resource.sleepTimer = NX_NULL;
+
+        /* must exit if terminated */
+        if (self->isTerminated != 0)
+        {
+            NX_ThreadExit();
+            NX_PANIC("thread sleep was terminate but exit failed");
+        }
         return NX_EINTR;
     }
     return NX_EOK;

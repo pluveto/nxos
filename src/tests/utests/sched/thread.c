@@ -25,27 +25,29 @@ NX_TEST(NX_ThreadSleep)
     s = NX_ClockTickGetMillisecond();
     NX_EXPECT_EQ(NX_ThreadSleep(100), NX_EOK);
     e = NX_ClockTickGetMillisecond();
-    NX_EXPECT_IN_RANGE(e - s, 100, 100 + NX_TICKS_PER_SECOND / (NX_TICKS_PER_SECOND / 10));
-    
+    NX_EXPECT_GE(e - s, 100);
+
     s = NX_ClockTickGetMillisecond();
     NX_EXPECT_EQ(NX_ThreadSleep(500), NX_EOK);
     e = NX_ClockTickGetMillisecond();
-    NX_EXPECT_IN_RANGE(e - s, 500, 500 + NX_TICKS_PER_SECOND / (NX_TICKS_PER_SECOND / 10));
-    
+    NX_EXPECT_GE(e - s, 500);
+
     s = NX_ClockTickGetMillisecond();
     NX_EXPECT_EQ(NX_ThreadSleep(1000), NX_EOK);
     e = NX_ClockTickGetMillisecond();
-    NX_EXPECT_IN_RANGE(e - s, 100, 1000 + NX_TICKS_PER_SECOND / (NX_TICKS_PER_SECOND / 10));
-    
+    NX_EXPECT_GE(e - s, 100);
+
     s = NX_ClockTickGetMillisecond();
     NX_EXPECT_EQ(NX_ThreadSleep(3000), NX_EOK);
     e = NX_ClockTickGetMillisecond();
-    NX_EXPECT_IN_RANGE(e - s, 3000, 3000 + NX_TICKS_PER_SECOND / (NX_TICKS_PER_SECOND / 10));
+    NX_EXPECT_GE(e - s, 3000);
 }
 
 NX_PRIVATE void NX_ThreadSleep1(void *arg)
 {
-    NX_EXPECT_NE(NX_ThreadSleep(2000), NX_EOK);
+    NX_EXPECT_NE(NX_ThreadSleep(500), NX_EOK);
+    /* should never be here */
+    NX_ASSERT_TRUE(NX_False);
 }
 
 NX_TEST(NX_ThreadSleepIntr)
@@ -55,12 +57,14 @@ NX_TEST(NX_ThreadSleepIntr)
     NX_EXPECT_NOT_NULL(thread);
     NX_EXPECT_EQ(NX_ThreadRun(thread), NX_EOK);
 
-    NX_EXPECT_EQ(NX_ThreadSleep(500), NX_EOK);
+    NX_EXPECT_EQ(NX_ThreadSleep(100), NX_EOK);
 
     /* term thread */
     NX_EXPECT_EQ(NX_ThreadTerminate(thread), NX_EOK);
 
-    NX_EXPECT_EQ(NX_ThreadSleep(100), NX_EOK);
+    /* sleep until thread exit */
+    NX_EXPECT_EQ(NX_ThreadSleep(1000), NX_EOK);
+
 }
 
 NX_TEST_TABLE(NX_Thread)

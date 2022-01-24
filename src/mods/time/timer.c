@@ -140,7 +140,7 @@ NX_PUBLIC NX_Error NX_TimerStart(NX_Timer *timer)
     {
         return NX_EINVAL;
     }
-    
+
     NX_UArch level;
 
     NX_SpinLockIRQ(&TimersSpin, &level);
