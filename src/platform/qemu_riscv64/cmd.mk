@@ -85,13 +85,13 @@ prepare:
 # gdb debug
 # 
 gdb:
-	@echo gdb load file from $(ARCH)/$(MACH)/$(NXOS_NAME).elf
+	@echo gdb load file from $(ARCH)/$(PLATFORM)/$(NXOS_NAME).elf
 	$(DEBUGER) $(NXOS_NAME).elf -x connect.gdb
 	
 #
 # dump kernel
 #
 dump:
-	@echo dump kernel $(ARCH)/$(MACH)/$(NXOS_NAME).elf
+	@echo dump kernel $(ARCH)/$(PLATFORM)/$(NXOS_NAME).elf
 	$(DUMP) -D -S $(NXOS_NAME).elf > $(NXOS_NAME).dump.S
 	
