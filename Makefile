@@ -1,5 +1,5 @@
 ##
-# Copyright (c) 2018-2021, BookOS Development Team
+# Copyright (c) 2018-2022, BookOS Development Team
 # SPDX-License-Identifier: Apache-2.0
 # 
 # Contains: Makefile for NXOS
@@ -12,7 +12,7 @@
 #
 # Get platform config
 #
-sinclude Platform.mk
+sinclude platform.mk
 
 #
 # Tools name
@@ -22,13 +22,13 @@ sinclude Platform.mk
 # Use build dir for target
 #
 USE_BUILD_DIR	:=y
-BUILD_DIR :=Build
+BUILD_DIR :=build
 
 #
-# Set compile and machine
+# Set compile and platform
 #
 CROSS_COMPILE	?=
-PLATFORM		?=
+ARCH_PLATFORM	?=
 
 #
 # Target file name
@@ -40,7 +40,7 @@ export NXOS_NAME
 # Use kconfiglib
 #
 USE_KCONFIGLIB	:=y
-KCONFIGLIB_DIR	:= Scripts/Kconfiglib
+KCONFIGLIB_DIR	:= scripts/kconfiglib
 
 #
 # Enable GDB debug
@@ -48,15 +48,15 @@ KCONFIGLIB_DIR	:= Scripts/Kconfiglib
 G	?=n
 
 #
-# Get platform information about ARCH and MACH from PLATFORM variable.
+# Get platform information about ARCH and PLATFORM from ARCH_PLATFORM variable.
 #
-ifeq ($(words $(subst -, , $(PLATFORM))), 2)
-ARCH			:= $(word 1, $(subst -, , $(PLATFORM)))
-MACH			:= $(word 2, $(subst -, , $(PLATFORM)))
+ifeq ($(words $(subst -, , $(ARCH_PLATFORM))), 2)
+ARCH			:= $(word 1, $(subst -, , $(ARCH_PLATFORM)))
+PLATFORM		:= $(word 2, $(subst -, , $(ARCH_PLATFORM)))
 else
 # you can set default platfrom here
-ARCH			:= I386
-MACH			:= PC32
+ARCH			:= x86
+PLATFORM		:= i386
 endif
 
 #
@@ -73,13 +73,13 @@ endif
 #
 # Override default variables.
 #
-sinclude Src/Platforms/$(ARCH)/$(MACH)/COMPILE.mk
+sinclude src/platform/$(PLATFORM)/compile.mk
 
 #
 # Export global values
 #
 export CROSS_COMPILE
-export MACH
+export PLATFORM
 export ARCH
 export HOSTOS
 export USE_BUILD_DIR
@@ -88,8 +88,8 @@ export G
 #
 # Kconfig path
 #
-CONFIG_OUT_FILE = ./Src/Inc/NXConfigure.h
-CONFIG_OUT_FILE_PLATFORM = ./Src/Platforms/$(ARCH)/$(MACH)/Src/Inc/NXConfigure.h
+CONFIG_OUT_FILE = ./src/include/nx_configure.h
+CONFIG_OUT_FILE_PLATFORM = ./src/platform/$(PLATFORM)/include/nx_configure.h
 CONFIG_IN_FILE = .config
 
 #
@@ -102,51 +102,51 @@ CONFIG_IN_FILE = .config
 #
 all:
 ifeq ($(USE_BUILD_DIR), y)
-	@$(MAKE) -s -C Src O=$(BUILD_DIR)
+	@$(MAKE) -s -C src O=$(BUILD_DIR)
 else
-	@$(MAKE) -s -C Src
+	@$(MAKE) -s -C src
 endif
 
 cleanAll: clean
 	@-rm -f .config
 	@-rm -f .config.old
-	@-rm -f ./Src/Platforms/Kconfig
-	@-rm -f ./Src/Inc/NXConfigure.h
+	@-rm -f ./src/platform/Kconfig
+	@-rm -f ./src/include/nx_configure.h
 
 #
 # Clean all targets
 #
 clean:
 ifeq ($(USE_BUILD_DIR), y)
-	@$(MAKE) -s -C Src clean O=$(BUILD_DIR)
+	@$(MAKE) -s -C src clean O=$(BUILD_DIR)
 else
-	@$(MAKE) -s -C Src clean
+	@$(MAKE) -s -C src clean
 endif
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) clean
+	@$(MAKE) -s -C src/platform/$(PLATFORM) -f cmd.mk clean
 
 #
 # Run OS
 #
 run: all
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) run
+	@$(MAKE) -s -C src/platform/$(PLATFORM) -f cmd.mk run
 
 #
 # Prepare platform tools
 #
 prepare: 
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) prepare
+	@$(MAKE) -s -C src/platform/$(PLATFORM) -f cmd.mk prepare
 
 #
 # GDB command
 #
 gdb:
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) gdb
+	@$(MAKE) -s -C src/platform/$(PLATFORM) -f cmd.mk gdb
 
 #
 # dump kernel
 #
 dump:
-	@$(MAKE) -s -C Src/Platforms/$(ARCH)/$(MACH) dump
+	@$(MAKE) -s -C src/platform/$(PLATFORM) -f cmd.mk dump
 
 #
 # menuconfig
@@ -166,13 +166,13 @@ endif
 defconfig:
 	@-rm -f .config
 	@-rm -f .config.old
-	@-cp Src/Platforms/$(ARCH)/$(MACH)/defconfig ./.config
-	@-cp Src/Platforms/$(ARCH)/$(MACH)/Kconfig ./Src/Platforms/Kconfig
+	@-cp src/platform/$(PLATFORM)/defconfig ./.config
+	@-cp src/platform/$(PLATFORM)/Kconfig ./src/platform/Kconfig
 	@-cp $(CONFIG_OUT_FILE_PLATFORM) $(CONFIG_OUT_FILE)
-	@echo update Kconfig from platform $(ARCH)-$(MACH) .
+	@echo update Kconfig from platform $(ARCH)-$(PLATFORM) .
 
 saveconfig:
-	@-cp ./.config Src/Platforms/$(ARCH)/$(MACH)/defconfig
-	@-cp ./Src/Platforms/Kconfig ./Src/Platforms/$(ARCH)/$(MACH)/Kconfig 
+	@-cp ./.config src/platform/$(PLATFORM)/defconfig
+	@-cp ./src/platform/Kconfig ./src/platform/$(PLATFORM)/Kconfig 
 	@-cp $(CONFIG_OUT_FILE) $(CONFIG_OUT_FILE_PLATFORM)
-	@echo save Kconfig to platform $(ARCH)-$(MACH) .
+	@echo save Kconfig to platform $(ARCH)-$(PLATFORM) .

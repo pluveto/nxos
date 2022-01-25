@@ -8,6 +8,6 @@ config NXOS_ROOT_DIR
 config NXOS_SRC_DIR
     string
     option env="NXOS_SRC_DIR"
-    default "./Src"
+    default "./src"
 
 source "$NXOS_SRC_DIR/Kconfig"

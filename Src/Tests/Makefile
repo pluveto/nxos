@@ -1,2 +1,0 @@
-SRC	+= UTests/
-SRC	+= Integrations/

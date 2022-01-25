@@ -19,7 +19,7 @@
                 "engineLogging": false
             },
             "MIMode": "gdb",
-            "miDebuggerPath": "${workspaceFolder}/Tools/gcc/x86_64-elf-gcc/bin/x86_64-elf-gdb.exe",
+            "miDebuggerPath": "${workspaceFolder}/tools/gcc/x86_64-elf-gcc/bin/x86_64-elf-gdb.exe",
         },
         {
             "name": "NXOS-debug-riscv64-Qemu",
@@ -36,7 +36,7 @@
                 "engineLogging": false
             },
             "MIMode": "gdb",
-            "miDebuggerPath": "${workspaceFolder}/Tools/gcc/riscv-none-embed-gcc/bin/riscv-none-embed-gdb.exe",
+            "miDebuggerPath": "${workspaceFolder}/tools/gcc/riscv-none-embed-gcc/bin/riscv-none-embed-gdb.exe",
         },
     ]
 }
