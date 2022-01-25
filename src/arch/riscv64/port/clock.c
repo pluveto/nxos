@@ -38,7 +38,7 @@ NX_PUBLIC void HAL_ClockHandler(void)
     sbi_set_timer(GetTimerCounter() + TickDelta);
 }
 
-NX_INTERFACE void HAL_InitClock(void)
+NX_INTERFACE NX_Error HAL_InitClock(void)
 {
     /* Clear the Supervisor-Timer bit in SIE */
     ClearCSR(sie, SIE_STIE);
@@ -48,4 +48,5 @@ NX_INTERFACE void HAL_InitClock(void)
 
     /* Enable the Supervisor-Timer bit in SIE */
     SetCSR(sie, SIE_STIE);
+    return NX_EOK;
 }

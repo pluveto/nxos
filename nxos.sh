@@ -17,7 +17,7 @@
 # example: source nxos.sh riscv64-qemu_riscv64  # riscv64-qemu_riscv64
 
 # supported targe list
-supported_target="x86-i386 riscv64-qemu_riscv64"
+supported_target="x86-i386 riscv64-qemu_riscv64 riscv64-k210"
 
 def_target="unknown" 
 
@@ -47,6 +47,9 @@ case $def_target in
         export NXOS_EXEC_PATH=$NXOS_ROOT_DIR/tools/gcc/x86_64-elf-gcc/bin
         ;;
     "riscv64-qemu_riscv64")
+        export NXOS_EXEC_PATH=$NXOS_ROOT_DIR/tools/gcc/riscv64-unknown-elf-gcc/bin
+        ;;
+    "riscv64-k210")
         export NXOS_EXEC_PATH=$NXOS_ROOT_DIR/tools/gcc/riscv64-unknown-elf-gcc/bin
         ;;
     *)  echo "unknown target! " $def_target

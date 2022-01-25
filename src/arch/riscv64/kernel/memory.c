@@ -80,8 +80,9 @@ NX_PUBLIC void HAL_PageZoneInit(void)
     }
     
     /* calc normal base & size */
-    NX_USize normalSize = memSize - MEM_KERNEL_SZ;
-    normalSize /= 2;
+    NX_USize avaliableSize = memSize - MEM_KERNEL_SZ - MEM_SBI_SZ;
+    
+    NX_USize normalSize = avaliableSize / 2;
     if (normalSize > MEM_KERNEL_SPACE_SZ)
     {
         normalSize = MEM_KERNEL_SPACE_SZ;
@@ -89,10 +90,10 @@ NX_PUBLIC void HAL_PageZoneInit(void)
     
     /* calc user base & size */
     NX_Addr userBase = MEM_NORMAL_BASE + normalSize;
-    NX_USize userSize = memSize - normalSize;
+    NX_USize userSize = avaliableSize - normalSize;
 
     NX_LOG_I("Normal memory: %p~%p NX_USize:%d MB", MEM_NORMAL_BASE, MEM_NORMAL_BASE + normalSize, normalSize / NX_MB);
-    NX_LOG_I("User memory: %p~%p NX_USize:%d MB", userBase, userBase+ userSize, userSize / NX_MB);
+    NX_LOG_I("User memory: %p~%p NX_USize:%d MB", userBase, userBase + userSize, userSize / NX_MB);
 
     /* init page zone */
     NX_PageInitZone(NX_PAGE_ZONE_NORMAL, (void *)MEM_NORMAL_BASE, normalSize);

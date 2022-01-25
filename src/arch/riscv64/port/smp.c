@@ -56,6 +56,9 @@ NX_PRIVATE NX_UArch HAL_CoreGetIndex(void)
 
 NX_PRIVATE NX_Error HAL_CoreBootApp(NX_UArch bootCoreId)
 {
+#ifdef CONFIG_NX_PLATFROM_K210
+    return NX_ENORES;   /* not support smp on k210 */
+#else
     NX_LOG_I("boot core is:%d", bootCoreId);
     NX_UArch coreId;
     for (coreId = 0; coreId < NX_MULTI_CORES_NR; coreId++)
@@ -72,6 +75,7 @@ NX_PRIVATE NX_Error HAL_CoreBootApp(NX_UArch bootCoreId)
         NX_LOG_I("core#%d state:%d after wakeup", coreId, sbi_hsm_hart_status(coreId));
     }
     return NX_EOK;
+#endif
 }
 
 NX_PRIVATE NX_Error HAL_CoreEnterApp(NX_UArch appCoreId)

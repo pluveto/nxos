@@ -32,6 +32,8 @@ if "%def_target%" == "x86-i386" (
     set NXOS_EXEC_PATH=%NXOS_ROOT_DIR%\tools\gcc\x86_64-elf-gcc\bin
 ) else if "%def_target%" == "riscv64-qemu_riscv64" (
     set NXOS_EXEC_PATH=%NXOS_ROOT_DIR%\tools\gcc\riscv-none-embed-gcc\bin
+) else if "%def_target%" == "riscv64-k210" (
+    set NXOS_EXEC_PATH=%NXOS_ROOT_DIR%\tools\gcc\riscv-none-embed-gcc\bin
 ) else (
     echo unknown target! %def_target%
     goto end

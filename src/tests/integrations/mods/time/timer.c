@@ -40,7 +40,7 @@ NX_PRIVATE NX_Bool NX_TimerHandler2(NX_Timer *timer, void *arg)
 NX_INTEGRATION_TEST(NX_Timer)
 {
     timerCounter = 0;
-    NX_Timer *timer1 = NX_TimerCreate(10000, NX_TimerHandler1, "1", NX_TIMER_ONESHOT);
+    NX_Timer *timer1 = NX_TimerCreate(500, NX_TimerHandler1, "1", NX_TIMER_ONESHOT);
     if (timer1 == NX_NULL)
     {
         NX_LOG_E("create timer 1 failed!");
