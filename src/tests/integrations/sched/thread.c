@@ -116,14 +116,29 @@ NX_INTEGRATION_TEST(TestThread)
     /* thread */
     threadTick = 0;
     NX_Thread *thread = NX_ThreadCreate("test thread 1", TestThread1, (void *) 0x1234abcd);
+    /* make sure has enough memory */
+    if (thread == NX_NULL)
+    {
+        return NX_ENOMEM;
+    }
     NX_ASSERT(thread != NX_NULL);
     NX_ASSERT(NX_ThreadRun(thread) == NX_EOK);
 
     thread = NX_ThreadCreate("test thread 2", TestThread2, (void *) 0x1234abcd);
+    /* make sure has enough memory */
+    if (thread == NX_NULL)
+    {
+        return NX_ENOMEM;
+    }
     NX_ASSERT(thread != NX_NULL);
     NX_ASSERT(NX_ThreadRun(thread) == NX_EOK);
 
     thread = NX_ThreadCreate("test thread 3", TestThread3, (void *) 0x1234abcd);
+    /* make sure has enough memory */
+    if (thread == NX_NULL)
+    {
+        return NX_ENOMEM;
+    }
     NX_ASSERT(thread != NX_NULL);
     NX_ASSERT(NX_ThreadRun(thread) == NX_EOK);
 

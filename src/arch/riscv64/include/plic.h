@@ -23,12 +23,38 @@
 /* interrupt pending */
 #define PLIC_PENDING            (PLIC_ADDR + 0x1000)
 
+#if CONFIG_NX_PLATFROM_K210
+
+/* interrupt enable for each hart */
+#define __PLIC_ENABLE(hart)      (PLIC_ADDR + 0x2000 + (hart) * 0x80)
+/* priority threshold for each hart */
+#define __PLIC_THRESHOLD(hart)   (PLIC_ADDR + 0x200000 + (hart) * 0x1000)
+/* claim for each hart */
+#define __PLIC_CLAIM(hart)       (PLIC_ADDR + 0x200004 + (hart) * 0x1000)
+
+#define PLIC_ENABLE(hart)       __PLIC_ENABLE(hart)
+#define PLIC_THRESHOLD(hart)    __PLIC_THRESHOLD(hart)
+#define PLIC_CLAIM(hart)        __PLIC_CLAIM(hart)
+
+#else
+/* machine interrupt enable for each hart */
+#define __PLIC_MENABLE(hart)      (PLIC_ADDR + 0x2000 + (hart) * 0x100)
 /* supervisor interrupt enable for each hart */
-#define PLIC_SENABLE(hart)      (PLIC_ADDR + 0x2080 + (hart) * 0x100)
+#define __PLIC_SENABLE(hart)      (PLIC_ADDR + 0x2080 + (hart) * 0x100)
+/* machine priority threshold for each hart */
+#define __PLIC_MTHRESHOLD(hart)   (PLIC_ADDR + 0x200000 + (hart) * 0x2000)
 /* supervisor priority threshold for each hart */
-#define PLIC_STHRESHOLD(hart)   (PLIC_ADDR + 0x201000 + (hart) * 0x2000)
+#define __PLIC_STHRESHOLD(hart)   (PLIC_ADDR + 0x201000 + (hart) * 0x2000)
+/* machine claim for each hart */
+#define __PLIC_MCLAIM(hart)       (PLIC_ADDR + 0x200004 + (hart) * 0x2000)
 /* supervisor claim for each hart */
-#define PLIC_SCLAIM(hart)       (PLIC_ADDR + 0x201004 + (hart) * 0x2000)
+#define __PLIC_SCLAIM(hart)       (PLIC_ADDR + 0x201004 + (hart) * 0x2000)
+
+#define PLIC_ENABLE(hart)       __PLIC_SENABLE(hart)
+#define PLIC_THRESHOLD(hart)    __PLIC_STHRESHOLD(hart)
+#define PLIC_CLAIM(hart)        __PLIC_SCLAIM(hart)
+
+#endif
 
 NX_PUBLIC NX_Error PLIC_EnableIRQ(NX_U32 hart, NX_IRQ_Number irqno);
 NX_PUBLIC NX_Error PLIC_DisableIRQ(NX_U32 hart, NX_IRQ_Number irqno);

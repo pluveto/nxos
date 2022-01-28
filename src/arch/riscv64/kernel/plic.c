@@ -12,6 +12,7 @@
 #include <xbook.h>
 #include <plic.h>
 #include <regs.h>
+#include <sbi.h>
 #include <io/irq.h>
 #include <utils/log.h>
 
@@ -39,7 +40,7 @@ NX_PUBLIC NX_Error PLIC_EnableIRQ(NX_U32 hart, NX_IRQ_Number irqno)
     
     /* enable irq */
     NX_U32 *enableReg;
-    enableReg = (NX_U32 *)PLIC_SENABLE(hart);
+    enableReg = (NX_U32 *)PLIC_ENABLE(hart);
     enableReg += irqno / 32;
     NX_U8 off = irqno % 32;
     Write32(enableReg, Read32(enableReg) | (1 << off));
@@ -58,7 +59,7 @@ NX_PUBLIC NX_Error PLIC_DisableIRQ(NX_U32 hart, NX_IRQ_Number irqno)
     
     /* disable irq */
     NX_U32 *enableReg;
-    enableReg = (NX_U32 *)PLIC_SENABLE(hart);
+    enableReg = (NX_U32 *)PLIC_ENABLE(hart);
     enableReg += irqno / 32;
     NX_U8 off = irqno % 32;
     Write32(enableReg, Read32(enableReg) & ~(1 << off)); 
@@ -77,8 +78,7 @@ NX_PUBLIC NX_IRQ_Number PLIC_Claim(NX_U32 hart)
     {
         return 0;
     }
-
-    NX_IRQ_Number irq = *(NX_U32 *)PLIC_SCLAIM(hart);
+    NX_IRQ_Number irq = *(NX_VOLATILE NX_U32 *)PLIC_CLAIM(hart);
     return irq;
 }
 
@@ -92,8 +92,13 @@ NX_PUBLIC NX_Error PLIC_Complete(NX_U32 hart, int irqno)
         return NX_EINVAL;
     }
     
-    *(NX_U32 *)PLIC_SCLAIM(hart) = irqno;
-    
+    *(NX_U32 *)PLIC_CLAIM(hart) = irqno;
+
+#if CONFIG_NX_PLATFROM_K210
+    WriteCSR(sip, ReadCSR(sip) & ~SIP_SSIE); /* clear software pending bit */
+    sbi_set_mie();  /* enable machine interrupt after complete */
+#endif
+
     return NX_EOK;
 }
 
@@ -105,7 +110,7 @@ NX_PUBLIC void PLIC_Init(NX_Bool bootCore)
         for (hart = 0; hart < NX_MULTI_CORES_NR; hart++)
         {
             /* priority must be > threshold to trigger an interrupt */
-            Write32(PLIC_STHRESHOLD(hart), 0);
+            Write32(PLIC_THRESHOLD(hart), 0);
             
             /* set all interrupt priority */
             int irqno;

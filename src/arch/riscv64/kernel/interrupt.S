@@ -57,6 +57,7 @@ TrapEntry3:
     j TrapEntry
 
 TrapEntry:
+
     /* save context to cpu stack */
     SAVE_CONTEXT
 

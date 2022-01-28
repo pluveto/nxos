@@ -172,7 +172,6 @@ NX_PUBLIC void CPU_InitTrap(NX_UArch coreId)
 
 NX_PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
 {
-    // NX_LOG_D("trap dispatcher");
     NX_U64 cause = ReadCSR(scause);
     NX_U64 stval = ReadCSR(stval);
 
@@ -180,9 +179,19 @@ NX_PUBLIC void TrapDispatch(HAL_TrapFrame *frame)
     NX_UArch id = cause & ((1UL << (RISCV_XLEN - 2)) - 1);
 
     /* supervisor external interrupt */
+#ifdef CONFIG_NX_PLATFROM_K210
+    /* 
+     * on k210, supervisor software interrupt is used 
+	 * in alternative to supervisor external interrupt, 
+	 * which is not available on k210. 
+	 */
+    if ((SCAUSE_INTERRUPT | SCAUSE_S_SOFTWARE_INTR) == cause && 
+        SCAUSE_S_EXTERNAL_INTR == stval)
+#else
     if ((SCAUSE_INTERRUPT & cause) && 
         SCAUSE_S_EXTERNAL_INTR == (cause & 0xff))
-    {
+#endif
+    {    
         NX_IRQ_Number irqno = PLIC_Claim(NX_SMP_GetBootCore());
         if (irqno != 0)
         {
@@ -235,7 +244,6 @@ NX_PUBLIC NX_U8 *TrapSwitchStack(HAL_TrapFrame *frame)
     NX_U8 *sp;
     if ((sstatus & SSTATUS_SPP)) /* trap from supervisor */
     {
-        //LOG_D("from supervisor:%p, sstatus:%p", frame, sstatus);
         sp = (NX_U8 *)ReadCSR(sscratch); /* read from sscratch, it saved old sp in kernel */
     }
     else    /* trap from user */

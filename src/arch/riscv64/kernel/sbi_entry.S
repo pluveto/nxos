@@ -16,6 +16,7 @@
     .globl CPU_StackTop1
     .globl CPU_StackTop2
     .globl CPU_StackTop3
+
     .global _Start
 _Start:
     li t0, 0
@@ -26,6 +27,7 @@ _Start:
     beq a0, t0, _SetSP2
     li t0, 3
     beq a0, t0, _SetSP3
+
     j _EnterMain
     
 _SetSP0:
@@ -59,12 +61,15 @@ loop:
 CPU_Stack0:
     .space 8192
 CPU_StackTop0:
+
 CPU_Stack1:
     .space 8192
 CPU_StackTop1:
+
 CoreStack2:
     .space 8192
 CPU_StackTop2:
+
 CoreStack3:
     .space 8192
 CPU_StackTop3:

@@ -46,6 +46,10 @@
 #define SIE_STIE    (1 << IRQ_S_TIMER)
 #define SIE_SEIE    (1 << IRQ_S_EXT)
 
+#define SIP_SSIE    (1 << IRQ_S_SOFT)
+#define SIP_STIE    (1 << IRQ_S_TIMER)
+#define SIP_SEIE    (1 << IRQ_S_EXT)
+
 #ifndef __ASSEMBLY__
 /* csr registers read/write */
 #define ReadCSR(reg) ({ NX_U64 __tmp; \

@@ -37,6 +37,9 @@
  */
 
 #include <sbi.h>
+
+#ifndef CONFIG_NX_PLATFROM_K210
+
 #include <utils/log.h>
 #include <xbook/debug.h>
 
@@ -264,3 +267,4 @@ sbi_init(void)
     if (sbi_probe_extension(SBI_EXT_ID_RFNC) != 0)
         has_rfnc_extension = NX_True;
 }
+#endif /* CONFIG_NX_PLATFROM_K210 */
